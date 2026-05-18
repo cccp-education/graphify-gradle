@@ -28,7 +28,7 @@ class ScanWorkspaceIntegrationTest {
     @BeforeEach
     fun setUp() {
         val project = ProjectBuilder.builder().build()
-        task = project.tasks.register("scanWorkspace", ScanWorkspaceTask::class.java).get()
+        task = project.tasks.register("collectFromWorkspace", ScanWorkspaceTask::class.java).get()
         outputFile = tempDir.resolve("graph.json").toFile()
         task.rootDir = tempDir.toFile()
         task.outputFile = outputFile
@@ -345,7 +345,7 @@ class ScanWorkspaceIntegrationTest {
 
             outputFile.delete()
             val secondProject = ProjectBuilder.builder().build()
-            val secondTask = secondProject.tasks.register("scanWorkspace", ScanWorkspaceTask::class.java).get()
+            val secondTask = secondProject.tasks.register("collectFromWorkspace", ScanWorkspaceTask::class.java).get()
             secondTask.rootDir = tempDir.toFile()
             secondTask.outputFile = outputFile
             secondTask.scan()

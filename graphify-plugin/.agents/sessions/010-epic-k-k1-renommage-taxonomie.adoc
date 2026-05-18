@@ -1,0 +1,29 @@
+= Session 010 — EPIC K K-1 Renommage Taxonomie
+:author: cheroliv + opencode
+:date: 2026-05-19
+:status: TERMINE
+
+== Résumé
+Renommage des tâches graphify selon la taxonomie unifiée (4 verbes : GENERER/COLLECTER/TRANSFORMER/DÉPLOYER) :
+- `scanWorkspace` → `collectFromWorkspace`
+- `scanAndVerify` → `collectAndVerify`
+- `verifyDagAcyclic` → inchangé (conforme à la taxonomie)
+
+== Groupes
+- **collect** : collectFromWorkspace, collectAndVerify
+- **verify** : verifyDagAcyclic
+
+== Build
+- 58/58 PASS ✅
+- Compilation OK
+- publishToMavenLocal OK
+
+== Fichiers modifiés (5)
+1. `GraphifyPlugin.kt` — renommage des task registrations
+2. `GraphifyExtension.kt` — mise à jour DSL
+3. `ScanWorkspaceTask.kt` — rename classe et usages
+4. `VerifyDagAcyclicTask.kt` — inchangé
+5. `INDEX.adoc` — mise à jour documentation
+
+== Prochaine session
+011 — (à définir)

@@ -27,7 +27,7 @@ class ScanWorkspaceTaskTest {
     @BeforeEach
     fun setUp() {
         val project = ProjectBuilder.builder().build()
-        task = project.tasks.register("scanWorkspace", ScanWorkspaceTask::class.java).get()
+        task = project.tasks.register("collectFromWorkspace", ScanWorkspaceTask::class.java).get()
         outputFile = tempDir.resolve("graph.json").toFile()
         task.rootDir = tempDir.toFile()
         task.outputFile = outputFile

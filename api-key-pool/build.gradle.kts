@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.cheroliv"
+group = "education.cccp"
 version = libs.versions.api.key.pool.get()
 kotlin.jvmToolchain(JavaVersion.VERSION_24.ordinal)
 
@@ -54,9 +54,9 @@ publishing {
                 }
                 developers {
                     developer {
-                        id.set("cheroliv")
-                        name.set("cheroliv")
-                        email.set("cheroliv.developer@gmail.com")
+                        id.set("cccp-education")
+                        name.set("CCCP Education")
+                        email.set("cccp.education@gmail.com")
                     }
                 }
                 scm {

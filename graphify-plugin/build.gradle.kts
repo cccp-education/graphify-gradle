@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.publish)
 }
 
-group = "com.cheroliv"
+group = "education.cccp"
 version = libs.plugins.graphify.get().version
 kotlin.jvmToolchain(23)
 
@@ -42,7 +42,7 @@ tasks.withType<Test> {
 gradlePlugin {
     plugins {
         create("graphify") {
-            id = "com.cheroliv.graphify"
+            id = "education.cccp.graphify"
             implementationClass = "com.cheroliv.graphify.GraphifyPlugin"
             displayName = "Graphify Plugin"
             description = "Gradle plugin for knowledge graph extraction across a workspace."
@@ -74,9 +74,9 @@ publishing {
                     }
                     developers {
                         developer {
-                            id.set("cheroliv")
-                            name.set("cheroliv")
-                            email.set("cheroliv.developer@gmail.com")
+                            id.set("cccp-education")
+                            name.set("CCCP Education")
+                            email.set("cccp.education@gmail.com")
                         }
                     }
                     scm {

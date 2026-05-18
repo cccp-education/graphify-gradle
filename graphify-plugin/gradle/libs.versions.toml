@@ -6,7 +6,7 @@ jackson = "2.18.3"
 junit = "5.10.1"
 
 [plugins]
-graphify = { id = "com.cheroliv.graphify", version.ref = "graphify" }
+graphify = { id = "education.cccp.graphify", version.ref = "graphify" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publish = { id = "com.gradle.plugin-publish", version.ref = "plugin-publish" }
 

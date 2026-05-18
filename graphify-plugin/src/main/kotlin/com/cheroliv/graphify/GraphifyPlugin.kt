@@ -8,7 +8,8 @@ class GraphifyPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("graphify", GraphifyExtension::class.java)
 
-        val scanWorkspace = project.tasks.register("scanWorkspace", ScanWorkspaceTask::class.java) { task ->
+        val collectFromWorkspace = project.tasks.register("collectFromWorkspace", ScanWorkspaceTask::class.java) { task ->
+            task.group = "collect"
             task.rootDir = extension.rootDir.get()
             task.outputFile = extension.outputFile.get()
             task.excludePatterns = extension.excludePatterns.get()
@@ -16,14 +17,15 @@ class GraphifyPlugin : Plugin<Project> {
         }
 
         project.tasks.register("verifyDagAcyclic", VerifyDagAcyclicTask::class.java) { task ->
+            task.group = "verify"
             task.dagLevels = extension.dagLevels.get()
             task.foundryDir = extension.foundryDir.get()
         }
 
-        project.tasks.register("scanAndVerify") { task ->
-            task.group = "graphify"
-            task.description = "Chain scanWorkspace + verifyDagAcyclic for integrated validation"
-            task.dependsOn(scanWorkspace)
+        project.tasks.register("collectAndVerify") { task ->
+            task.group = "collect"
+            task.description = "Chain collectFromWorkspace + verifyDagAcyclic for integrated validation"
+            task.dependsOn(collectFromWorkspace)
             task.finalizedBy("verifyDagAcyclic")
         }
     }
