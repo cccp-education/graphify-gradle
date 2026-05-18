@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 009 | 2026-05-18 | migration | CCCP — propagation rename api-key-pool (commit parent) | 10/10
 | EPIC A | 2026-05-12 | feat | GF-2 Tests intégration + GF-3 verifyDagAcyclic + scanAndVerify (58/58 PASS, CI intégrée). VerifyDagAcyclicTask migrée d'engine → graphify-plugin, levelOf résolution suffixes (-gradle/-plugin, underscore/dash), scanAndVerify chaîné, engine/bakery/consumer configurés. CI: build + publishToMavenLocal + scanAndVerify. | 10/10
 | 007 | 2026-05-12 | feat | GF-6 verifyDagAcyclic — Detection violations DAG + 14 tests (delivre par EPIC B engine). VerifyDagAcyclicTask.kt 103 lignes, levelOf resolution flexible (suffixes -gradle/-plugin, underscore/dash normalization). Total : 57/57 PASS (44 existing + 14 new). | 10/10
 | 006 | 2026-05-12 | feat | GF-3 Integration engine N3 - graph.json consume par N3 | 10/10

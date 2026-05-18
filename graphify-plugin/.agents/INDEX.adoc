@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session en cours_ : 008 — GF-4 Publication Gradle Plugin Portal
-_Session précédente_ : EPIC A — GF-2 Tests intégration + GF-3 verifyDagAcyclic + scanAndVerify (TERMINÉ, 58/58 PASS)
+_Session terminee_ : 009 — Migration CCCP — propagation api-key-pool rename
+_Session en cours_ : 010 — (a definir)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -88,6 +88,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 009 | 2026-05-18 | migration | CCCP — propagation rename api-key-pool (commit parent) | 10/10
 | EPIC A | 2026-05-12 | feat | GF-2 Tests intégration + GF-3 verifyDagAcyclic + scanAndVerify (58/58 PASS, CI intégrée) | 10/10
 | 006 | 2026-05-12 | feat | GF-3 — Intégration engine N3 (consommation graph.json) | 10/10
 | 005 | 2026-05-11 | feat | GF-2 — Tests intégration (scan workspace réel, 44/44 PASS, 26 communautés) | 10/10

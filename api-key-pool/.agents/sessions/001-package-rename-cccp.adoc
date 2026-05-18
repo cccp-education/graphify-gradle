@@ -1,0 +1,17 @@
+= Session 001 — Package Rename CCCP Migration
+:author: cheroliv + opencode
+:date: 2026-05-18
+:status: TERMINE
+
+== Contexte
+Migration partielle du namespace CCCP — deplacement de `models.kt` du package
+`com.cheroliv.graphify.apikey` vers `graphify.apikey`.
+
+== Actions
+* Rename `api-key-pool/src/main/kotlin/com/cheroliv/graphify/apikey/models.kt` → `graphify/apikey/models.kt`
+* Fix imports `com.cheroligraphify.apikey` (point manquant) → `graphify.apikey` dans 4 fichiers
+* Fix imports dans 5 fichiers de test (ApiKeyModelsTest, QuotaAuditLoggerTest, QuotaResetManagerTest, QuotaTrackerTest, ApiKeyPoolTest)
+
+== Résultat
+✅ Commit f9371f0 — rename + fix imports, push OK
+✅ Compilation OK

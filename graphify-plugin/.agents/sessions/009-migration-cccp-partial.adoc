@@ -1,0 +1,14 @@
+= Session 009 — Migration CCCP (propagation api-key-pool rename)
+:author: cheroliv + opencode
+:date: 2026-05-18
+:status: TERMINE
+
+== Contexte
+Propagation indirecte du rename de package dans `api-key-pool` (`com.cheroliv.graphify.apikey` → `graphify.apikey`).
+Pas de modification directe du plugin graphify, mais commit au niveau du repo parent.
+
+== Actions
+* Aucune modification directe — le graphify-plugin n'a pas ete touche
+
+== Résultat
+✅ Compilation OK (herite de api-key-pool fixes)
