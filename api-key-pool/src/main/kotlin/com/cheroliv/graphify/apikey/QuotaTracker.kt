@@ -1,5 +1,7 @@
 package com.cheroliv.graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+
 class QuotaTracker {
 
     private val usageCounts = mutableMapOf<String, Long>()

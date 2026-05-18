@@ -1,10 +1,18 @@
-package com.cheroliv.graphify.apikey
+package graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+import com.cheroliv.graphify.apikey.ApiKeyPool
+import graphify.apikey.AuditEventType
+import com.cheroliv.graphify.apikey.Provider
+import graphify.apikey.QuotaConfig
+import graphify.apikey.ResetPolicy
+import com.cheroliv.graphify.apikey.RotationStrategy
+import com.cheroliv.graphify.apikey.ServiceType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ApiKeyPoolTest {
 

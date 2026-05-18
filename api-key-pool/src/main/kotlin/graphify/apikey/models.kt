@@ -1,5 +1,8 @@
-package com.cheroliv.graphify.apikey
+package graphify.apikey
 
+import com.cheroliv.graphify.apikey.Provider
+import com.cheroliv.graphify.apikey.RotationStrategy
+import com.cheroliv.graphify.apikey.ServiceType
 import java.time.LocalDateTime
 
 data class ApiKeyEntry(

@@ -1,5 +1,9 @@
 package com.cheroliv.graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+import graphify.apikey.QuotaConfig
+import graphify.apikey.QuotaType
+import graphify.apikey.ResetPolicy
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

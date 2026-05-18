@@ -1,5 +1,8 @@
 package com.cheroliv.graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+import graphify.apikey.AuditEventType
+import graphify.apikey.AuditLogEntry
 import java.time.LocalDateTime
 
 class QuotaAuditLogger(

@@ -1,5 +1,7 @@
 package com.cheroliv.graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+import graphify.apikey.ResetPolicy
 import java.time.LocalDateTime
 
 class QuotaResetManager(

@@ -1,5 +1,8 @@
 package com.cheroliv.graphify.apikey
 
+import graphify.apikey.ApiKeyEntry
+import graphify.apikey.AuditLogEntry
+
 class ApiKeyPool(
     private val entries: List<ApiKeyEntry>,
     private val rotationStrategy: RotationStrategy = RotationStrategy.ROUND_ROBIN,
