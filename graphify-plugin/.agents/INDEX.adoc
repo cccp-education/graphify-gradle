@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 010 — EPIC K K-1 Renommage taxonomie (collectFromWorkspace, collectAndVerify)
-_Session en cours_ : 011 — (a definir)
+_Session terminee_ : 011 — Extraction definitive api-key-pool + Architecture Racine Consommateur
+_Session en cours_ : 012 — (a definir)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -28,28 +28,27 @@ graphify-gradle/                     # CONSUMER (dogfooding) + repo git
 ├── settings.gradle.kts              # NO include()
 ├── gradlew + gradle/                # Wrapper consumer
 ├── .gitignore
-├── graphify-plugin/                 # ⭐ RACINE DE TRAVAIL + BUILD INDÉPENDANT
-│   ├── AGENT.adoc                   # Directives agent
-│   ├── PROMPT_REPRISE.adoc          # Mission session en cours
-│   ├── opencode.json                # Config opencode
-│   ├── settings.gradle.kts          # rootProject.name = "graphify-plugin"
-│   ├── gradlew + gradle/            # Wrapper INDÉPENDANT
-│   ├── .agents/                     # GOUVERNANCE (dans le plugin)
-│   │   ├── INDEX.adoc               # Ce fichier
-│   │   ├── SESSIONS_HISTORY.adoc    # Historique consolidé
-│   │   ├── SESSION_CHECKLIST.adoc   # Checklist ouverture/fermeture
-│   │   ├── TEST_COVERAGE_ANALYSIS.adoc
-│   │   ├── sessions/                # Archives par session
-│   │   ├── archives/                # Archives mensuelles
-│   │   └── encyclopedies/           # Connaissance froide
-│   └── src/
-│       ├── main/kotlin/com/cheroliv/graphify/
-│       └── test/                    # 58 tests (24 ScanWorkspaceTask + 14 intégration + 11 VerifyDagAcyclic + 3 ScanAndVerify + 6 GraphModel)
-└── api-key-pool/                    # BUILD INDÉPENDANT (sibling)
-    ├── settings.gradle.kts          # rootProject.name = "api-key-pool"
+└── graphify-plugin/                 # ⭐ RACINE DE TRAVAIL + BUILD INDÉPENDANT
+    ├── AGENT.adoc                   # Directives agent
+    ├── PROMPT_REPRISE.adoc          # Mission session en cours
+    ├── opencode.json                # Config opencode
+    ├── settings.gradle.kts          # rootProject.name = "graphify-plugin"
     ├── gradlew + gradle/            # Wrapper INDÉPENDANT
-    └── src/                         # 66 tests, publishable
+    ├── .agents/                     # GOUVERNANCE (dans le plugin)
+    │   ├── INDEX.adoc               # Ce fichier
+    │   ├── SESSIONS_HISTORY.adoc    # Historique consolidé
+    │   ├── SESSION_CHECKLIST.adoc   # Checklist ouverture/fermeture
+    │   ├── TEST_COVERAGE_ANALYSIS.adoc
+    │   ├── sessions/                # Archives par session
+    │   ├── archives/                # Archives mensuelles
+    │   └── encyclopedies/           # Connaissance froide
+    └── src/
+        ├── main/kotlin/com/cheroliv/graphify/
+        └── test/                    # 58 tests (24 scan + 14 verifyDagAcyclic + 3 ScanAndVerify + 11 integration + 6 GraphModel)
 ----
+
+*Note* : `api-key-pool` a migré vers `foundry/public/api-key-pool-gradle/` — librairie N0 standalone
+avec architecture Racine Consommateur + Plugin Indépendant (article 0124).
 
 '''
 == Plugin — Composants Existants
@@ -111,7 +110,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | bakery-gradle | `foundry/public/bakery-gradle/bakery-plugin/` | N2 | 21+
 | codebase-gradle | `foundry/public/codebase-gradle/` | N1 | 12+
 | graphify-plugin | `foundry/public/graphify-gradle/graphify-plugin/` | N0 | 8+
-| api-key-pool | `../api-key-pool/` | N0 | 0+
+| api-key-pool | `foundry/public/api-key-pool-gradle/` | N0 | 0+
 | runner-gradle | `foundry/public/runner-gradle/` | N3 | 11+
 | readme-plugin | `foundry/public/readme-gradle/readme-plugin/` | N2 | 0+
 | mp3-organizer | `foundry/public/newpipe-gradle/mp3-organizer/` | hors DAG | 0+

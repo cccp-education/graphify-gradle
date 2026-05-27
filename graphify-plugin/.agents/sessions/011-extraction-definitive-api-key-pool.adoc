@@ -1,0 +1,32 @@
+= Session 011 — Extraction definitive api-key-pool + Architecture Racine Consommateur
+:session: 011
+:date: 2026-05-27
+:status: TERMINE
+
+== Contexte
+
+api-key-pool etait niche dans graphify-gradle/ comme sous-projet sibling sans dependance reelle.
+La gouvernance workspace a decide : extraction en projet standalone avec architecture
+Racine Consommateur + Plugin Independant (pattern article 0124).
+
+== Actions
+
+1. ✅ Deplacement `graphify-gradle/api-key-pool/` → `foundry/public/api-key-pool-gradle/`
+2. ✅ Transformation architecture Racine + Plugin (article 0124)
+3. ✅ Creation `api-key-pool-gradle/api-key-pool-plugin/` (build independant)
+4. ✅ Creation racine consommateur dogfood minimale
+5. ✅ Renommage `api-key-pool-gradle/` (convention foundry)
+6. ✅ MAJ AGENT.adoc, .agents/INDEX.adoc, build.gradle.kts (SCM URLs)
+7. ✅ git init dans le nouveau projet
+8. ✅ MAJ graphify-plugin/.agents/INDEX.adoc (portefeuille + note extraction)
+
+== Fichiers dans graphify-gradle
+
+- `graphify-plugin/.agents/INDEX.adoc` : arborescence + portefeuille mis a jour
+- Tous les fichiers `api-key-pool/` supprimes (deplaces vers projet standalone)
+
+== Justification
+
+api-key-pool est une librairie N0 zero-dependance. Sa presence dans graphify-gradle
+etait un artefact historique (extraction initiale depuis plantuml-gradle).
+Le pattern foundry standard est : un projet = une responsabilite.
