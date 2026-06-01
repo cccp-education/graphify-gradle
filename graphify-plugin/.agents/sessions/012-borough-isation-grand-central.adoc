@@ -1,0 +1,31 @@
+= Session 012 — Borough-isation Grand Central 🟡
+:date: 2026-06-02
+:type: governance
+:score: 10/10
+:project: graphify-gradle (Grand Central 🟡)
+:dashboard_number: 24
+
+== Contexte
+
+Borough-isation de graphify-gradle dans le portefeuille workspace. Le projet `foundry/public/graphify-gradle/` reçoit le borough Grand Central 🟡 et devient le 24ème borough gouverné.
+
+Cette session est purement gouvernance — aucun code source modifié.
+
+== Opérations réalisées
+
+. Création du rapport de session `012-borough-isation-grand-central.adoc`
+. Mise à jour `SESSIONS_HISTORY.adoc` — ajout session 012
+. Mise à jour `INDEX.adoc` — session en cours passe à 013
+
+== Artefacts modifiés
+
+|===
+| Fichier | Action
+| `.agents/sessions/012-borough-isation-grand-central.adoc` | Créé
+| `.agents/SESSIONS_HISTORY.adoc` | Mise à jour
+| `.agents/INDEX.adoc` | Mise à jour (session en cours → 013)
+|===
+
+== Résultat
+
+graphify-gradle est désormais Grand Central 🟡, 24ème borough du workspace, N0 (extraction graphe de connaissance).

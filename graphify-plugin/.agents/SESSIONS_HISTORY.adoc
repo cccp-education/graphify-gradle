@@ -2,6 +2,8 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 012 | 2026-06-02 | governance | Borough-isation — graphify-gradle devient Grand Central 🟡, 24ème borough | 10/10
+| 011 | 2026-05-19 | feat | Extraction définitive api-key-pool + Architecture Racine Consommateur | 10/10
 | 010 | 2026-05-19 | refactor | EPIC K K-1 Renommage taxonomie (scanWorkspace→collectFromWorkspace, scanAndVerify→collectAndVerify, verifyDagAcyclic inchangé). 58/58 PASS. 5 fichiers modifiés. | 10/10
 | 009 | 2026-05-18 | migration | CCCP — propagation rename api-key-pool (commit parent) | 10/10
 | EPIC A | 2026-05-12 | feat | GF-2 Tests intégration + GF-3 verifyDagAcyclic + scanAndVerify (58/58 PASS, CI intégrée). VerifyDagAcyclicTask migrée d'engine → graphify-plugin, levelOf résolution suffixes (-gradle/-plugin, underscore/dash), scanAndVerify chaîné, engine/bakery/consumer configurés. CI: build + publishToMavenLocal + scanAndVerify. | 10/10
