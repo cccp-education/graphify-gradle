@@ -1,6 +1,17 @@
 = Test Coverage Analysis — Graphify Gradle
 
 _Statut_ : EPIC A TERMINÉ (GF-2 + GF-3, 58/58 PASS)
+_Dernière mise à jour_ : Session 013 (2026-06-11)
+
+== Session 013 — Fix @Input validatePlugins
+
+- `VerifyDagAcyclicTask.kt` : foundryDir: File → String (@Input compatible)
+- `GraphifyPlugin.kt` : .absolutePath conversion
+- `VerifyDagAcyclicTaskTest.kt` : .absolutePath + 14/14 PASS
+- `ScanAndVerifyIntegrationTest.kt` : .absolutePath + 3/3 PASS
+- 58/58 total PASS, 0 régression
+
+== Couverture actuelle
 
 == Couverture actuelle
 
@@ -34,6 +45,10 @@ Temps:        4m 51s
 Taille:       98 MB
 ----
 
+== Session 015 — Couverture inchangée
+
+Pas de modification de code source. 58/58 PASS inchangé.
+
 == Prochaine étape
 
-Session 008 — GF-4 : Publication Gradle Plugin Portal.
+Session 016 — GF-4 : Publication Gradle Plugin Portal.

@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 012 — Borough-isation Grand Central 🟡
-_Session en cours_ : 014 — (a definir)
+_Session terminee_ : 015 — Publication Maven Central (retry 0.0.1 rejeté)
+_Session en cours_ : 016 — (a definir)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -88,6 +88,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant existant), 0.0.2 conservé. Aucun changement fonctionnel. | 5/10
 | 013 | 2026-06-11 | ops/bugfix | Publication Maven Central 0.0.2 + fix @Input validatePlugins (foundryDir File→String). Nmcp + mavenCentral(). 58/58 PASS. plugin-publish conservé. | 7/10
 | 012 | 2026-06-02 | governance | Borough-isation — graphify-gradle devient Grand Central 🟡, 24ème borough | 10/10
 | 011 | 2026-05-19 | feat | Extraction definitive api-key-pool + Architecture Racine Consommateur | 10/10

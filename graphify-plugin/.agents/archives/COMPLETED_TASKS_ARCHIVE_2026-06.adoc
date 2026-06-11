@@ -1,0 +1,6 @@
+= Completed Tasks Archive — Juin 2026
+
+|===
+| Date | Session | EPIC/US | Description
+| 2026-06-11 | 015 | GF-6 | Tentative publication Maven Central 0.0.1 — rejeté (composant déjà existant pour 0.0.2), version 0.0.2 conservée. Pas de changement fonctionnel.
+|===

@@ -1,0 +1,23 @@
+= Session 015 — Publication Maven Central (retry 0.0.1)
+:session: 015
+:date: 2026-06-11
+:type: ops
+
+== Objectif
+
+Tentative de downgrade de version 0.0.2 → 0.0.1 pour publication Maven Central.
+
+== Résultat
+
+- Tentative de publication 0.0.1 rejetée par Central (composant déjà existant pour 0.0.2)
+- Version restaurée à 0.0.2
+- Pas de changement fonctionnel
+- Aucune modification de code source
+
+== Contexte global
+
+Voir session workspace 084 pour le contexte global de la VAGUE 2.
+
+== Score
+
+5/10 — tentative infructueuse, version conservée
