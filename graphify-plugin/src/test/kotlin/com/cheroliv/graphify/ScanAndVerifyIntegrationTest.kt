@@ -56,7 +56,7 @@ class ScanAndVerifyIntegrationTest {
 
             val vt = project.tasks.register("vd", VerifyDagAcyclicTask::class.java).get()
             vt.dagLevels = dagLevels
-            vt.foundryDir = fd.toFile()
+            vt.foundryDir = fd.toFile().absolutePath
             assertThatCode { vt.verify() }.doesNotThrowAnyException()
         }
 
@@ -81,7 +81,7 @@ class ScanAndVerifyIntegrationTest {
 
             val vt = project.tasks.register("vd2", VerifyDagAcyclicTask::class.java).get()
             vt.dagLevels = dagLevels
-            vt.foundryDir = fd.toFile()
+            vt.foundryDir = fd.toFile().absolutePath
             assertThatThrownBy { vt.verify() }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessageContaining("DAG violations")
@@ -127,7 +127,7 @@ class ScanAndVerifyIntegrationTest {
 
             val vt = project.tasks.register("vd3", VerifyDagAcyclicTask::class.java).get()
             vt.dagLevels = dagLevels
-            vt.foundryDir = fd.toFile()
+            vt.foundryDir = fd.toFile().absolutePath
             assertThatCode { vt.verify() }.doesNotThrowAnyException()
         }
     }

@@ -14,11 +14,12 @@ open class VerifyDagAcyclicTask : DefaultTask() {
     lateinit var dagLevels: Map<String, Int>
 
     @get:Input
-    lateinit var foundryDir: File
+    lateinit var foundryDir: String
 
     @TaskAction
     fun verify() {
-        val projectDirs = foundryDir.listFiles { f: File -> f.isDirectory } ?: emptyArray()
+        val foundry = File(foundryDir)
+        val projectDirs = foundry.listFiles { f: File -> f.isDirectory } ?: emptyArray()
         val violations = mutableListOf<String>()
 
         for (projectDir in projectDirs) {

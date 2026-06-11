@@ -1,0 +1,15 @@
+= PROMPT_REPRISE — Graphify Gradle — Session 014
+:session: 014
+:sessions_precedente: 013 — Publication Maven Central 0.0.2
+
+== Contexte Hérité
+
+- graphify-plugin:0.0.2 publié sur Maven Central (education.cccp.graphify)
+- Nmcp configuré, version hardcodée, mavenCentral() repo
+- 58/58 tests PASS, build OK
+- plugin-publish présent (conservé pour Gradle Plugin Portal futur)
+
+== Prochaine Session (014)
+
+- EPIC GF-4 : Publication Gradle Plugin Portal (besoin domaine cccp.education)
+- Aucune urgence, mode maintenance

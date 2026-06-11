@@ -1,0 +1,25 @@
+= Session 013 — Publication Maven Central 0.0.2 + fix @Input validatePlugins
+:sessions: 013
+:date: 2026-06-11
+:type: ops/bugfix
+:score: 7/10
+
+== Summary
+Publication graphify-plugin sur Maven Central via nmcp :
+- Version 0.0.1 hardcodée dans build.gradle.kts (ex-catalogue 0.0.2)
+- Ajout nmcp settings plugin 1.5.0 + creds depuis ~/.gradle/gradle.properties
+- POM propagé à toutes les publications (withType<MavenPublication>) — fix marker validation
+- Repo mavenCentral() (plus l'ancien staging Sonatype)
+- 0.0.1 publié → validatePlugins FAIL (fix @Input sur File dans VerifyDagAcyclicTask)
+- Fix foundryDir: File → String + 3 callers (GraphifyPlugin, 2 tests)
+- 0.0.1 déjà validé par Central → bump obligatoire 0.0.2
+- 0.0.2 publié avec succès
+- 58/58 tests PASS
+- plugin-publish restauré (jamais demandé de retrait)
+
+== Issues
+- Bump 0.0.1 → 0.0.2 non souhaité, imposé par Central immutable
+- Temps perdu à debugger nmcp (publishAllPublicationsToCentralPortal vs publishAggregationToCentralPortal)
+
+== Score
+7/10 — publication OK mais bump non souhaité, debug nmcp

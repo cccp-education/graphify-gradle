@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 013 | 2026-06-11 | ops/bugfix | Publication Maven Central 0.0.2 + fix @Input validatePlugins. Nmcp + version hardcodée + mavenCentral(). 58/58 PASS. | 7/10
 | 012 | 2026-06-02 | governance | Borough-isation — graphify-gradle devient Grand Central 🟡, 24ème borough | 10/10
 | 011 | 2026-05-19 | feat | Extraction définitive api-key-pool + Architecture Racine Consommateur | 10/10
 | 010 | 2026-05-19 | refactor | EPIC K K-1 Renommage taxonomie (scanWorkspace→collectFromWorkspace, scanAndVerify→collectAndVerify, verifyDagAcyclic inchangé). 58/58 PASS. 5 fichiers modifiés. | 10/10

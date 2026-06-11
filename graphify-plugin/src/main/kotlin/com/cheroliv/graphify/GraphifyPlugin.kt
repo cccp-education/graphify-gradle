@@ -19,7 +19,7 @@ class GraphifyPlugin : Plugin<Project> {
         project.tasks.register("verifyDagAcyclic", VerifyDagAcyclicTask::class.java) { task ->
             task.group = "verify"
             task.dagLevels = extension.dagLevels.get()
-            task.foundryDir = extension.foundryDir.get()
+            task.foundryDir = extension.foundryDir.get().absolutePath
         }
 
         project.tasks.register("collectAndVerify") { task ->
