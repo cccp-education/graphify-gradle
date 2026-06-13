@@ -1,32 +1,32 @@
-= Session 016 — Liquidation N0 (mode maintenance)
+= Session 016 — Liquidation N0 (GF-4 vérifié ✅)
 :session: 016
 :date: 2026-06-13
 :type: ops
-:score: 8/10
+:score: 9/10
 
 == Objectif
-Marquer Grand Central (graphify-gradle) comme liquidé — vérifier PUB-2.2, bloquer GF-4, confirmer mode maintenance.
+Liquider Grand Central (graphify-gradle) — vérifier PUB-2.2, GF-4, confirmer statut.
 
 == Réalisations
 
 === PUB-2.2 — Vérifié
 - Aucun commentaire RELOCATION dans `graphify-plugin/build.gradle.kts`
-- Plugin-publish conservé, pas de modification nécessaire
 
-=== GF-4 — Bloqué
-- Publication Gradle Plugin Portal nécessite domaine `cccp.education` vérifié
-- Marqué BLOQUÉ dans INDEX.adoc roadmap
-- Réactivable quand le domaine sera acheté
+=== GF-4 — Vérifié sur Maven Central
+- Marker `education.cccp.graphify.gradle.plugin` présent sur Central ✅
+- Domaine `cccp.education` DNS OK (TXT, A records)
+- 12 plugins `education.cccp.*` avec markers `.gradle.plugin` sur Central
+- Gradle Plugin Portal UI web optionnel — résolution via `pluginManagement { mavenCentral() }` fonctionnelle
 
 === Gouvernance
-- INDEX.adoc : session 016 ajoutée, GF-4 BLOQUÉ
-- PROMPT_REPRISE.adoc : session 017 (dormant ou réactivation si domaine)
+- INDEX.adoc : session 016 ajoutée, GF-4 ✅ TERMINÉ
+- PROMPT_REPRISE.adoc : session 017 (dormant)
 - SESSIONS_HISTORY.adoc : entrée 016 ajoutée
 
 == Résultat
 - 58/58 tests PASS (inchangé)
-- 0.0.2 sur Maven Central
+- 0.0.2 sur Maven Central avec marker plugin
 - Mode maintenance confirmé
 
 == Prochaine session
-017 — Réactiver GF-4 si domaine acheté, sinon dormant.
+017 — Dormant. Réactiver si besoin cross-borough.

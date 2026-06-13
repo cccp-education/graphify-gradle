@@ -1,14 +1,15 @@
 = PROMPT_REPRISE — Graphify Gradle — Session 017
 :session: 017
-:session_precedente: 016 — Liquidation N0 (mode maintenance)
+:session_precedente: 016 — Liquidation N0 (GF-4 vérifié ✅)
 
 == Session 016 terminée
 
-- PUB-2.2 vérifié : pas de commentaire RELOCATION dans build.gradle.kts, plugin-publish conservé
-- GF-4 bloqué par achat domaine cccp.education (Gradle Plugin Portal requiert un domaine vérifié)
+- PUB-2.2 vérifié : pas de commentaire RELOCATION dans build.gradle.kts
+- GF-4 vérifié : marker `education.cccp.graphify.gradle.plugin` sur Maven Central ✅
+- Domaine `cccp.education` DNS OK, 12 plugins avec markers sur Central
+- Gradle Plugin Portal UI web optionnel — Maven Central suffit pour résolution
 - Mode maintenance confirmé — 58/58 tests PASS, 0.0.2 sur Maven Central
 
 == Prochaine Session (017)
 
-- Réactiver GF-4 si domaine cccp.education est acheté (relocation via plugin-publish)
-- Sinon : projet dormant, maintenance uniquement
+- Dormant. Réactiver si besoin cross-borough.

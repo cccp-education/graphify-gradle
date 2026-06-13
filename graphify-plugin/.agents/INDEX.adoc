@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 015 — Publication Maven Central (retry 0.0.1 rejeté)
-_Session en cours_ : 016 — Liquidation N0 (mode maintenance)
+_Session terminee_ : 016 — Liquidation N0 (GF-4 vérifié : marker .gradle.plugin sur Central ✅, domaine cccp.education OK)
+_Session en cours_ : 017 — (dormant, maintenance)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -79,7 +79,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-1 | Tests unitaires — ScanWorkspaceTask (24 tests) + GraphModel (6 tests) = 30/30 PASS | ✅ TERMINÉ (sessions 002, 002-cleanup) | P0
 | GF-2 | Tests intégration — scan workspace réel, validation format, 6 boroughs, exclusions, 26 communautés | ✅ TERMINÉ (session 005) | P0
 | GF-3 | Intégration runner-gradle — verifyDagAcyclicTask migrée + scanAndVerify chaîné + CI chain | ✅ TERMINÉ (session EPIC A) | P1
-| GF-4 | Publication Gradle Plugin Portal | BLOQUÉ (domaine cccp.education) | P2
+| GF-4 | Publication Gradle Plugin Portal | ✅ TERMINÉ — marker .gradle.plugin sur Maven Central (résolvable via pluginManagement { mavenCentral() }). Portail UI web optionnel. | P2
 | GF-6 | Publication Maven Central (nmcp) — v0.0.2 déployé | ✅ TERMINÉ (session 013) | P0
 |===
 
