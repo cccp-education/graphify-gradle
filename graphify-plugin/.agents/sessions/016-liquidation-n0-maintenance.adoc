@@ -1,0 +1,32 @@
+= Session 016 — Liquidation N0 (mode maintenance)
+:session: 016
+:date: 2026-06-13
+:type: ops
+:score: 8/10
+
+== Objectif
+Marquer Grand Central (graphify-gradle) comme liquidé — vérifier PUB-2.2, bloquer GF-4, confirmer mode maintenance.
+
+== Réalisations
+
+=== PUB-2.2 — Vérifié
+- Aucun commentaire RELOCATION dans `graphify-plugin/build.gradle.kts`
+- Plugin-publish conservé, pas de modification nécessaire
+
+=== GF-4 — Bloqué
+- Publication Gradle Plugin Portal nécessite domaine `cccp.education` vérifié
+- Marqué BLOQUÉ dans INDEX.adoc roadmap
+- Réactivable quand le domaine sera acheté
+
+=== Gouvernance
+- INDEX.adoc : session 016 ajoutée, GF-4 BLOQUÉ
+- PROMPT_REPRISE.adoc : session 017 (dormant ou réactivation si domaine)
+- SESSIONS_HISTORY.adoc : entrée 016 ajoutée
+
+== Résultat
+- 58/58 tests PASS (inchangé)
+- 0.0.2 sur Maven Central
+- Mode maintenance confirmé
+
+== Prochaine session
+017 — Réactiver GF-4 si domaine acheté, sinon dormant.

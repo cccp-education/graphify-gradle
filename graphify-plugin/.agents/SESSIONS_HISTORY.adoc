@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié (pas de RELOCATION dans build.gradle.kts), GF-4 marqué BLOQUÉ (domaine cccp.education), mode maintenance confirmé. 58/58 PASS. | 8/10
 | 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant déjà existant), version 0.0.2 conservée. Pas de changement fonctionnel. | 5/10
 | 013 | 2026-06-11 | ops/bugfix | Publication Maven Central 0.0.2 + fix @Input validatePlugins. Nmcp + version hardcodée + mavenCentral(). 58/58 PASS. | 7/10
 | 012 | 2026-06-02 | governance | Borough-isation — graphify-gradle devient Grand Central 🟡, 24ème borough | 10/10

@@ -7,7 +7,7 @@ _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
 _Session terminee_ : 015 — Publication Maven Central (retry 0.0.1 rejeté)
-_Session en cours_ : 016 — (a definir)
+_Session en cours_ : 016 — Liquidation N0 (mode maintenance)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -79,7 +79,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-1 | Tests unitaires — ScanWorkspaceTask (24 tests) + GraphModel (6 tests) = 30/30 PASS | ✅ TERMINÉ (sessions 002, 002-cleanup) | P0
 | GF-2 | Tests intégration — scan workspace réel, validation format, 6 boroughs, exclusions, 26 communautés | ✅ TERMINÉ (session 005) | P0
 | GF-3 | Intégration runner-gradle — verifyDagAcyclicTask migrée + scanAndVerify chaîné + CI chain | ✅ TERMINÉ (session EPIC A) | P1
-| GF-4 | Publication Gradle Plugin Portal | À FAIRE | P2
+| GF-4 | Publication Gradle Plugin Portal | BLOQUÉ (domaine cccp.education) | P2
 | GF-6 | Publication Maven Central (nmcp) — v0.0.2 déployé | ✅ TERMINÉ (session 013) | P0
 |===
 
@@ -88,6 +88,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié (pas de RELOCATION), GF-4 marqué bloqué, mode maintenance confirmé | 8/10
 | 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant existant), 0.0.2 conservé. Aucun changement fonctionnel. | 5/10
 | 013 | 2026-06-11 | ops/bugfix | Publication Maven Central 0.0.2 + fix @Input validatePlugins (foundryDir File→String). Nmcp + mavenCentral(). 58/58 PASS. plugin-publish conservé. | 7/10
 | 012 | 2026-06-02 | governance | Borough-isation — graphify-gradle devient Grand Central 🟡, 24ème borough | 10/10

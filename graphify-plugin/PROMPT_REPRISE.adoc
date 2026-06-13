@@ -1,16 +1,14 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 015
-:session: 015
-:session_precedente: 014 — Publication Maven Central 0.0.2 (retry 0.0.1 rejeté)
+= PROMPT_REPRISE — Graphify Gradle — Session 017
+:session: 017
+:session_precedente: 016 — Liquidation N0 (mode maintenance)
 
-== Contexte Hérité
+== Session 016 terminée
 
-- graphify-plugin:0.0.2 publié sur Maven Central (education.cccp.graphify)
-- Tentative de downgrade 0.0.1 rejetée (composant déjà existant)
-- 58/58 tests PASS, build OK
-- Nmcp configuré, version hardcodée
+- PUB-2.2 vérifié : pas de commentaire RELOCATION dans build.gradle.kts, plugin-publish conservé
+- GF-4 bloqué par achat domaine cccp.education (Gradle Plugin Portal requiert un domaine vérifié)
+- Mode maintenance confirmé — 58/58 tests PASS, 0.0.2 sur Maven Central
 
-== Prochaine Session (016)
+== Prochaine Session (017)
 
-- EPIC GF-4 : Publication Gradle Plugin Portal (besoin domaine cccp.education)
-- Relocation possible quand domaine cccp.education sera acheté
-- Mode maintenance
+- Réactiver GF-4 si domaine cccp.education est acheté (relocation via plugin-publish)
+- Sinon : projet dormant, maintenance uniquement
