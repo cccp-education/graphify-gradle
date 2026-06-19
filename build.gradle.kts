@@ -19,7 +19,7 @@ graphify {
         "readme-gradle" to 2,
         "slider-gradle" to 2,
         "training-gradle" to 2,
-        "engine" to 3,
+        "runner-gradle" to 3,
         "waiter-plugin" to 2,
         "notebook-gradle" to 2,
         "newpipe-gradle" to 2,

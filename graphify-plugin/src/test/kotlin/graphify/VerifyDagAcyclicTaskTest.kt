@@ -1,4 +1,4 @@
-package com.cheroliv.graphify
+package graphify
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -27,7 +27,7 @@ class VerifyDagAcyclicTaskTest {
             "codex-gradle" to 2,
             "magic-stick" to 2,
             "plantuml-gradle" to 2,
-            "engine" to 3
+            "runner-gradle" to 3
         )
     }
 
@@ -41,7 +41,7 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should pass when DAG is acyclic`() {
-        writeBuild("engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.bakery\") version \"0.1.4\" }" }
+        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.bakery\") version \"0.1.4\" }" }
         writeBuild("bakery-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("graphify-gradle") { "plugins { java }" }
@@ -51,7 +51,7 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should fail when N1 imports N2`() {
-        writeBuild("engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
+        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.bakery\") version \"0.1.4\" }" }
         writeBuild("bakery-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("graphify-gradle") { "plugins { java }" }
@@ -63,8 +63,8 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should fail when N0 imports N3`() {
-        writeBuild("graphify-gradle") { "plugins { id(\"com.cheroliv.engine\") version \"1.0.0\" }" }
-        writeBuild("engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
+        writeBuild("graphify-gradle") { "plugins { id(\"com.cheroliv.runner\") version \"1.0.0\" }" }
+        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
 
         assertThatThrownBy { task.verify() }
             .isInstanceOf(GradleException::class.java)
@@ -86,7 +86,7 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should skip directories not in dagLevels registry`() {
-        writeBuild("unknown-project") { "plugins { id(\"com.cheroliv.engine\") version \"1.0.0\" }" }
+        writeBuild("unknown-project") { "plugins { id(\"com.cheroliv.runner\") version \"1.0.0\" }" }
 
         assertThatCode { task.verify() }.doesNotThrowAnyException()
     }
@@ -103,8 +103,8 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should detect violation regardless of version string`() {
-        writeBuild("graphify-gradle") { "plugins { id(\"com.cheroliv.engine\") version \"2.5.1-SNAPSHOT\" }" }
-        writeBuild("engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
+        writeBuild("graphify-gradle") { "plugins { id(\"com.cheroliv.runner\") version \"2.5.1-SNAPSHOT\" }" }
+        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
 
         assertThatThrownBy { task.verify() }
             .isInstanceOf(GradleException::class.java)
@@ -125,7 +125,7 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should pass with no violations in mixed setup`() {
-        writeBuild("engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\"; id(\"com.cheroliv.codex\") version \"0.0.1\" }" }
+        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\"; id(\"com.cheroliv.codex\") version \"0.0.1\" }" }
         writeBuild("plantuml-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
         writeBuild("codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("graphify-gradle") { "plugins { java; kotlin }" }

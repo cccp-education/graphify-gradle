@@ -1,9 +1,9 @@
-package com.cheroliv.graphify
+package graphify
 
-import com.cheroliv.graphify.model.GraphCommunity
-import com.cheroliv.graphify.model.GraphEdge
-import com.cheroliv.graphify.model.GraphModel
-import com.cheroliv.graphify.model.GraphNode
+import graphify.model.GraphCommunity
+import graphify.model.GraphEdge
+import graphify.model.GraphModel
+import graphify.model.GraphNode
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import java.io.File
+import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -62,7 +63,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                     return FileVisitResult.CONTINUE
                 }
 
-                override fun visitFileFailed(file: Path, exc: java.io.IOException): FileVisitResult {
+                override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
                     logger.warn("Skipping inaccessible path: $file")
                     return FileVisitResult.CONTINUE
                 }

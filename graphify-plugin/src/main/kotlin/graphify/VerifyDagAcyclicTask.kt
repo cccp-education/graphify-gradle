@@ -1,4 +1,4 @@
-package com.cheroliv.graphify
+package graphify
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException

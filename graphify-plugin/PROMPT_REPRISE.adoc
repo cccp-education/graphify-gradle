@@ -1,15 +1,13 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 017
-:session: 017
-:session_precedente: 016 — Liquidation N0 (GF-4 vérifié ✅)
+= PROMPT_REPRISE — Graphify Gradle — Session 018
+:session: 018
+:session_precedente: 018 — engine→runner-gradle rename terminé ✅
 
-== Session 016 terminée
+== Session 018 terminée
 
-- PUB-2.2 vérifié : pas de commentaire RELOCATION dans build.gradle.kts
-- GF-4 vérifié : marker `education.cccp.graphify.gradle.plugin` sur Maven Central ✅
-- Domaine `cccp.education` DNS OK, 12 plugins avec markers sur Central
-- Gradle Plugin Portal UI web optionnel — Maven Central suffit pour résolution
-- Mode maintenance confirmé — 58/58 tests PASS, 0.0.2 sur Maven Central
+- engine→runner-gradle rename dans `build.gradle.kts`, `VerifyDagAcyclicTaskTest.kt`, `ScanAndVerifyIntegrationTest.kt`
+- runner-gradle/build.gradle.kts : supprimé fallback `cheroliv.com`
+- 58/58 PASS ✅
 
-== Prochaine Session (017)
+== Prochaine Session
 
 - Dormant. Réactiver si besoin cross-borough.

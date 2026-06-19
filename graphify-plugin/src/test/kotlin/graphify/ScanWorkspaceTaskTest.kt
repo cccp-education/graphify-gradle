@@ -1,6 +1,6 @@
-package com.cheroliv.graphify
+package graphify
 
-import com.cheroliv.graphify.model.GraphModel
+import graphify.model.GraphModel
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule

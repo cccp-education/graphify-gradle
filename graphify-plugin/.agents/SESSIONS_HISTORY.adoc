@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 018 | 2026-06-19 | bugfix | Renommage engine→runner-gradle dans build.gradle.kts + tests DAG. Suppression fallback cheroliv.com dans runner-gradle N3. 58/58 PASS. | 10/10
 | 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié, GF-4 vérifié (marker .gradle.plugin sur Central ✅, domaine cccp.education OK). 12 plugins education.cccp.* sur Central. | 9/10
 | 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant déjà existant), version 0.0.2 conservée. Pas de changement fonctionnel. | 5/10
 | 013 | 2026-06-11 | ops/bugfix | Publication Maven Central 0.0.2 + fix @Input validatePlugins. Nmcp + version hardcodée + mavenCentral(). 58/58 PASS. | 7/10

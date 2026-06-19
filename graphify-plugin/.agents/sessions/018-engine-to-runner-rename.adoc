@@ -1,0 +1,37 @@
+= Session 018 — Renommage engine → runner-gradle dans graphify
+:session: 018
+:date: 2026-06-19
+:type: bugfix
+:score: 10/10
+
+== Contexte
+
+Suite au rename `engine` → `runner-gradle` (New Jersey EPIC B Engine Clean),
+les références à `engine` n'avaient pas été mises à jour dans graphify :
+
+- `build.gradle.kts` : `"engine" to 3` au lieu de `"runner-gradle" to 3`
+- `VerifyDagAcyclicTaskTest.kt` : 10 occurrences de `"engine"` / `"com.cheroliv.engine"`
+- `ScanAndVerifyIntegrationTest.kt` : 5 occurrences de `"engine"` / classe `EngineConsumer`
+
+== Travail effectué
+
+=== Runner-gradle (projet N3 consommateur)
+
+- `runner-gradle/build.gradle.kts` : supprimé le fallback `cheroliv.com` — `siteName` devient obligatoire via `-PsiteName=<domain>`. Runner N3 ne doit pas contenir de données métier.
+
+=== Graphify
+
+- `graphify-gradle/build.gradle.kts:22` : `"engine" to 3` → `"runner-gradle" to 3`
+- `VerifyDagAcyclicTaskTest.kt` : `"engine"` → `"runner-gradle"` + `com.cheroliv.engine` → `com.cheroliv.runner`
+- `ScanAndVerifyIntegrationTest.kt` : `"engine"` → `"runner-gradle"`, `EngineConsumer` → `RunnerConsumer`
+
+== Résultat
+
+58/58 PASS ✅ inchangé. Messages DAG affichent désormais `runner (N3)`.
+
+== Fichiers modifiés
+
+- graphify-gradle/build.gradle.kts
+- graphify-gradle/graphify-plugin/src/test/kotlin/graphify/VerifyDagAcyclicTaskTest.kt
+- graphify-gradle/graphify-plugin/src/test/kotlin/graphify/ScanAndVerifyIntegrationTest.kt
+- runner-gradle/build.gradle.kts

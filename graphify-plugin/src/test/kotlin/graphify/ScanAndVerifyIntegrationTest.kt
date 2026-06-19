@@ -1,12 +1,13 @@
-package com.cheroliv.graphify
+package graphify
 
-import com.cheroliv.graphify.model.GraphModel
+import graphify.model.GraphModel
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -25,9 +26,9 @@ class ScanAndVerifyIntegrationTest {
     private val dagLevels = mapOf(
         "graphify-gradle" to 0, "codebase-gradle" to 1,
         "bakery-gradle" to 2, "codex-gradle" to 2,
-        "plantuml-gradle" to 2, "engine" to 3
+        "plantuml-gradle" to 2, "runner-gradle" to 3
     )
-    private val project = org.gradle.testfixtures.ProjectBuilder.builder().build()
+    private val project = ProjectBuilder.builder().build()
 
     @Nested
     inner class ScanThenVerify {
@@ -41,7 +42,7 @@ class ScanAndVerifyIntegrationTest {
 
             createProject(fd, "graphify-gradle") { "plugins { java }" }
             createProject(fd, "codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
-            createProject(fd, "engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
+            createProject(fd, "runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
 
             val st = project.tasks.register("sw", ScanWorkspaceTask::class.java).get()
             st.rootDir = ws.toFile()
@@ -90,16 +91,16 @@ class ScanAndVerifyIntegrationTest {
     }
 
     @Nested
-    inner class EngineConsumer {
+    inner class RunnerConsumer {
 
         @Test
-        fun `should validate graph json contract for engine consumption`() {
+        fun `should validate graph json contract for runner consumption`() {
             val ws = tempDir.resolve("ws3")
             val fd = ws.resolve("foundry/public")
             fd.createDirectories()
             graphOutput = tempDir.resolve("g3.json")
 
-            createProject(fd, "engine") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
+            createProject(fd, "runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
             createProject(fd, "codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
             createProject(fd, "graphify-gradle") { "plugins { java }" }
 
@@ -123,7 +124,7 @@ class ScanAndVerifyIntegrationTest {
                 assertThat(e.type).isNotBlank
             }
             assertThat(g.communities).isNotEmpty
-            assertThat(g.communities.find { it.id == "engine" }).isNotNull
+            assertThat(g.communities.find { it.id == "runner-gradle" }).isNotNull
 
             val vt = project.tasks.register("vd3", VerifyDagAcyclicTask::class.java).get()
             vt.dagLevels = dagLevels

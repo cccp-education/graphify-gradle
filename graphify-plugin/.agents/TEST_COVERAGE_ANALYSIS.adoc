@@ -1,7 +1,7 @@
 = Test Coverage Analysis — Graphify Gradle
 
 _Statut_ : EPIC A TERMINÉ (GF-2 + GF-3, 58/58 PASS)
-_Dernière mise à jour_ : Session 013 (2026-06-11)
+_Dernière mise à jour_ : Session 018 (2026-06-19)
 
 == Session 013 — Fix @Input validatePlugins
 
@@ -49,6 +49,13 @@ Taille:       98 MB
 
 Pas de modification de code source. 58/58 PASS inchangé.
 
+== Session 018 — engine→runner-gradle rename
+
+- `build.gradle.kts` : `"engine" to 3` → `"runner-gradle" to 3`
+- `VerifyDagAcyclicTaskTest.kt` : 10 occurrences engine → runner-gradle + com.cheroliv.runner
+- `ScanAndVerifyIntegrationTest.kt` : 5 occurrences engine → runner-gradle
+- 58/58 PASS inchangé
+
 == Prochaine étape
 
-Session 016 — GF-4 : Publication Gradle Plugin Portal.
+Dormant.

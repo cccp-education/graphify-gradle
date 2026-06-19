@@ -1,4 +1,4 @@
-package com.cheroliv.graphify
+package graphify
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty

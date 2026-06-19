@@ -1,9 +1,13 @@
-package com.cheroliv.graphify.model
+package graphify.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import graphify.model.GraphCommunity
+import graphify.model.GraphEdge
+import graphify.model.GraphModel
+import graphify.model.GraphNode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

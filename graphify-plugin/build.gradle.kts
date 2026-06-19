@@ -43,14 +43,14 @@ gradlePlugin {
     plugins {
         create("graphify") {
             id = "education.cccp.graphify"
-            implementationClass = "com.cheroliv.graphify.GraphifyPlugin"
+            implementationClass = "graphify.GraphifyPlugin"
             displayName = "Graphify Plugin"
             description = "Gradle plugin for knowledge graph extraction across a workspace."
             tags.set(listOf("knowledge-graph", "workspace", "dependency-analysis", "graphify"))
         }
     }
-    website = "https://cheroliv.com"
-    vcsUrl = "https://github.com/cheroliv/graphify-gradle.git"
+    website = "https://cccp.education/"
+    vcsUrl = "https://github.com/cccp-education/graphify-gradle.git"
 }
 
 java {
@@ -75,7 +75,7 @@ publishing {
                     developer {
                         id.set("cccp-education")
                         name.set("CCCP Education")
-                        email.set("cccp.education@gmail.com")
+                        email.set("cccp.edu@gmail.com")
                     }
                 }
                 scm {

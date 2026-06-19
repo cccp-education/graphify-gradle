@@ -1,4 +1,4 @@
-package com.cheroliv.graphify.model
+package graphify.model
 
 data class GraphModel(
     val nodes: List<GraphNode> = emptyList(),

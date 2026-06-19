@@ -1,4 +1,4 @@
-package com.cheroliv.graphify
+package graphify
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
