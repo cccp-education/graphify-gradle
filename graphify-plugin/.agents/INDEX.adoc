@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 018 — engine→runner-gradle rename ✅
-_Session en cours_ : 019 — (dormant, maintenance)
+_Session terminee_ : 019 — README i18n (10 langues × consumer + plugin) ✅
+_Session en cours_ : 020 — (dormant, maintenance)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -88,6 +88,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers (10 langues × consumer + plugin), badges 0.0.2/58 PASS, switcher, AR/UR RTL | 9/10
 | 018 | 2026-06-19 | bugfix | engine→runner-gradle rename + fallback cheroliv.com supprimé de runner N3 | 10/10
 | 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié (pas de RELOCATION), GF-4 marqué bloqué, mode maintenance confirmé | 8/10
 | 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant existant), 0.0.2 conservé. Aucun changement fonctionnel. | 5/10

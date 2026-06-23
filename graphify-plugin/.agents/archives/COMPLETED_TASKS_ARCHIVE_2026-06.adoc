@@ -2,6 +2,7 @@
 
 |===
 | Date | Session | EPIC/US | Description
+| 2026-06-24 | 019 | — | README i18n — 20 fichiers (10 langues × README.consommateurs + README.plugin). Badges 0.0.2/58 PASS, switcher multilingue, support RTL AR/UR. Documentation seule.
 | 2026-06-19 | 018 | — | Renommage engine→runner-gradle dans build.gradle.kts + tests graphify. Suppression fallback cheroliv.com runner-gradle N3.
 | 2026-06-13 | 016 | PUB-2.2 | Vérifié — pas de commentaire RELOCATION dans build.gradle.kts. Aucun changement.
 | 2026-06-13 | 016 | GF-4 | Marqué BLOQUÉ (domaine cccp.education requis pour Gradle Plugin Portal). Mode maintenance confirmé.

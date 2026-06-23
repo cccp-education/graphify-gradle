@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers créés (10 langues × README.consommateurs + README.plugin). Badges Maven Central/Portal/CI/Coverage 58 PASS/Licence. Switcher 10 langues, support RTL Arabe/Urdu. Aucun code touché. | 9/10
 | 018 | 2026-06-19 | bugfix | Renommage engine→runner-gradle dans build.gradle.kts + tests DAG. Suppression fallback cheroliv.com dans runner-gradle N3. 58/58 PASS. | 10/10
 | 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié, GF-4 vérifié (marker .gradle.plugin sur Central ✅, domaine cccp.education OK). 12 plugins education.cccp.* sur Central. | 9/10
 | 015 | 2026-06-11 | ops | Publication Maven Central retry — downgrade 0.0.1 rejeté (composant déjà existant), version 0.0.2 conservée. Pas de changement fonctionnel. | 5/10

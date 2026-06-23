@@ -1,0 +1,128 @@
+= Session 019 — README i18n (10 langues × consumer + plugin)
+:session: 019
+:date: 2026-06-24
+:type: docs/i18n
+:score: 9/10
+
+== Contexte
+
+Documentation README mono-langue (EN master uniquement). Alignement sur
+le standard i18n des autres boroughs N0/N2 (bakery-gradle, plantuml-gradle)
+afin d'offrir un switcher multilingue cohérent sur le Gradle Plugin Portal
+et GitHub. Aucune logique métier touchée — documentation seule.
+
+== Travail effectué
+
+=== Structure créée
+
+```
+graphify-gradle/                      # repo consumer
+├── README.consommateurs/             # 10 fichiers — guide utilisateur
+│   ├── README.md          (master EN, 144 lignes)
+│   ├── README.fr.md       (5 552 o)
+│   ├── README.es.md
+│   ├── README.pt.md
+│   ├── README.zh.md
+│   ├── README.hi.md       (8 422 o)
+│   ├── README.bn.md       (8 325 o)
+│   ├── README.ar.md       (RTL)
+│   ├── README.ur.md       (RTL)
+│   └── README.ru.md
+└── README.plugin/                   # 10 fichiers — guide développeur/contributeur
+    ├── README.md          (master EN, 194 lignes)
+    ├── README.fr.md       (9 018 o)
+    ├── README.es.md
+    ├── README.pt.md
+    ├── README.zh.md
+    ├── README.hi.md       (13 125 o)
+    ├── README.bn.md       (13 199 o)
+    ├── README.ar.md       (RTL)
+    ├── README.ur.md       (RTL)
+    └── README.ru.md
+```
+
+Total : **20 fichiers README** créés (10 langues × 2 vues).
+
+=== Langues couvertes (10)
+
+[cols="2,1,1"]
+|===
+| Langue | Code | Script
+| English (master) | `en` | LTR
+| Français | `fr` | LTR
+| Español | `es` | LTR
+| Português | `pt` | LTR
+| 中文 | `zh` | LTR
+| हिन्दी | `hi` | LTR (Devanagari)
+| বাংলা | `bn` | LTR (Bengali)
+| العربية | `ar` | RTL
+| اردو | `ur` | RTL
+| Русский | `ru` | LTR (Cyrillic)
+|===
+
+=== Badges & markers standardisés
+
+Chaque README porte les mêmes shields alignés sur la release publiée :
+
+- **Maven Central** : `education.cccp/graphify-plugin` (résolvable)
+- **Gradle Plugin Portal** : `education.cccp.graphify` (marker UI optionnel)
+- **CI** : `cheroliv/graphify-gradle` test.yml
+- **Coverage** : `58/58 PASS` (badge statique vert)
+- **License** : lien `../LICENSE`
+
+Markers de version uniformes :
+- Version `0.0.2` · Group `education.cccp` · Plugin ID `education.cccp.graphify`
+- Toolchain : Java 23 · Kotlin 2.2.20 · Gradle 9.x
+- Statut : *Liquidé, dormant.*
+
+=== Switcher i18n
+
+Header multilingue standardisé dans chaque fichier. La langue courante
+est en gras (`**…​**`), les autres sont des liens relatifs `README.<code>.md`.
+
+Exemple (français) :
+```
+🌐 Langues : [English](README.md) | **Français**
+```
+
+Versions non-françaises affichent le switcher complet à 10 entrées :
+```
+🌐 Languages: [English](README.md) | [中文](README.zh.md) | [हिन्दी](README.hi.md)
+            | [Español](README.es.md) | [Français](README.fr.md) | [العربية](README.ar.md)
+            | [বাংলা](README.bn.md) | [Português](README.pt.md) | [Русский](README.ru.md)
+            | [اردو](README.ur.md)
+```
+
+=== Support RTL (Arabe, Urdu)
+
+README.ar.md et README.ur.md (dans les deux répertoires) :
+- contenu en script natif (Arabic / Nastaliq)
+- switcher i18n ordonné (العربية et اردو en gras sur leur fichier)
+- badges/markers alignés sur le master EN
+- Aucune directive `dir="rtl"` HTML ajoutée — GitHub Plugin Portal et
+  l'agent de rendu markdown détectent automatiquement le script.
+
+== Fichiers créés (20)
+
+README.consommateurs/ (10) :
+- README.md, README.fr.md, README.es.md, README.pt.md, README.zh.md,
+  README.hi.md, README.bn.md, README.ar.md, README.ur.md, README.ru.md
+
+README.plugin/ (10) :
+- README.md, README.fr.md, README.es.md, README.pt.md, README.zh.md,
+  README.hi.md, README.bn.md, README.ar.md, README.ur.md, README.ru.md
+
+== Validation
+
+- Pas de test modifié (documentation seule)
+- Pas de modification du code source Kotlin
+- Pas de publishToMavenLocal (aucun impact artefact)
+- Compilation/build non affecté
+- 58/58 PASS inchangé (non rejoué — règle fin de session)
+
+== Suivi
+
+- Alignement documentation borough Grand Central sur standard i18n.
+- Prochain possible : backlinks depuis bakery/slider/plantuml qui
+  référencent graphify-gradle (mise à jour cross-borough optionnelle).
+- Borough reste dormant au niveau métier.

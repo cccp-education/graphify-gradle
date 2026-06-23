@@ -1,13 +1,16 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 018
-:session: 018
-:session_precedente: 018 — engine→runner-gradle rename terminé ✅
+= PROMPT_REPRISE — Graphify Gradle — Session 019
+:session: 019
+:session_precedente: 019 — README i18n terminé ✅
 
-== Session 018 terminée
+== Session 019 terminée
 
-- engine→runner-gradle rename dans `build.gradle.kts`, `VerifyDagAcyclicTaskTest.kt`, `ScanAndVerifyIntegrationTest.kt`
-- runner-gradle/build.gradle.kts : supprimé fallback `cheroliv.com`
-- 58/58 PASS ✅
+- 20 fichiers README créés (10 langues × `README.consommateurs/` + `README.plugin/`)
+- Langues : EN (master), FR, ES, PT, ZH, HI, BN, AR (RTL), UR (RTL), RU
+- Badges alignés 0.0.2 / 58 PASS · switcher i18n 10 entrées
+- Aucun code Kotlin touché, aucun artefact impacté
 
 == Prochaine Session
 
-- Dormant. Réactiver si besoin cross-borough.
+- Dormant. Borough liquidé, métier stable.
+- Optionnel : backlinks cross-borough (bakery/slider/plantuml qui référencent graphify).
+- Réactiver si nouveau borough ou changement DAG foundry.
