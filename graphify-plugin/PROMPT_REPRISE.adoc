@@ -1,13 +1,12 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 019
-:session: 019
-:session_precedente: 019 — README i18n terminé ✅
+= PROMPT_REPRISE — Graphify Gradle — Session 020
+:session: 020
+:date: 2026-06-24
 
-== Session 019 terminée
+== Session 020 terminée — Architecture README Plugin + Consommateur
 
-- 20 fichiers README créés (10 langues × `README.consommateurs/` + `README.plugin/`)
-- Langues : EN (master), FR, ES, PT, ZH, HI, BN, AR (RTL), UR (RTL), RU
-- Badges alignés 0.0.2 / 58 PASS · switcher i18n 10 entrées
-- Aucun code Kotlin touché, aucun artefact impacté
+Déplacement README.plugin → graphify-plugin/README.plugin/ (README.md master
+remonté à racine plugin). Déplacement README.consommateurs → racine borough.
+Liens i18n recréés (10 langues).
 
 == Prochaine Session
 

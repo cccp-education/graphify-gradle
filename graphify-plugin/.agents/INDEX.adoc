@@ -6,8 +6,8 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 019 — README i18n (10 langues × consumer + plugin) ✅
-_Session en cours_ : 020 — (dormant, maintenance)
+_Session terminee_ : 020 — Architecture README Plugin + Consommateur (déplacement README.plugin → graphify-plugin/, README.consommateurs → racine, liens i18n recréés) ✅
+_Session en cours_ : 021 — (dormant, maintenance)
 
 '''
 == RÈGLES ABSOLUES (résumé)
