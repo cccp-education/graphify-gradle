@@ -1,22 +1,12 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-
 plugins {
-    signing
     `java-library`
-    `maven-publish`
-    `java-gradle-plugin`
-    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.publish)
+    id("education.cccp.build.gradle-plugin") version "0.0.1"
+    id("education.cccp.build.publishing") version "0.0.1"
 }
 
 group = "education.cccp"
 version = "0.0.2"
-kotlin.jvmToolchain(23)
-
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -31,11 +21,6 @@ dependencies {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-    }
     outputs.cacheIf { true }
 }
 
@@ -53,59 +38,18 @@ gradlePlugin {
     vcsUrl = "https://github.com/cccp-education/graphify-gradle.git"
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
+publishingConventions {
+    publicationType = "PLUGIN"
 }
 
 publishing {
-    publications {
-        withType<MavenPublication> {
-            pom {
-                name.set(gradlePlugin.plugins.getByName("graphify").displayName)
-                description.set(gradlePlugin.plugins.getByName("graphify").description)
-                url.set(gradlePlugin.website.get())
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("cccp-education")
-                        name.set("CCCP Education")
-                        email.set("cccp.edu@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set(gradlePlugin.vcsUrl.get())
-                    developerConnection.set(gradlePlugin.vcsUrl.get())
-                    url.set(gradlePlugin.vcsUrl.get())
-                }
-                project.findProperty("relocationGroup")?.let { targetGroup ->
-                    withXml {
-                        val pom = asElement()
-                        val doc = pom.ownerDocument
-                        val distMgmt = doc.createElement("distributionManagement")
-                        val relocation = doc.createElement("relocation")
-                        relocation.appendChild(doc.createElement("groupId")).also { it.textContent = targetGroup.toString() }
-                        relocation.appendChild(doc.createElement("artifactId")).also { it.textContent = project.name }
-                        distMgmt.appendChild(relocation)
-                        pom.appendChild(distMgmt)
-                    }
-                }
-            }
+    publications.withType<MavenPublication> {
+        pom {
+            name.set("Graphify Gradle Plugin")
+            description.set("Gradle plugin for knowledge graph extraction across a workspace.")
         }
     }
     repositories {
         mavenCentral()
     }
-}
-
-signing {
-    if (System.getenv("CI") != "true" && !version.toString().endsWith("-SNAPSHOT")) {
-        sign(publishing.publications)
-    }
-    useGpgCmd()
 }

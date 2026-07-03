@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées (pattern bakery gradle-plugin + publishing), build.gradle.kts 111→49 lignes (-62), compileKotlin SUCCESS, BUILD SUCCESS. | 9/10
 | 020 | 2026-06-24 | refactor README | Architecture README Plugin + Consommateur — déplacement README.plugin → graphify-plugin/, README.consommateurs → racine, liens i18n recréés (10 langues) | 8/10
 | 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers créés (10 langues × README.consommateurs + README.plugin). Badges Maven Central/Portal/CI/Coverage 58 PASS/Licence. Switcher 10 langues, support RTL Arabe/Urdu. Aucun code touché. | 9/10
 | 018 | 2026-06-19 | bugfix | Renommage engine→runner-gradle dans build.gradle.kts + tests DAG. Suppression fallback cheroliv.com dans runner-gradle N3. 58/58 PASS. | 10/10

@@ -6,8 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Session terminee_ : 020 — Architecture README Plugin + Consommateur (déplacement README.plugin → graphify-plugin/, README.consommateurs → racine, liens i18n recréés) ✅
-_Session en cours_ : 021 — (dormant, maintenance)
+_Derniere mise a jour_ : 2026-07-03
+_Session terminee_ : 021 — CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS ✅ TERMINE
+_Session en cours_ : 022 — (dormant, maintenance)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -88,6 +89,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS | ✅ TERMINE
 | 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers (10 langues × consumer + plugin), badges 0.0.2/58 PASS, switcher, AR/UR RTL | 9/10
 | 018 | 2026-06-19 | bugfix | engine→runner-gradle rename + fallback cheroliv.com supprimé de runner N3 | 10/10
 | 016 | 2026-06-13 | ops | Liquidation N0 — PUB-2.2 vérifié (pas de RELOCATION), GF-4 marqué bloqué, mode maintenance confirmé | 8/10

@@ -1,15 +1,15 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 020
-:session: 020
-:date: 2026-06-24
+= PROMPT_REPRISE — Graphify Gradle — Session 021
+:session: 021
+:date: 2026-07-03
 
-== Session 020 terminée — Architecture README Plugin + Consommateur
+== Session 021 terminée — CNV-6 Migration
 
-Déplacement README.plugin → graphify-plugin/README.plugin/ (README.md master
-remonté à racine plugin). Déplacement README.consommateurs → racine borough.
-Liens i18n recréés (10 langues).
+Convention plugins education.cccp.build.* v0.0.1 appliquées (pattern bakery
+gradle-plugin + publishing). build.gradle.kts 111→49 lignes (-62).
+compileKotlin SUCCESS, BUILD SUCCESS.
 
-== Prochaine Session
+== Prochaine Session (022)
 
-- Dormant. Borough liquidé, métier stable.
+- Dormant. Borough liquidé, métier stable, CNV-6 terminé.
 - Optionnel : backlinks cross-borough (bakery/slider/plantuml qui référencent graphify).
 - Réactiver si nouveau borough ou changement DAG foundry.
