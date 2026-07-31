@@ -141,6 +141,18 @@ graphify-gradle/                     # CONSUMER (dogfooding) + repo git
     └── src/                         # 66 tests, publishable
 ----
 
+=== Conventions Plugins (ABIDJAN N0)
+
+Graphify consomme le convention plugin centralise `education.cccp.build` v0.0.3 (library pure, publishing seul) :
+
+[cols="2,5"]
+|===
+| Plugin ID | Role
+| `education.cccp.build.publishing` | POM Maven Central + signing conditionnel + relocation + publicationType
+|===
+
+Ce plugin remplace ~62 lignes de build redondantes (POM, signing).
+
 === Composants Clés
 
 * **GraphifyPlugin** : Point d'entrée du plugin — enregistre l'extension et la tâche
