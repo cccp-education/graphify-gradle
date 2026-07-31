@@ -39,7 +39,7 @@ gradlePlugin {
 }
 
 publishingConventions {
-    publicationType = "PLUGIN"
+    publicationType = "LIBRARY"
 }
 
 publishing {
