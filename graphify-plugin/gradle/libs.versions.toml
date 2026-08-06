@@ -1,7 +1,7 @@
 [versions]
 graphify = "0.0.2"
 plugin-publish = "1.3.1"
-kotlin = "2.2.20"
+kotlin = "2.4.10"
 jackson = "2.18.3"
 junit = "5.10.1"
 
