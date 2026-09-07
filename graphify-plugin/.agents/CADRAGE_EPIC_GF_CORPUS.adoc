@@ -1,6 +1,6 @@
-= Cadrage EPIC GF-FPA — Graphe de connaissance du corpus FPA (GBL-003.2)
+= Cadrage EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (GBL-003.2)
 :date: 2026-09-07
-:epic: GF-FPA
+:epic: GF-CORPUS
 :origine: BACKLOG.adoc racine § GBL-003 + AGENTS.adoc § MVP0 Critical Path
 :methode: Cadrage (gouvernance pure, zéro code) — pattern S-057/S-063
 
@@ -37,7 +37,7 @@ que les agents de génération SPG/SPD naviguent la structure du métier.
 
 - D1 : EPIC graphify-only — le plugin ne dépend d'aucun borough, le
   corpus reste dans office/.
-- D2 : le graphe FPA (`graph-fpa.json`) est généré dans le workspace
+- D2 : le graphe FPA (`graph-content.json`) est généré dans le workspace
   office/ (œuvre dérivée), consommé par codebase/bakery via chemin
   config, pas transporté par graphify.
 - D3 : périmètre = graphe sections (livre.adoc) + pages OCR + liens
@@ -52,9 +52,9 @@ que les agents de génération SPG/SPD naviguent la structure du métier.
 
 |===
 | US | Description | Pts
-| GF-FPA-1 | Audit schéma : vérifier que les types noeuds/arêtes existants couvrent sections/pages/liens du corpus FPA — zéro code si couvert | 1
-| GF-FPA-2 | Scan du corpus FPA → `graph-fpa.json` dans office/metiers/FPA (run dogfooding, pas de code) | 1
-| GF-FPA-3 | Extension schéma si types manquants (TDD : test d'abord, 1 type = 1 test) | 1
+| GF-CORPUS-1 | Audit schéma : vérifier que les types noeuds/arêtes existants couvrent sections/pages/liens du corpus FPA — zéro code si couvert | 1
+| GF-CORPUS-2 | Scan du corpus FPA → `graph-content.json` dans office/metiers/FPA (run dogfooding, pas de code) | 1
+| GF-CORPUS-3 | Extension schéma si types manquants (TDD : test d'abord, 1 type = 1 test) | 1
 |===
 
 == Débloque

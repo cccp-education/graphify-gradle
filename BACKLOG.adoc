@@ -4,19 +4,19 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-07 (S-023 — cadrage EPIC GF-FPA : graphe de connaissance du corpus FPA, GBL-003.2 critical path MVP0. 3 US ~3 pts. Zéro code.)_
+_Dernière mise à jour : 2026-09-07 (S-023 — cadrage EPIC GF-CORPUS : graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME), GBL-003.2 critical path MVP0. 3 US ~3 pts. Zéro code.)_
 
 '''
-== EPIC GF-FPA — Graphe de connaissance du corpus FPA (GBL-003.2) 🟡 CADRÉ
+== EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) 🟡 CADRÉ
 
 _Origine : BACKLOG.adoc racine § GBL-003 (critical path MVP0, arbitrage pilote 2026-09-07)._
 _Cadrage : `graphify-plugin/.agents/CADRAGE_EPIC_GF_FPA.adoc`._
 
 |===
 | US | Description | Pts | Statut
-| GF-FPA-1 | Audit schéma — types noeuds/arêtes couvrent sections/pages/liens du corpus FPA | 1 | 🟡 À FAIRE
-| GF-FPA-2 | Scan corpus FPA → `graph-fpa.json` dans office/metiers/FPA (dogfooding) | 1 | 🟡 À FAIRE
-| GF-FPA-3 | Extension schéma si types manquants (TDD strict) | 1 | 🟡 À FAIRE
+| GF-CORPUS-1 | Audit schéma — types noeuds/arêtes couvrent sections/pages/liens du corpus FPA (ex-métier privé — renommage RENAME) | 1 | 🟡 À FAIRE
+| GF-CORPUS-2 | Scan corpus FPA (ex-métier privé — renommage RENAME) → `graph-content.json` dans office/metiers/FPA (dogfooding) | 1 | 🟡 À FAIRE
+| GF-CORPUS-3 | Extension schéma si types manquants (TDD strict) | 1 | 🟡 À FAIRE
 |===
 
 *Frontière licence* : le graphe FPA est une œuvre dérivée — il vit dans
