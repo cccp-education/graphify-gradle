@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "education.cccp"
-version = "0.0.2"
+version = ws.versions.graphify.plugin.get()
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))

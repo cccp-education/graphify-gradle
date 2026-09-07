@@ -1,15 +1,27 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 021
-:session: 021
-:date: 2026-07-03
+= PROMPT_REPRISE — Graphify Gradle — Session 022
+:session: 022
+:date: 2026-09-07
 
-== Session 021 terminée — CNV-6 Migration
+== Session S-214 (pilote Brooklyn/codex) terminée — US-ROLLOUT-6 adoption version catalog + bump 0.0.3
 
-Convention plugins education.cccp.build.* v0.0.1 appliquées (pattern bakery
-gradle-plugin + publishing). build.gradle.kts 111→49 lignes (-62).
-compileKotlin SUCCESS, BUILD SUCCESS.
+Adoption version catalog workspace (EPIC MEM-CAT-ROLLOUT ordre 6) :
+garde `GraphifyPluginPublicationTest` 3 gardes RED → GREEN (pin ws
+`workspace-catalog:0.0.33` D4 + `version = ws.versions.graphify.plugin.get()`
+D3 + id inline stable). Fix parseur hygiène : toml local déclare
+`graphify = "x"` (pas `graphify-plugin`).
 
-== Prochaine Session (022)
+Bump graphify 0.0.2 → 0.0.3 propagé MEMPHIS-first (demande pilote) :
+toml root + plugin `graphify = "0.0.3"` → MEMPHIS `graphify-plugin 0.0.3`
++ `workspace-bom 0.0.33` + catalog 0.0.33 mavenLocal → pin ws 0.0.33.
 
-- Dormant. Borough liquidé, métier stable, CNV-6 terminé.
-- Optionnel : backlinks cross-borough (bakery/slider/plantuml qui référencent graphify).
+Gates : `check` VERT 63 tests 0 FAIL (baseline 60 → +3) ;
+root consumer `collectAndVerify` VERT (DAG acyclic OK) ;
+`publishToMavenLocal` VERT (POM 0.0.3 version dérivée ws vérifiée).
+Publication Central graphify 0.0.3 + BOM 0.0.33 reportée à la demande
+du pilote (mavenLocal fait).
+
+== Prochaine Session (023)
+
+- Dormant. Borough liquidé, métier stable.
+- Optionnel : publication Central 0.0.3 (à la demande pilote — mavenLocal seul).
 - Réactiver si nouveau borough ou changement DAG foundry.
