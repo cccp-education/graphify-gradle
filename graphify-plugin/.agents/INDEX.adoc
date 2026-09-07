@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-07-03
-_Session terminee_ : 021 — CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS ✅ TERMINE
-_Session en cours_ : 022 — (dormant, maintenance)
+_Derniere mise a jour_ : 2026-09-07 (session 023 — cadrage EPIC GF-FPA (GBL-003.2 critical path MVP0) — graphe de connaissance du corpus FPA, 3 US ~3 pts, zéro code, frontière licence actée : graph-fpa.json vit dans office/)
+_Session terminee_ : 023 — Cadrage EPIC GF-FPA (gouvernance pure, pattern S-057)
+_Session en cours_ : 025 — GF-FPA-1/2/3 scan corpus FPA (critical path GBL-003)
 
 '''
 == RÈGLES ABSOLUES (résumé)

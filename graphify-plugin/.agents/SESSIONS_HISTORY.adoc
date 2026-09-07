@@ -2,6 +2,7 @@
 
 |===
 | # | Date | Type | Sujet | Score
+| 023 | 2026-09-07 | cadrage | EPIC GF-FPA cadré (GBL-003.2 critical path MVP0 — arbitrage pilote : priorité génération de formation) — graphe de connaissance du corpus FPA, 3 US ~3 pts (GF-FPA-1 audit schéma / GF-FPA-2 scan corpus / GF-FPA-3 extension si besoin), frontière licence actée (graph-fpa.json dans office/, plugin Apache 2.0 sans contenu FPA), zéro code modifié. Doc `.agents/CADRAGE_EPIC_GF_FPA.adoc`. | 10/10
 | 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées (pattern bakery gradle-plugin + publishing), build.gradle.kts 111→49 lignes (-62), compileKotlin SUCCESS, BUILD SUCCESS. | 9/10
 | 020 | 2026-06-24 | refactor README | Architecture README Plugin + Consommateur — déplacement README.plugin → graphify-plugin/, README.consommateurs → racine, liens i18n recréés (10 langues) | 8/10
 | 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers créés (10 langues × README.consommateurs + README.plugin). Badges Maven Central/Portal/CI/Coverage 58 PASS/Licence. Switcher 10 langues, support RTL Arabe/Urdu. Aucun code touché. | 9/10

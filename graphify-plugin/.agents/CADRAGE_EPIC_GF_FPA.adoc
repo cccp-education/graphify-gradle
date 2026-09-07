@@ -1,0 +1,63 @@
+= Cadrage EPIC GF-FPA — Graphe de connaissance du corpus FPA (GBL-003.2)
+:date: 2026-09-07
+:epic: GF-FPA
+:origine: BACKLOG.adoc racine § GBL-003 + AGENTS.adoc § MVP0 Critical Path
+:methode: Cadrage (gouvernance pure, zéro code) — pattern S-057/S-063
+
+== Contexte
+
+Arbitrage pilote (2026-09-07) : priorité aux boroughs qui rapprochent de
+la génération de formation. Le corpus FPA (`office/metiers/FPA`,
+livre.adoc 7787 lignes + pages OCR + gouvernance `.agents`) doit devenir
+du contexte augmenté exploitable. Graphify est le premier maillon de la
+chaîne (GBL-003.2) : extraire le graphe de connaissance du corpus pour
+que les agents de génération SPG/SPD naviguent la structure du métier.
+
+== Constats
+
+1. Graphify est N0 (scanner zéro dépendance inter-plugin), liquidé S-017,
+   publié Central 0.0.3 (S-215). Tooling stable : `graph.json` standardisé
+   (noeuds/arêtes/communautés).
+2. Le corpus FPA est structuré AsciiDoc : `livre.adoc` (niveaux de titre
+   = hiérarchie naturelle de sections), pages OCR individuelles sous
+   `Devenir_Formateur_Professionnel_d_Adultes_FPA_II/scans`.
+3. Frontière licence (S-070) : le graphe dérivé du corpus reste une
+   œuvre dérivée — le `graph.json` FPA vit dans `office/metiers/FPA`
+   (jamais dans graphify-gradle ni un borough public). Graphify le
+   plugin reste Apache 2.0, il ne transporte aucun contenu FPA.
+4. Les consommateurs actuels de graph.json (plantuml, bakery, runner,
+   dashboard-flow) parsent le schéma standard — aucun changement de
+   contrat nécessaire si le scan respecte les types de noeuds existants.
+5. Économie d'encre : le scan du corpus FPA est un dogfooding par
+   configuration (point d'entrée sur le répertoire FPA), pas une feature
+   nouvelle. Si un type de noeud `section`/`page` manque, l'extension du
+   schéma est la seule évolution légitime.
+
+== Décisions
+
+- D1 : EPIC graphify-only — le plugin ne dépend d'aucun borough, le
+  corpus reste dans office/.
+- D2 : le graphe FPA (`graph-fpa.json`) est généré dans le workspace
+  office/ (œuvre dérivée), consommé par codebase/bakery via chemin
+  config, pas transporté par graphify.
+- D3 : périmètre = graphe sections (livre.adoc) + pages OCR + liens
+  TOC. Pas d'extraction sémantique LLM (hors scope — c'est le rôle des
+  N2 codex/codebase).
+- D4 : zéro modification du plugin si le schéma existant couvre les
+  types requis (vérifier en US-1 avant toute évolution).
+- D5 : baby-step TDD strict — toute extension de schéma passe par
+  test d'abord.
+
+== User Stories (~3 pts)
+
+|===
+| US | Description | Pts
+| GF-FPA-1 | Audit schéma : vérifier que les types noeuds/arêtes existants couvrent sections/pages/liens du corpus FPA — zéro code si couvert | 1
+| GF-FPA-2 | Scan du corpus FPA → `graph-fpa.json` dans office/metiers/FPA (run dogfooding, pas de code) | 1
+| GF-FPA-3 | Extension schéma si types manquants (TDD : test d'abord, 1 type = 1 test) | 1
+|===
+
+== Débloque
+
+GBL-003.3 (codex acquisition) et GBL-003.4 (codebase RAG) consomment le
+graphe pour contextualiser le chunking et l'ingestion.

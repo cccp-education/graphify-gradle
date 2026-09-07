@@ -1,27 +1,28 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 022
-:session: 022
+= PROMPT_REPRISE — Graphify Gradle — Session 024
+:session: 024
 :date: 2026-09-07
 
-== Session S-214 (pilote Brooklyn/codex) terminée — US-ROLLOUT-6 adoption version catalog + bump 0.0.3
+== Session 023 (S-215 globale) terminée — Cadrage EPIC GF-FPA (gouvernance pure)
 
-Adoption version catalog workspace (EPIC MEM-CAT-ROLLOUT ordre 6) :
-garde `GraphifyPluginPublicationTest` 3 gardes RED → GREEN (pin ws
-`workspace-catalog:0.0.33` D4 + `version = ws.versions.graphify.plugin.get()`
-D3 + id inline stable). Fix parseur hygiène : toml local déclare
-`graphify = "x"` (pas `graphify-plugin`).
+Arbitrage pilote 2026-09-07 : priorité critical path MVP0 (génération de
+formation), pas les boroughs peu développés. EPIC transverse GBL-003
+créé racine (corpus FPA → contexte augmenté). Cadrage EPIC *GF-FPA*
+livré (`.agents/CADRAGE_EPIC_GF_FPA.adoc`) : graphe de connaissance du
+corpus FPA (GBL-003.2), 3 US ~3 pts, zéro code modifié. Constat clé :
+frontière licence — le graph-fpa.json vit dans office/ (œuvre dérivée),
+le plugin reste Apache 2.0 sans contenu FPA.
 
-Bump graphify 0.0.2 → 0.0.3 propagé MEMPHIS-first (demande pilote) :
-toml root + plugin `graphify = "0.0.3"` → MEMPHIS `graphify-plugin 0.0.3`
-+ `workspace-bom 0.0.33` + catalog 0.0.33 mavenLocal → pin ws 0.0.33.
+== Prochaine Session (025)
 
-Gates : `check` VERT 63 tests 0 FAIL (baseline 60 → +3) ;
-root consumer `collectAndVerify` VERT (DAG acyclic OK) ;
-`publishToMavenLocal` VERT (POM 0.0.3 version dérivée ws vérifiée).
-Publication Central graphify 0.0.3 + BOM 0.0.33 reportée à la demande
-du pilote (mavenLocal fait).
+*Priorité critical path* : GF-FPA-1 audit schéma (1 pt) → GF-FPA-2 scan
+corpus FPA → graph-fpa.json (1 pt) → GF-FPA-3 extension schéma si
+besoin (1 pt, TDD strict).
 
-== Prochaine Session (023)
+Mission : lancer le scan graphify sur `office/metiers/FPA` (dogfooding
+par configuration) et vérifier le schéma couvre sections/pages/liens.
 
-- Dormant. Borough liquidé, métier stable.
-- Optionnel : publication Central 0.0.3 (à la demande pilote — mavenLocal seul).
-- Réactiver si nouveau borough ou changement DAG foundry.
+== Rappel
+
+- Borough liquidé (GF-0→6 + PUB terminés), tooling stable 0.0.3 Central.
+- Zéro initiative : publication/bump uniquement à la demande pilote.
+- Baby-step TDD/BDD : test d'abord, build verify.
