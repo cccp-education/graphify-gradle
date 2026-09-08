@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-09-07 (session 023 — cadrage EPIC GF-CORPUS (GBL-003.2 critical path MVP0) — graphe de connaissance du corpus (ex-FPA — renommé RENAME), 3 US ~3 pts, zéro code, frontière licence actée : graph-content.json vit dans office/)
-_Session terminee_ : 023 — Cadrage EPIC GF-CORPUS (gouvernance pure, pattern S-057)
-_Session en cours_ : 025 — GF-CORPUS-1/2/3 scan corpus FPA (critical path GBL-003)
+_Derniere mise a jour_ : 2026-09-08 (session 024 — EPIC GF-CORPUS TERMINÉ 3/3 US : audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry, unicité IDs) + scan corpus FPA → office/metiers/FPA/graph-content.json 1989 nœuds. 70/70 PASS (+12).)
+_Session terminee_ : 024 — EPIC GF-CORPUS TERMINÉ 3/3 US (TDD strict + dogfooding)
+_Session en cours_ : 025 — maintenance (borough liquidé, GBL-003 passe aux consommateurs)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -82,6 +82,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-3 | Intégration runner-gradle — verifyDagAcyclicTask migrée + scanAndVerify chaîné + CI chain | ✅ TERMINÉ (session EPIC A) | P1
 | GF-4 | Publication Gradle Plugin Portal | ✅ TERMINÉ — marker .gradle.plugin sur Maven Central (résolvable via pluginManagement { mavenCentral() }). Portail UI web optionnel. | P2
 | GF-6 | Publication Maven Central (nmcp) — v0.0.2 déployé | ✅ TERMINÉ (session 013) | P0
+| GF-CORPUS | Graphe de connaissance du corpus FPA (GBL-003.2) — audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry) + scan corpus → office/metiers/FPA/graph-content.json | ✅ TERMINÉ (session 024) | P0
 |===
 
 '''
@@ -89,6 +90,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 024 | 2026-09-08 | dev | EPIC GF-CORPUS TERMINÉ 3/3 US — extension schéma TDD strict (sections, has_section, subsection, toc_entry, IDs uniques) + scan corpus FPA → graph-content.json (1989 nœuds). 70/70 PASS (+12). | 10/10
 | 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS | ✅ TERMINE
 | 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers (10 langues × consumer + plugin), badges 0.0.2/58 PASS, switcher, AR/UR RTL | 9/10
 | 018 | 2026-06-19 | bugfix | engine→runner-gradle rename + fallback cheroliv.com supprimé de runner N3 | 10/10

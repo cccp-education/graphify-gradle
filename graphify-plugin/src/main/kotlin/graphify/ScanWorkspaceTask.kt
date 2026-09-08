@@ -34,6 +34,8 @@ open class ScanWorkspaceTask : DefaultTask() {
     @get:Internal
     var excludePatterns: List<String> = emptyList()
 
+    private val headingRegex = Regex("""^(=+)\s+(.+?)\s*$""")
+
     private val mapper: ObjectMapper = ObjectMapper()
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
         .registerKotlinModule()
@@ -89,10 +91,15 @@ open class ScanWorkspaceTask : DefaultTask() {
         val nodes = extractNodes(root, allFileData, dirs, projects, repoMap)
         val edges = extractEdges(allFiles, projectDirs, root)
         val communities = extractCommunities(repoMap)
+        val sections = extractSections(root, allFiles)
 
         val graph = GraphModel(
-            nodes = nodes,
-            edges = edges,
+            nodes = nodes + sections.map { it.node },
+            edges = edges
+                + sections.map { section ->
+                    GraphEdge(source = section.fileRelative, target = section.node.id, type = "has_section")
+                }
+                + buildSubsectionEdges(sections),
             communities = communities
         )
 
@@ -204,12 +211,21 @@ open class ScanWorkspaceTask : DefaultTask() {
         for (file in adocFiles) {
             val content = safe { Files.readString(file) } ?: continue
             val refs = extractAdocReferences(content)
+            val tocRefs = extractTocTableReferences(content)
             for (ref in refs) {
                 val targetFile = safe { resolveReferenceToFile(file.parent, ref) }
                 if (targetFile != null && safe { Files.exists(targetFile) } == true) {
                     val src = safe { root.relativize(file).toString() } ?: continue
                     val tgt = safe { root.relativize(targetFile).toString() } ?: continue
                     edges.add(GraphEdge(source = src, target = tgt, type = "reference"))
+                }
+            }
+            for (ref in tocRefs) {
+                val targetFile = resolveTocReference(file, ref, files)
+                if (targetFile != null && safe { Files.exists(targetFile) } == true) {
+                    val src = safe { root.relativize(file).toString() } ?: continue
+                    val tgt = safe { root.relativize(targetFile).toString() } ?: continue
+                    edges.add(GraphEdge(source = src, target = tgt, type = "reference", label = "toc_entry"))
                 }
             }
         }
@@ -248,6 +264,17 @@ open class ScanWorkspaceTask : DefaultTask() {
         val pathRegex = Regex("""`([\w./-]+\.(?:adoc|ad|kt|kts|yml|yaml|json|java|md))`""")
         refs.addAll(pathRegex.findAll(content).map { it.groupValues[1] }.toList())
         return refs
+    }
+
+    private fun extractTocTableReferences(content: String): List<String> {
+        val cellRegex = Regex("""\|\s*([\w./-]+\.(?:adoc|ad))\s*(?:\||$)""", RegexOption.MULTILINE)
+        return cellRegex.findAll(content).map { it.groupValues[1] }.toList()
+    }
+
+    private fun resolveTocReference(fromFile: Path, ref: String, allFiles: List<Path>): Path? {
+        val direct = safe { resolveReferenceToFile(fromFile.parent, ref) }
+        if (direct != null && safe { Files.isRegularFile(direct) } == true) return direct
+        return allFiles.firstOrNull { it.fileName.toString() == ref }
     }
 
     private fun resolveReferenceToFile(base: Path, ref: String): Path? {
@@ -291,6 +318,59 @@ open class ScanWorkspaceTask : DefaultTask() {
     }
 
     private data class FileInfo(val path: Path, val size: Long)
+
+    private data class SectionInfo(val node: GraphNode, val fileRelative: String, val level: Int)
+
+    private fun buildSubsectionEdges(sections: List<SectionInfo>): List<GraphEdge> {
+        val edges = mutableListOf<GraphEdge>()
+        val stack = mutableListOf<SectionInfo>()
+        for (section in sections) {
+            while (stack.isNotEmpty() && stack.last().level >= section.level) stack.removeAt(stack.lastIndex)
+            stack.lastOrNull()?.let { parent ->
+                edges.add(GraphEdge(source = parent.node.id, target = section.node.id, type = "subsection"))
+            }
+            stack.add(section)
+        }
+        return edges
+    }
+
+    private fun extractSections(root: Path, files: List<Path>): List<SectionInfo> {
+        val sections = mutableListOf<SectionInfo>()
+        val adocFiles = files.filter { it.extension == "adoc" || it.extension == "ad" }
+        val idCounts = mutableMapOf<String, Int>()
+        for (file in adocFiles) {
+            val content = safe { Files.readString(file) } ?: continue
+            val fileRelative = safe { root.relativize(file).toString() } ?: continue
+            val lines = content.lines()
+            var lineNumber = 0
+            for (line in lines) {
+                lineNumber++
+                val match = headingRegex.find(line) ?: continue
+                val level = match.groupValues[1].length
+                val title = match.groupValues[2]
+                val baseId = "$fileRelative#$title"
+                val count = idCounts.merge(baseId, 1, Int::plus) ?: 1
+                val sectionId = if (count == 1) baseId else "$baseId~$count"
+                sections.add(
+                    SectionInfo(
+                        node = GraphNode(
+                            id = sectionId,
+                            label = title,
+                            type = "section",
+                            metadata = mapOf(
+                                "level" to level,
+                                "line" to lineNumber,
+                                "source" to fileRelative
+                            )
+                        ),
+                        fileRelative = fileRelative,
+                        level = level
+                    )
+                )
+            }
+        }
+        return sections
+    }
 
     private fun <T> safe(block: () -> T): T? {
         return try { block() } catch (_: Exception) { null }

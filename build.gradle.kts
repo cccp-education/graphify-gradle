@@ -1,3 +1,5 @@
+import graphify.ScanWorkspaceTask
+
 plugins {
     alias(libs.plugins.graphify)
 }
@@ -25,4 +27,19 @@ graphify {
         "newpipe-gradle" to 2,
         "saas-deploy-gradle" to 2
     ))
+}
+
+tasks.register("scanFpaCorpus", ScanWorkspaceTask::class.java) {
+    group = "collect"
+    description = "GF-CORPUS-2 — Scan corpus FPA -> office/metiers/FPA/graph-content.json"
+    rootDir = file("/home/cheroliv/workspace/office/metiers/FPA")
+    outputFile = file("/home/cheroliv/workspace/office/metiers/FPA/graph-content.json")
+    excludePatterns = listOf(
+        "**/build/**",
+        "**/node_modules/**",
+        "**/.gradle/**",
+        "**/.git/**",
+        "**/.idea/**",
+        "**/target/**"
+    )
 }

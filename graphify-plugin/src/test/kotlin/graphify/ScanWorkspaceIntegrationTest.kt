@@ -438,6 +438,71 @@ class ScanWorkspaceIntegrationTest {
         }
     }
 
+    @Nested
+    inner class FpaCorpusKnowledgeGraph {
+
+        @TempDir
+        lateinit var corpusDir: Path
+
+        @Test
+        fun `should extract full corpus graph with sections pages and toc links`() {
+            val scans = corpusDir.resolve("scans")
+            scans.createDirectories()
+            for (page in listOf("000", "009", "010")) {
+                scans.resolve("$page.adoc").writeText("= Page $page\nContenu OCR de la page.")
+            }
+
+            corpusDir.resolve("livre.adoc").writeText(
+                """
+                = Devenir Formateur Professionnel d'Adultes
+                == Chapitre 1 : Introduction
+                === Définition du métier
+                == Chapitre 2 : Ingénierie pédagogique
+                """.trimIndent()
+            )
+
+            corpusDir.resolve("toc.adoc").writeText(
+                """
+                | Référence | Sujet / Titre | Page | Fichier
+                | 1.0.0 | Introduction | 0 | 000.adoc
+                | 1.0.1 | Chapitre 1 | 9 | 009.adoc
+                | 1.0.2 | Chapitre 2 | 10 | 010.adoc
+                """.trimIndent()
+            )
+
+            task.rootDir = corpusDir.toFile()
+            task.outputFile = outputFile
+            task.scan()
+
+            val graph = parseOutput()
+
+            val sections = graph.nodes.filter { it.type == "section" }
+            assertThat(sections).hasSize(7)
+            assertThat(sections.map { it.label }).containsExactlyInAnyOrder(
+                "Devenir Formateur Professionnel d'Adultes",
+                "Chapitre 1 : Introduction",
+                "Définition du métier",
+                "Chapitre 2 : Ingénierie pédagogique",
+                "Page 000", "Page 009", "Page 010"
+            )
+
+            val hasSectionEdges = graph.edges.filter { it.type == "has_section" }
+            assertThat(hasSectionEdges.map { it.source }.distinct())
+                .containsExactlyInAnyOrder("livre.adoc", "scans/000.adoc", "scans/009.adoc", "scans/010.adoc")
+
+            val subsectionEdges = graph.edges.filter { it.type == "subsection" }
+            assertThat(subsectionEdges).hasSize(3)
+
+            val tocEdges = graph.edges.filter { it.type == "reference" && it.label == "toc_entry" }
+            assertThat(tocEdges.map { it.target }).containsExactlyInAnyOrder(
+                "scans/000.adoc", "scans/009.adoc", "scans/010.adoc"
+            )
+
+            val pageNodes = graph.nodes.filter { it.type == "file" && it.id.startsWith("scans/") }
+            assertThat(pageNodes).hasSize(3)
+        }
+    }
+
     private fun parseOutput(): GraphModel {
         assertThat(outputFile).exists()
         return mapper.readValue(outputFile, GraphModel::class.java)

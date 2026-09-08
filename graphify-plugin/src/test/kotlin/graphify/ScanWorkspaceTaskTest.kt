@@ -421,6 +421,123 @@ class ScanWorkspaceTaskTest {
         assertThat(fileNode!!.id).isEqualTo("file.txt")
     }
 
+    @Test
+    fun `should extract section nodes from adoc headings`() {
+        writeFile("book.adoc", """
+            = Livre
+            == Chapitre Un
+            === Partie A
+            == Chapitre Deux
+        """.trimIndent())
+
+        task.scan()
+
+        val graph = parseOutput()
+        val sections = graph.nodes.filter { it.type == "section" }
+        assertThat(sections.map { it.label })
+            .containsExactlyInAnyOrder("Livre", "Chapitre Un", "Partie A", "Chapitre Deux")
+        val chapter = sections.find { it.label == "Chapitre Un" }!!
+        assertThat(chapter.metadata["level"]).isEqualTo(2)
+        assertThat(chapter.metadata["line"]).isEqualTo(2)
+    }
+
+    @Test
+    fun `should not create section nodes from block delimiters`() {
+        writeFile("book.adoc", """
+            = Livre
+            ====
+            This is an example block, not a heading.
+            ====
+        """.trimIndent())
+
+        task.scan()
+
+        val graph = parseOutput()
+        val sections = graph.nodes.filter { it.type == "section" }
+        assertThat(sections.map { it.label }).containsExactly("Livre")
+    }
+
+    @Test
+    fun `should link sections to their source file with has_section edges`() {
+        writeFile("docs/book.adoc", """
+            = Livre
+            == Chapitre Un
+        """.trimIndent())
+
+        task.scan()
+
+        val graph = parseOutput()
+        val hasSectionEdges = graph.edges.filter { it.type == "has_section" }
+        assertThat(hasSectionEdges).hasSize(2)
+        assertThat(hasSectionEdges.map { "${it.source}->${it.target}" }).containsExactlyInAnyOrder(
+            "docs/book.adoc->docs/book.adoc#Livre",
+            "docs/book.adoc->docs/book.adoc#Chapitre Un"
+        )
+    }
+
+    @Test
+    fun `should build subsection hierarchy edges between section levels`() {
+        writeFile("book.adoc", """
+            = Livre
+            == Chapitre Un
+            === Partie A
+            === Partie B
+            == Chapitre Deux
+            = Autre Fichier
+        """.trimIndent())
+        writeFile("other.adoc", "= Tête de l'autre fichier")
+
+        task.scan()
+
+        val graph = parseOutput()
+        val subEdges = graph.edges.filter { it.type == "subsection" }
+        assertThat(subEdges.map { "${it.source}->${it.target}" }).containsExactlyInAnyOrder(
+            "book.adoc#Livre->book.adoc#Chapitre Un",
+            "book.adoc#Chapitre Un->book.adoc#Partie A",
+            "book.adoc#Chapitre Un->book.adoc#Partie B",
+            "book.adoc#Livre->book.adoc#Chapitre Deux"
+        )
+    }
+
+    @Test
+    fun `should resolve toc table cell references to scan pages`() {
+        writeFile("scans/000.adoc")
+        writeFile("scans/009.adoc")
+        writeFile("toc.adoc", """
+            | Référence | Sujet / Titre | Page | Fichier
+            | 1.0.0 | Introduction | 0 | 000.adoc
+            | 1.0.1 | Chapitre 1 | 9 | 009.adoc
+        """.trimIndent())
+
+        task.scan()
+
+        val graph = parseOutput()
+        val tocRefs = graph.edges.filter { it.type == "reference" && it.label == "toc_entry" }
+        assertThat(tocRefs.map { "${it.source}->${it.target}" }).containsExactlyInAnyOrder(
+            "toc.adoc->scans/000.adoc",
+            "toc.adoc->scans/009.adoc"
+        )
+    }
+
+    @Test
+    fun `should deduplicate section ids when same title appears twice`() {
+        writeFile("book.adoc", """
+            = Livre
+            == Introduction
+            == Chapitre
+            === Introduction
+        """.trimIndent())
+
+        task.scan()
+
+        val graph = parseOutput()
+        val sections = graph.nodes.filter { it.type == "section" }
+        assertThat(sections.map { it.id }.distinct()).hasSameSizeAs(sections)
+        val introIds = sections.filter { it.label == "Introduction" }.map { it.id }
+        assertThat(introIds).hasSize(2)
+        assertThat(introIds[0]).isNotEqualTo(introIds[1])
+    }
+
     private fun parseOutput(): GraphModel {
         assertThat(outputFile).exists()
         return mapper.readValue(outputFile, GraphModel::class.java)

@@ -1,0 +1,111 @@
+= Session 024 — GF-CORPUS-1/2/3 : Graphe de connaissance du corpus FPA
+:date: 2026-09-08
+:epic: GF-CORPUS (GBL-003.2 — critical path MVP0)
+:methode: Baby-step TDD strict (RED→GREEN) + dogfooding par configuration
+:type: dev
+
+== Mission
+
+Exécuter l'EPIC GF-CORPUS cadré en S-023 : audit du schéma (US-1), scan du
+corpus FPA vers `office/metiers/FPA/graph-content.json` (US-2), extension du
+schéma si types manquants (US-3, TDD strict).
+
+== Réalisations
+
+=== GF-CORPUS-1 — Audit schéma (1 pt) ✅
+
+Audit du code (`GraphModel.kt`, `ScanWorkspaceTask.kt`) contre les 3 besoins
+du corpus FPA :
+
+|===
+| Besoin corpus | Couverture schéma existant | Verdict
+| Pages OCR (`scans/000.adoc`…) | nœuds `file` + edges `contains` | ✅ couvert
+| Sections (titres `=`/`==`/`===` de livre.adoc) | aucun type `section` | ❌ manquant
+| Liens TOC (cellules `| 000.adoc |` de toc.adoc) | regex ne capte ni cellules ni nom simple | ❌ manquant
+|===
+
+Verdict : extension de schéma nécessaire → GF-CORPUS-3 déclenché (conforme
+décision D4 du cadrage).
+
+=== GF-CORPUS-3 — Extension schéma TDD strict (1 pt) ✅
+
+5 baby-steps RED→GREEN, un type = un test :
+
+. *U1 nœuds `section`* — `headingRegex` `^(=+)\s+(.+?)\s*$` (exclut
+  les délimiteurs de blocs `====`), extraction par fichier adoc, metadata
+  `level`/`line`/`source`. 2 tests.
+. *U2 edges `has_section`* — fichier → section. Bug trouvé en chemin :
+  `file.toString()` donnait le chemin absolu → corrigé en
+  `root.relativize(file)`. 1 test.
+. *U3 edges `subsection`* — hiérarchie par pile (parent = dernier titre de
+  niveau strictement inférieur, jamais cross-fichier, niveau 1 sans parent).
+  Attente de test initiale (chaîne linéaire) corrigée — la sémantique
+  AsciiDoc impose la pile. 1 test.
+. *U4 `reference` TOC* — regex cellules de table
+  `\|\s*([\w./-]+\.(?:adoc|ad))\s*(?:\||$)` + résolution par nom de fichier
+  (`resolveTocReference` : direct d'abord, puis match sur `fileName`).
+  Label `toc_entry`. 1 test.
+. *U5 unicité IDs* — sections homonymes suffixées `~N`
+  (`book.adoc#Intro~2`). 1 test.
+
++ Test d'intégration end-to-end `FpaCorpusKnowledgeGraph` (mini-corpus
+miroir FPA : scans + livre + toc). Attente corrigée : les pages OCR ont
+aussi leur titre `= Page NNN` (légitime).
+
+Décision méthode : pas d'infra Cucumber dans ce borough (library pure
+JUnit5, zéro dépendance cucumber au build). Le cadrage D5 demande le TDD
+strict ; la couverture BDD est assurée par 7 tests unitaires + 1 test
+d'intégration end-to-end. Cucumber serait une addition de dépendance hors
+périmètre EPIC (économise l'encre).
+
+=== GF-CORPUS-2 — Scan corpus FPA (1 pt) ✅
+
+Dogfooding par configuration (décision D2) — tâche `scanFpaCorpus` ajoutée
+au consumer `graphify-gradle/build.gradle.kts` (racine de travail, pas le
+plugin) :
+
+* `rootDir = office/metiers/FPA`
+* `outputFile = office/metiers/FPA/graph-content.json` (œuvre dérivée,
+  frontière licence respectée — jamais dans le repo public)
+* exclusions standard
+
+Résultat du run : 1989 nœuds, 1857 edges, 0 communautés, 2.85 MB.
+
+|===
+| Artefact graphe | Compte
+| Nœuds `file` | 1694 (374 adoc, 297 pdf, 223 png, 222 jpg…)
+| Nœuds `section` | 2213 (livre + pages OCR + docs)
+| Edges `has_section` | 2213
+| Edges `subsection` | 1966 (hiérarchie livre navigable)
+| Edges `toc_entry` | 3 (toc.adoc → scans/000|009|010.adoc)
+|===
+
+== Gates
+
+* `./gradlew test` : 70/70 PASS (baseline 58 → +12), 0 régression
+* `./gradlew publishToMavenLocal` : BUILD SUCCESSFUL (règle 0)
+* `./gradlew compileKotlin` (ouverture) : SUCCESS
+* Frontière licence : `graph-content.json` dans office/, zéro contenu FPA
+  dans graphify-gradle
+
+== Fichiers modifiés
+
+* `graphify-plugin/src/main/kotlin/graphify/ScanWorkspaceTask.kt` —
+  extractSections + buildSubsectionEdges + extractTocTableReferences +
+  resolveTocReference (~80 lignes ajoutées)
+* `graphify-plugin/src/test/kotlin/graphify/ScanWorkspaceTaskTest.kt` —
+  +6 tests unitaires
+* `graphify-plugin/src/test/kotlin/graphify/ScanWorkspaceIntegrationTest.kt` —
+  +1 test intégration (nested FpaCorpusKnowledgeGraph)
+* `graphify-gradle/build.gradle.kts` (consumer) — tâche scanFpaCorpus
+* `office/metiers/FPA/graph-content.json` — artefact généré (œuvre dérivée)
+
+== Débloque
+
+GBL-003.3 (codex acquisition) et GBL-003.4 (codebase RAG) — les agents de
+génération SPG/SPD peuvent naviguer la structure du corpus via le graphe.
+
+== Score
+
+10/10 — EPIC GF-CORPUS TERMINÉ 3/3 US, méthode baby-step respectée,
+critical path MVP0 avancé.

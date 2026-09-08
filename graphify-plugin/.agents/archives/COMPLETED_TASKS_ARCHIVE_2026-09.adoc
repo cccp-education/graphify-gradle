@@ -1,0 +1,19 @@
+= Archive Tâches Complétées — Septembre 2026
+
+== Session 024 (2026-09-08) — EPIC GF-CORPUS TERMINÉ 3/3 US (GBL-003.2 critical path MVP0)
+
+* GF-CORPUS-1 ✅ Audit schéma — sections + liens TOC non couverts (verdict : extension nécessaire)
+* GF-CORPUS-3 ✅ Extension schéma TDD strict — 5 baby-steps RED→GREEN :
+  - nœuds `section` (headingRegex `^(=+)\s+(.+?)\s*$`, metadata level/line/source)
+  - edges `has_section` (fichier → section, fix relativisation root)
+  - edges `subsection` (pile hiérarchique, jamais cross-fichier)
+  - edges `reference` label `toc_entry` (cellules table + résolution par nom)
+  - unicité IDs sections homonymes (`~N`)
+  + test intégration FpaCorpusKnowledgeGraph end-to-end
+* GF-CORPUS-2 ✅ Scan corpus FPA — tâche `scanFpaCorpus` (consumer) →
+  `office/metiers/FPA/graph-content.json` : 1989 nœuds, 1857 edges, 2.85 MB
+  (1694 files, 2213 sections, 1966 subsection, 3 toc_entry). Frontière
+  licence respectée (œuvre dérivée dans office/).
+* Gates : 70/70 PASS (+12), publishToMavenLocal VERT, 0 régression
+* Décision : pas de Cucumber dans ce borough (library pure JUnit5)
+* Débloque : GBL-003.3 (codex) + GBL-003.4 (codebase RAG)

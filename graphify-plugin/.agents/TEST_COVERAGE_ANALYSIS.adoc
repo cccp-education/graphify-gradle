@@ -1,7 +1,21 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3, 58/58 PASS)
-_Dernière mise à jour_ : Session 018 (2026-06-19)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3, 58/58 PASS) + EPIC GF-CORPUS TERMINÉ (S-024, 70/70 PASS)
+_Dernière mise à jour_ : Session 024 (2026-09-08)
+
+== Session 024 — EPIC GF-CORPUS extension schéma TDD strict
+
+- `ScanWorkspaceTask.kt` : +extractSections (nœuds `section`, headingRegex
+  excluant délimiteurs de blocs), +buildSubsectionEdges (pile hiérarchique),
+  +extractTocTableReferences + resolveTocReference (cellules table + nom),
+  unicité IDs `~N`, fix relativisation has_section
+- `ScanWorkspaceTaskTest.kt` : +6 tests unitaires (section nodes, block
+  delimiters, has_section, subsection hierarchy, toc cells, dedup IDs)
+- `ScanWorkspaceIntegrationTest.kt` : +FpaCorpusKnowledgeGraph (end-to-end
+  mini-corpus miroir FPA : 7 sections, 4 has_section, 3 subsection, 3 toc)
+- Décision : pas de Cucumber (library pure JUnit5, addition de dépendance
+  hors périmètre EPIC — économise l'encre)
+- 70/70 total PASS (baseline 58 → +12), 0 régression
 
 == Session 013 — Fix @Input validatePlugins
 
@@ -18,17 +32,17 @@ _Dernière mise à jour_ : Session 018 (2026-06-19)
 |===
 | Module | Tests | Couverture
 | api-key-pool | 66/66 PASS ✅ | 100% (6 classes testées)
-| graphify-plugin | 58/58 PASS ✅ | ScanWorkspaceTask (24 unitaires) + ScanWorkspaceIntegrationTest (14 intégration) + VerifyDagAcyclicTask (11) + ScanAndVerifyIntegration (3) + GraphModel (6)
+| graphify-plugin | 70/70 PASS ✅ | ScanWorkspaceTask (30 unitaires) + ScanWorkspaceIntegrationTest (15 intégration) + VerifyDagAcyclicTask (11) + ScanAndVerifyIntegration (3) + GraphModel (6)
 |===
 
-Total : 124/124 PASS ✅
+Total : 136/136 PASS ✅
 
 == Tests par composant (graphify-plugin)
 
 |===
 | Fichier | Tests | Couvre
-| `ScanWorkspaceTaskTest.kt` | 24 unitaires | Exclusions, nœuds (file/dir/project), arêtes (contains/import/reference/agent_reference), communautés, JSON, empty workspace, .agents/ cross-project
-| `ScanWorkspaceIntegrationTest.kt` | 14 intégration | Multi-borough detection, cross-project edges, exclusion verification, output validation, workspace mimic
+| `ScanWorkspaceTaskTest.kt` | 30 unitaires | Exclusions, nœuds (file/dir/project/section), arêtes (contains/import/reference/toc_entry/has_section/subsection), communautés, JSON, empty workspace, .agents/ cross-project, unicité IDs sections
+| `ScanWorkspaceIntegrationTest.kt` | 15 intégration | Multi-borough detection, cross-project edges, exclusion verification, output validation, workspace mimic, FpaCorpusKnowledgeGraph (sections+pages+toc end-to-end)
 | `VerifyDagAcyclicTaskTest.kt` | 11 unitaires | DAG acyclic OK, N1→N2 violation, N0→N3 violation, suffixes resolution, underscores, custom levels, levelOf()
 | `ScanAndVerifyIntegrationTest.kt` | 3 intégration | scan→verify OK, scan→detect violation, engine contract validation
 | `GraphModelTest.kt` | 6 | Jackson serialization/deserialization, defaults, NON_NULL labels, GraphCommunity

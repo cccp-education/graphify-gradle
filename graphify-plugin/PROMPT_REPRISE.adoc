@@ -1,28 +1,31 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 024
-:session: 024
-:date: 2026-09-07
+= PROMPT_REPRISE — Graphify Gradle — Session 025
+:session: 025
+:date: 2026-09-08
 
-== Session 023 (S-215 globale) terminée — Cadrage EPIC GF-CORPUS (gouvernance pure)
+== Session 024 terminée — EPIC GF-CORPUS TERMINÉ 3/3 US
 
-Arbitrage pilote 2026-09-07 : priorité critical path MVP0 (génération de
-formation), pas les boroughs peu développés. EPIC transverse GBL-003
-créé racine (corpus FPA → contexte augmenté). Cadrage EPIC *GF-CORPUS*
-livré (`.agents/CADRAGE_EPIC_GF_FPA.adoc`) : graphe de connaissance du
-corpus FPA (GBL-003.2), 3 US ~3 pts, zéro code modifié. Constat clé :
-frontière licence — le graph-content.json vit dans office/ (œuvre dérivée),
-le plugin reste Apache 2.0 sans contenu FPA.
+GF-CORPUS-1 audit schéma ✅ (sections + liens TOC non couverts).
+GF-CORPUS-3 extension schéma ✅ (TDD strict, 5 baby-steps RED→GREEN :
+nœuds `section`, edges `has_section`/`subsection`/`reference toc_entry`,
+unicité IDs). GF-CORPUS-2 scan corpus FPA ✅ (dogfooding par configuration :
+tâche `scanFpaCorpus` consumer → `office/metiers/FPA/graph-content.json`,
+1989 nœuds / 1857 edges / 2.85 MB). Gates : 70/70 PASS (+12), 
+publishToMavenLocal VERT. Frontière licence respectée (graphe dans office/).
 
-== Prochaine Session (025)
+== Prochaine Session (026)
 
-*Priorité critical path* : GF-CORPUS-1 audit schéma (1 pt) → GF-CORPUS-2 scan
-corpus FPA → graph-content.json (1 pt) → GF-CORPUS-3 extension schéma si
-besoin (1 pt, TDD strict).
+EPIC GF-CORPUS clos. Le graphe du corpus est disponible pour GBL-003.3
+(codex acquisition) et GBL-003.4 (codebase RAG).
 
-Mission : lancer le scan graphify sur `office/metiers/FPA` (dogfooding
-par configuration) et vérifier le schéma couvre sections/pages/liens.
+Priorité critical path MVP0 — GBL-003 suite : passer la main à Brooklyn
+(codex) ou Queens (codebase) selon l'ordonnancement du pilote. Zéro
+initiative graphify : le borough retourne en maintenance (liquidé, 0.0.3
+Central).
 
 == Rappel
 
-- Borough liquidé (GF-0→6 + PUB terminés), tooling stable 0.0.3 Central.
+- Borough liquidé (GF-0→6 + PUB + GF-CORPUS terminés), tooling stable 0.0.3 Central.
 - Zéro initiative : publication/bump uniquement à la demande pilote.
 - Baby-step TDD/BDD : test d'abord, build verify.
+- Pas d'infra Cucumber dans ce borough — library pure JUnit5, tests
+  unitaires + intégration suffisent (décision S-024).
