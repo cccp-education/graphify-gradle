@@ -12,7 +12,7 @@
 == Pendant la session
 
 . [ ] Respecter la Règle 0 — publishToMavenLocal OBLIGATOIRE après modif
-. [ ] Respecter la Règle 1 — AUCUN commit sans permission explicite
+. [ ] Respecter la Règle — Git autorisé (décision 2026-09-17), zéro secret commité
 . [ ] Respecter la Règle 1b — backup avant modif fichiers config
 . [ ] Respecter la Règle 2 — PAS de tests en fin de session sans permission
 . [ ] Vérifier que chaque modification compile avant de continuer

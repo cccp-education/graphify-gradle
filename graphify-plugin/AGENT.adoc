@@ -51,10 +51,9 @@ Ce projet vit dans `foundry/public/graphify-gradle/` → *cercle 4 (public, Apac
 
 === Git
 
-**INTERDICTION FORMELLE** de commit/push/merge sans permission explicite de l'utilisateur.
+* Commit/push/merge autorisés (décision pilote 2026-09-17 — suppression de l'interdiction formelle). Ne JAMAIS commiter de secret.
 
-Commandes autorisées (lecture seule) : `git status`, `git diff`, `git log`, `git show`
-Commandes interdites (sauf ordre) : `git add`, `git commit`, `git push`, `git merge`, `git rebase`
+Lecture seule toujours autorisée : `git status`, `git diff`, `git log`, `git show`
 
 === Tests
 
