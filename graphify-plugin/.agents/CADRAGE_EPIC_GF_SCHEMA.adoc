@@ -1,0 +1,206 @@
+= CADRAGE EPIC GF-SCHEMA — Enrichissement du schéma GraphModel (types + alias)
+
+:toc: macro
+:sectnums:
+:date: 2026-09-17
+:source: Session 025 (origine DFL-2 Brooklin Flow, S-216 cross-borough)
+
+toc::[]
+
+== Contexte — Pourquoi cet EPIC maintenant
+
+L'EPIC DSH-BOUNDARY (cadrage cross-borough S-216) a acté la frontière des
+trois surfaces d'observation du workspace :
+
+* *ALGER* (dashboard-gradle) = pilotage, lit la gouvernance `.adoc`.
+* *Brooklin Flow* (dashboard-flow-gradle) = navigation, lit `graph.json` (structure).
+* *Edster* (privé) = interactif avec état.
+
+Deux items du backlog Brooklin Flow ont été explicitement *laissés à graphify*
+(N0), car la structure du graphe est produite par graphify, jamais par le
+dashboard :
+
+|===
+| Item | Sujet | Pts | Statut
+| DFL-2 | Enrichissement schéma `GraphModel` (types + alias) | 5 | 🟡 À FAIRE (graphify N0)
+| DFL-5 | Fingerprinting incrémental | 5 | 🟡 À FAIRE (graphify N0)
+|===
+
+Le `BACKLOG.adoc` racine (ligne 199) porte la même intention : « Schéma KG
+enrichi (21 types nœuds / 35 arêtes + alias) — Aligner `GraphModel.kt` sur le
+schéma d'Understand-Anything ».
+
+*Cet EPIC traite DFL-2 uniquement.* DFL-5 (fingerprinting) est orthogonal et
+reste au backlog (optimisation de production, pas un contrat de schéma).
+
+== Audit — 7 constats
+
+[cols="1,3,3", options="header"]
+|===
+| # | Constat | Preuve
+
+| 1
+| Le vocabulaire de types est *implicite* — des littéraux de chaîne dispersés
+| `ScanWorkspaceTask.kt` émet `"project"`/`"directory"`/`"file"`/`"section"`
+  (lignes 151, 164, 355) et `"contains"`/`"import"`/`"reference"`/
+  `"agent_reference"`/`"has_section"`/`"subsection"` (lignes 188, 203, 220,
+  228, 239, 330). Aucun registre, aucune constante, aucune validation.
+
+| 2
+| *4 types de nœuds, 6 types d'arêtes* — contre 21/35 chez Understand-Anything
+| Audit production : `office/graph.json` = `file` 17 894, `directory` 3 280 ;
+  `office/metiers/FPA/graph-content.json` = `file` 1 694, `directory` 294,
+  `section` 2 213, `project` 1.
+
+| 3
+| Divergence orthographique documentée singulier ↔ pluriel
+| UA propose `imports`/`references` (DASHBOARD_REACT_FLOW.adoc:175-176) ;
+  graphify émet `import`/`reference`. Point de friction nommé, non résolu.
+
+| 4
+| Le type `module` est *fantôme* — cité partout, jamais produit
+| `bakery/lens/LensConfig.kt` + `codebase/graph/LensConfig.kt` citent
+  `module` en KDoc et fixtures ; `ScanWorkspaceTask` ne l'émet jamais. Le
+  « module » réel est typé `project`.
+
+| 5
+| Les types sont *durs-consommés* — un renommage casse silencieusement
+| `bakery/lens/AugmentedArticlesService.kt:107` : `it.type == "agent_reference"`
+  conditionne le score cross-ref. `LensConfig` (bakery + codebase) :
+  `nodeTypes = ["file"]`, `edgeTypes = ["reference","agent_reference"]`.
+
+| 6
+| Les consommateurs désérialisent en *strict* — un champ top-level ajouté casse
+| `bakery/lens/SubgraphExtractor.kt:39` + `codebase/graph/GraphContext.kt:33` +
+  `codebase/graph/SubgraphExtractor.kt` : `ObjectMapper().registerKotlinModule()`
+  puis `readValue<GraphModel>` — `FAIL_ON_UNKNOWN_PROPERTIES` reste à `true`.
+  Ajouter `schemaVersion` à `GraphModel` casserait bakery ET codebase.
+
+| 7
+| La documentation publique fige le contrat mais dérive déjà
+| `graphify-gradle/README.md:76-77` + 9 traductions
+  `README.consommateurs/` listent `project|directory|file` +
+  `contains|import|reference|agent_reference` — sans `section`/`has_section`/
+  `subsection`/`toc_entry` (introduits S-024, jamais documentés).
+
+|===
+
+== Décisions architecturales
+
+. *Non destructif d'abord.* Aucun type existant n'est renommé dans cet EPIC.
+   Le vocabulaire émis reste *byte-identique* (constat #5 : renommer =
+   régression silencieuse chez bakery/codebase, non détectée par `check`).
+
+. *`graphify.schema` — domaine Gradle-free, registre unique des littéraux.*
+   Nouveau domaine `graphify.schema` (objet pur, zéro dépendance Gradle) :
+   `NodeType`/`EdgeType` (enums canoniques), `GraphSchema` (registre +
+   résolution d'alias). `ScanWorkspaceTask` cesse d'écrire des chaînes
+   littérales et passe par `GraphSchema` — *single source of truth*.
+
+. *Mécanisme d'alias — entrée tolérante, sortie canonique.*
+   `canonicalizeNodeType(raw)` / `canonicalizeEdgeType(raw)` :
+   * un type canonique → inchangé (idempotent) ;
+   * un alias connu → résolu vers le canonique (ex. `imports` → `import`,
+     `module` → `project`, `dir` → `directory`) ;
+   * un type *inconnu* → **préservé tel quel** (jamais perdu, jamais
+     silencieusement remplacé). Règle d'or : le schéma tolère l'avenir.
+
+. *Direction de canonicalisation = singulier (état actuel) — inversible en 1 ligne.*
+   Puisque les consommateurs codent en dur le singulier, `import`/`reference`/
+   `agent_reference` restent canoniques. Le jour où les consommateurs adoptent
+   le pluriel UA (bump cross-borough), on inverse la table d'alias dans
+   `GraphSchema` *sans toucher* `ScanWorkspaceTask` ni ses tests de forme.
+
+. *Vocabulaire réservé (déclaré, non émis).* Les types UA non produits
+   (`domain`, `flow`, `step`, `service`, `endpoint`, `config`, `concept` ;
+   arêtes `depends_on`, `deploys`, `documents`, `similar_to`) sont *déclarés*
+   dans le registre pour que les consommateurs puissent valider/filtrer sans
+   deviner. Leur *détection* est un EPIC futur (elle changerait la sortie —
+   ex. `build.gradle.kts` deviendrait `config` — donc interdite tant que
+   bakery/codebase n'ont pas adopté).
+
+. *`schemaVersion` — DIFFÉRÉ (décision explicite).* Ajouter un champ top-level
+   à `GraphModel` casse les 3 consommateurs stricts (constat #6). Le
+   versionnement de schéma est donc *hors* de cet EPIC : il exige d'abord un
+   `@JsonIgnoreProperties(ignoreUnknown = true)` cross-borough + bump des
+   dépendances. `schemaVersion` reste porté par `dashboard-data.json` (ALGER),
+   qui est un contrat *neuf* sans consommateur legacy.
+
+. *Rétrocompat garantie par garde de test.* Un `graph.json` legacy doit rester
+   désérialisable par un `GraphModel` strict (sans champ ajouté). Garde
+   fonctionnelle + BDD dédiées.
+
+. *English only* — code, commentaires, Gherkin (règle transverse).
+
+. *Méthode* : baby-step DDD/TDD/BDD strict RED → GREEN → REFACTOR, 3 niveaux
+   (unit → functional → cucumber). Révision de la décision S-024 (« pas de
+   Cucumber dans ce borough ») : l'EPIC touche un *contrat public*, l'infra
+   Cucumber est désormais justifiée (cf. § Méthode).
+
+== Découpage US (~9 pts)
+
+[cols="1,3,2,1", options="header"]
+|===
+| US | Description | Statut | Pts
+
+| GF-SCHEMA-0
+| Cadrage EPIC (gouvernance pure, zéro code — ce document)
+| ✅ TERMINÉ (S-025)
+| 1
+
+| GF-SCHEMA-1
+| *Domaine `graphify.schema`* : `NodeType`/`EdgeType` enums + `GraphSchema`
+  (`canonicalizeNodeType`/`canonicalizeEdgeType`, alias, vocabulaire réservé).
+  Objet pur, TDD unit strict.
+| 🔲 À FAIRE
+| 3
+
+| GF-SCHEMA-2
+| *Wiring producteur* : `ScanWorkspaceTask` émet via `GraphSchema` (zéro
+  littéral), non-régression byte-identique de `graph.json`.
+| 🔲 À FAIRE
+| 2
+
+| GF-SCHEMA-3
+| *Functional (TestKit)* : scan end-to-end d'un mini-workspace +
+  garde de rétrocompat (JSON strict parsable sans champ ajouté).
+| 🔲 À FAIRE
+| 2
+
+| GF-SCHEMA-4
+| *BDD Cucumber* : `schema_alias.feature` — canonicalisation, préservation
+  des inconnus, idempotence, round-trip legacy. Infra Cucumber minimale.
+| 🔲 À FAIRE
+| 2
+
+| GF-SCHEMA-5
+| *(DIFFÉRÉ)* `schemaVersion` top-level + `@JsonIgnoreProperties` cross-borough
+  bakery/codebase + bump. Gate : adoption consommateurs.
+| ⏳ DIFFÉRÉ
+| 2
+|===
+
+== Gates et risques
+
+* *Non-régression* : `./gradlew test` VERT (baseline 70 tests, 0 FAIL).
+  Tout type émis doit rester identique → les 70 tests existants sont la garde.
+* *Rétrocompat consommateurs* : aucun type renommé, aucun champ ajouté au JSON.
+* *`module` fantôme* : le résoudre dans cet EPIC (alias `module` → `project`)
+  documente l'ambiguïté sans changer la sortie.
+* *README désynchronisé* (constat #7) : synchroniser les 10 READMEs (EN + 9
+  traductions) dans une US de documentation, *pas* dans le code.
+* *Dette cross-borough* : GF-SCHEMA-5 (schemaVersion) est un chantier
+  multi-borough — il ne doit pas être absorbé subrepticement dans une session
+  graphify.
+
+== Méthode — Révision de la décision S-024
+
+S-024 avait acté « pas d'infra Cucumber dans ce borough (library pure JUnit5,
+tests unitaires + intégration suffisent) ». Cet EPIC *révise* cette décision :
+GF-SCHEMA touche un *contrat public consommé par 5 boroughs*. Le niveau BDD
+(Cucumber) est désormais justifié pour figer le comportement du schéma en
+langage métier (canonicalisation, tolérance aux inconnus, rétrocompat).
+
+L'infra Cucumber est *minimale* et consomme le convention plugin centralisé
+`education.cccp.build.cucumber` v0.0.4 (ABIDJAN N0) — pattern document-gradle /
+slider-gradle, zéro boilerplate local.

@@ -4,7 +4,7 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-08 (S-024 — EPIC GF-CORPUS TERMINÉ 3/3 US : audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry, IDs uniques) + scan corpus FPA → office/metiers/FPA/graph-content.json (1989 nœuds, 1857 edges). 70/70 PASS (+12). Débloque GBL-003.3/003.4.)_
+_Dernière mise à jour : 2026-09-17 (S-025 — EPIC GF-SCHEMA 4/5 US + 1 différée, réponse à DFL-2 Brooklin Flow : domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias non destructifs), wiring producteur byte-identique, functional TestKit (3), BDD Cucumber (7 scénarios). 91 unit + 3 functional + 7 cucumber, 0 FAIL. GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ — exige `@JsonIgnoreProperties` cross-borough bakery/codebase.)_
 
 '''
 == EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) ✅ TERMINÉ (S-024)
@@ -21,6 +21,37 @@ _Cadrage : `graphify-plugin/.agents/CADRAGE_EPIC_GF_CORPUS.adoc`._
 
 *Frontière licence* : le graphe FPA est une œuvre dérivée — il vit dans
 `office/metiers/FPA`, jamais dans ce repo public (Apache 2.0).
+
+'''
+== EPIC GF-SCHEMA — Enrichissement du schéma GraphModel (types + alias) ✅ TERMINÉ 4/5 US (S-025)
+
+_Origine : DFL-2 Brooklin Flow (cross-borough S-216, frontière dashboard).
+Cadrage : `graphify-plugin/.agents/CADRAGE_EPIC_GF_SCHEMA.adoc`._
+
+|===
+| US | Description | Pts | Statut
+| GF-SCHEMA-0 | Cadrage EPIC (audit 7 constats + 9 décisions) | 1 | ✅ TERMINÉ (S-025)
+| GF-SCHEMA-1 | Domaine `graphify.schema` — NodeType/EdgeType/GraphSchema + alias | 3 | ✅ TERMINÉ (S-025)
+| GF-SCHEMA-2 | Wiring producteur `ScanWorkspaceTask` (byte-identique) | 2 | ✅ TERMINÉ (S-025)
+| GF-SCHEMA-3 | Functional TestKit (contrat + rétrocompat) | 2 | ✅ TERMINÉ (S-025)
+| GF-SCHEMA-4 | BDD Cucumber `schema_alias.feature` | 2 | ✅ TERMINÉ (S-025)
+| GF-SCHEMA-5 | `schemaVersion` top-level + `@JsonIgnoreProperties` cross-borough + bump | 2 | ⏳ DIFFÉRÉ — gate : adoption consommateurs (casserait bakery/codebase aujourd'hui)
+|===
+
+_Non destructif par construction_ : aucun type renommé, aucun champ ajouté au
+JSON. Les alias sont résolus *à l'entrée* (canonicalisation) ; le vocabulaire UA
+(`imports`/`references`, `domain`/`flow`/…) est *déclaré réservé*, non émis.
+
+'''
+== EPIC GF-FINGERPRINT — Fingerprinting incrémental (DFL-5, P2)
+
+_Origine : DFL-5 Brooklin Flow. Optimisation de production, pas un contrat de
+schéma — hors périmètre GF-SCHEMA._
+
+* `FileFingerprint` (SHA256 + mtime) par fichier dans `ScanWorkspaceTask` ;
+  comparaison avec le scan précédent, re-analyse delta uniquement.
+* Tests unitaires sur les fingerprints.
+* Statut : 🔲 À FAIRE (non planifié — à la demande pilote).
 
 '''
 == EPIC PUB — Publication Maven Central

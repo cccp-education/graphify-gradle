@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.publish)
     id("education.cccp.build.gradle-plugin") version "0.0.4"
     id("education.cccp.build.publishing") version "0.0.4"
+    id("education.cccp.build.functional-test") version "0.0.4"
+    id("education.cccp.build.cucumber") version "0.0.4"
 }
 
 group = "education.cccp"
@@ -22,6 +24,15 @@ dependencies {
 
 tasks.withType<Test> {
     outputs.cacheIf { true }
+}
+
+// Exclude the Cucumber runner + step glue from the unit `test` task.
+// The convention plugin excludes `*.scenarios.*` by default, but this project
+// uses the `graphify.steps` package, so we add a matching filter.
+tasks.named<Test>("test") {
+    filter {
+        excludeTestsMatching("graphify.steps.**")
+    }
 }
 
 gradlePlugin {

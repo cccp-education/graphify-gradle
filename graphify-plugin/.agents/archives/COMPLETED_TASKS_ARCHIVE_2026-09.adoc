@@ -1,5 +1,25 @@
 = Archive Tâches Complétées — Septembre 2026
 
+== Session 025 (2026-09-17) — EPIC GF-SCHEMA 4/5 US (+ 1 différée) — débloque Brooklin Flow (DFL-2)
+
+* GF-SCHEMA-0 ✅ Cadrage — audit 7 constats (littéraux dispersés, module
+  fantôme, types durs-consommés, mappers stricts, README désync),
+  9 décisions. Doc `.agents/CADRAGE_EPIC_GF_SCHEMA.adoc`.
+* GF-SCHEMA-1 ✅ Domaine `graphify.schema` — `NodeType`/`EdgeType` enums +
+  `GraphSchema` (`canonicalizeNodeType`/`canonicalizeEdgeType`/`canonicalize(model)`),
+  alias non destructifs, vocabulaire UA réservé, idempotent. 21 unit.
+* GF-SCHEMA-2 ✅ Wiring producteur — `ScanWorkspaceTask` zéro littéral de type,
+  sortie byte-identique (70 tests historiques inchangés).
+* GF-SCHEMA-3 ✅ Functional TestKit — 3 tests (contrat canonique, top-level
+  3 champs strict-safe, déterminisme byte-identique).
+* GF-SCHEMA-4 ✅ BDD Cucumber — `schema_alias.feature` 7 scénarios + infra
+  convention plugin 0.0.4 + filtre `graphify.steps.**`.
+* GF-SCHEMA-5 ⏳ DIFFÉRÉ — `schemaVersion` top-level (casserait bakery/codebase).
+* ✅ README 10 langues synchronisés (section/has_section/subsection).
+* Gates : 91 unit + 3 functional + 7 cucumber, 0 FAIL. `check` +
+  `publishToMavenLocal` VERTS. Zéro secret.
+* Révision décision S-024 : infra Cucumber désormais justifiée (contrat public).
+
 == Session 024 (2026-09-08) — EPIC GF-CORPUS TERMINÉ 3/3 US (GBL-003.2 critical path MVP0)
 
 * GF-CORPUS-1 ✅ Audit schéma — sections + liens TOC non couverts (verdict : extension nécessaire)

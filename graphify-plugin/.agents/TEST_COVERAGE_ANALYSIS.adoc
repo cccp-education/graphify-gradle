@@ -1,7 +1,25 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3, 58/58 PASS) + EPIC GF-CORPUS TERMINÉ (S-024, 70/70 PASS)
-_Dernière mise à jour_ : Session 024 (2026-09-08)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025)
+_Dernière mise à jour_ : Session 025 (2026-09-17)
+
+== Session 025 — EPIC GF-SCHEMA (types + alias), 3 niveaux
+
+- `schema/NodeType.kt` + `schema/EdgeType.kt` + `schema/GraphSchema.kt` : domaine
+  pur (nouvelles sources).
+- `ScanWorkspaceTask.kt` : littéraux de type remplacés par `NodeType.*.wire` /
+  `EdgeType.*.wire` — sortie byte-identique.
+- `src/test/kotlin/graphify/schema/GraphSchemaTest.kt` : 15 unit (canonicalisation,
+  alias, inconnus préservés, idempotence, vocabulaire réservé).
+- `src/test/kotlin/graphify/schema/GraphSchemaModelTest.kt` : 6 unit
+  (`canonicalize(model)` entier, préservation des champs, conformance producteur).
+- `src/functionalTest/kotlin/graphify/SchemaFunctionalTest.kt` : 3 functional
+  (TestKit — contrat canonique, top-level strict-safe, déterminisme).
+- `src/test/features/schema_alias.feature` + `graphify/steps/GraphSchemaSteps.kt`
+  + `CucumberTestRunner.kt` : 7 scénarios BDD.
+- Infra : convention plugins `functional-test` + `cucumber` 0.0.4 ; filtre
+  `graphify.steps.**` sur le task `test`.
+- 91 unit (+21) + 3 functional + 7 cucumber, 0 FAIL (baseline 70).
 
 == Session 024 — EPIC GF-CORPUS extension schéma TDD strict
 
@@ -31,11 +49,11 @@ _Dernière mise à jour_ : Session 024 (2026-09-08)
 
 |===
 | Module | Tests | Couverture
-| api-key-pool | 66/66 PASS ✅ | 100% (6 classes testées)
-| graphify-plugin | 70/70 PASS ✅ | ScanWorkspaceTask (30 unitaires) + ScanWorkspaceIntegrationTest (15 intégration) + VerifyDagAcyclicTask (11) + ScanAndVerifyIntegration (3) + GraphModel (6)
+| api-key-pool | 66/66 PASS ✅ | migré `foundry/public/api-key-pool-gradle/`
+| graphify-plugin | 91 unit + 3 functional + 7 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
 |===
 
-Total : 136/136 PASS ✅
+Total : 101 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 
 == Tests par composant (graphify-plugin)
 
@@ -46,6 +64,10 @@ Total : 136/136 PASS ✅
 | `VerifyDagAcyclicTaskTest.kt` | 11 unitaires | DAG acyclic OK, N1→N2 violation, N0→N3 violation, suffixes resolution, underscores, custom levels, levelOf()
 | `ScanAndVerifyIntegrationTest.kt` | 3 intégration | scan→verify OK, scan→detect violation, engine contract validation
 | `GraphModelTest.kt` | 6 | Jackson serialization/deserialization, defaults, NON_NULL labels, GraphCommunity
+| `schema/GraphSchemaTest.kt` | 15 unitaires | Canonicalisation nœuds/arêtes, alias pluriels/dash, inconnus préservés, idempotence, vocabulaire UA réservé (S-025)
+| `schema/GraphSchemaModelTest.kt` | 6 unitaires | `canonicalize(model)` entier, préservation champs non-type, conformance producteur (S-025)
+| `SchemaFunctionalTest.kt` | 3 functional | TestKit end-to-end : contrat canonique, top-level 3 champs strict-safe, déterminisme byte-identique (S-025)
+| `schema_alias.feature` + `GraphSchemaSteps.kt` | 7 cucumber | Canonicalisation métier, alias, préservation, idempotence, round-trip legacy (S-025)
 |===
 
 == Scan workspace réel (validation GF-2)
@@ -72,4 +94,5 @@ Pas de modification de code source. 58/58 PASS inchangé.
 
 == Prochaine étape
 
-Dormant.
+GF-SCHEMA-5 (`schemaVersion` top-level) différé — exige `@JsonIgnoreProperties`
+cross-borough bakery/codebase + bump. DFL-5 (fingerprinting) au backlog.

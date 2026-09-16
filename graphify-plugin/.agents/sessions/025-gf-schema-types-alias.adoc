@@ -1,0 +1,119 @@
+= Session 025 — EPIC GF-SCHEMA (types + alias)
+
+:date: 2026-09-17
+:type: dev
+:epic: GF-SCHEMA
+:score: 10/10
+
+== Mission
+
+Débloquer le consommateur Brooklin Flow (DFL-2, cross-borough S-216) en
+extrayant le vocabulaire de types de `graph.json` dans un domaine
+`graphify.schema` avec mécanisme d'alias — **sans jamais renommer** les types
+existants (durs-consommés par bakery/codebase).
+
+== Réalisé
+
+=== GF-SCHEMA-0 — Cadrage (gouvernance pure)
+
+Doc `.agents/CADRAGE_EPIC_GF_SCHEMA.adoc`. Audit 7 constats :
+
+. Vocabulaire implicite (littéraux dispersés dans `ScanWorkspaceTask`).
+. 4 types nœuds / 6 types arêtes (vs 21/35 UA).
+. Divergence singulier ↔ pluriel documentée (`import` vs `imports`).
+. Type `module` fantôme (cité par les consommateurs, jamais produit).
+. Types durs-consommés (`bakery/AugmentedArticlesService.kt:107`,
+   `LensConfig` bakery + codebase).
+. Consommateurs **stricts** (`ObjectMapper().registerKotlinModule()` +
+   `readValue<GraphModel>`) — un champ top-level ajouté casse bakery/codebase.
+. README public désynchronisé (10 fichiers).
+
+Décisions : non destructif d'abord, domaine `graphify.schema`, alias entrée
+tolérante / sortie canonique, canonicalisation = singulier (inversible en 1
+ligne), vocabulaire UA réservé (déclaré non émis), `schemaVersion` **DIFFÉRÉ**
+(GF-SCHEMA-5), rétrocompat garantie par garde, English only, baby-step 3 niveaux.
+
+=== GF-SCHEMA-1 — Domaine `graphify.schema` (unit, TDD strict)
+
+`NodeType` / `EdgeType` (enums canoniques) + `GraphSchema` :
+`canonicalizeNodeType` / `canonicalizeEdgeType` / `canonicalize(model)`.
+Alias : `dir`→`directory`, `module`→`project`, `imports`→`import`,
+`references`→`reference`, variantes dash. Inconnu **préservé**. Vocabulaire UA
+réservé exposé. Idempotence garantie.
+
+RED (compile fail, 15 tests) → GREEN. `GraphSchemaTest` 15 tests.
+
+=== GF-SCHEMA-2 — Wiring producteur (non-régression)
+
+`ScanWorkspaceTask` n'écrit plus aucun littéral de type : tout passe par
+`NodeType.*.wire` / `EdgeType.*.wire`. Vérifié par grep : les 10 littéraux
+n'existent plus que dans les 2 enums.
+
+Ajout de `GraphSchemaTest`+`GraphSchemaModelTest` (21 unit). Gates : 91 unit
+(baseline 70 → +21), 0 FAIL — **sortie byte-identique** (les 70 tests
+historiques passent inchangés).
+
+=== GF-SCHEMA-3 — Functional TestKit
+
+`SchemaFunctionalTest` (3 tests) : scan end-to-end → `graph.json` canonique,
+top-level à 3 champs (strict-consumer safe), déterminisme byte-identique.
+Convention plugin `education.cccp.build.functional-test` 0.0.4 (ABIDJAN N0).
+
+=== GF-SCHEMA-4 — BDD Cucumber
+
+`schema_alias.feature` (7 scénarios) + `GraphSchemaSteps` + `CucumberTestRunner`.
+Infra via `education.cccp.build.cucumber` 0.0.4. Filtre `graphify.steps.**`
+ajouté au task `test` (le convention plugin ne filtre que `*.scenarios.*`).
+
+=== Documentation
+
+10 READMEs consommateur synchronisés (EN + 9 traductions) : vocabulaire
+`section` / `has_section` / `subsection` (introduits S-024, jamais documentés).
+
+== Gates
+
+|===
+| Gate | Résultat
+| `test` (unit) | 91 tests, 0 FAIL (baseline 70 → +21)
+| `functionalTest` | 3 tests, 0 FAIL
+| `cucumberTest` | 7 scénarios, 0 FAIL
+| `check` | BUILD SUCCESSFUL
+| `publishToMavenLocal` | BUILD SUCCESSFUL
+| Secrets | zéro (`grep TOKEN/SECRET/...` = 0)
+|===
+
+== Révision de décision
+
+S-024 avait acté « pas d'infra Cucumber dans ce borough (library pure JUnit5) ».
+Cette session *révise* la décision : GF-SCHEMA touche un *contrat public*
+consommé par 5 boroughs → le niveau BDD est justifié. Infra minimale via
+convention plugin centralisé (zéro boilerplate local).
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Statut | Fichier
+
+| Créé | `.agents/CADRAGE_EPIC_GF_SCHEMA.adoc`
+| Créé | `src/main/kotlin/graphify/schema/NodeType.kt`
+| Créé | `src/main/kotlin/graphify/schema/EdgeType.kt`
+| Créé | `src/main/kotlin/graphify/schema/GraphSchema.kt`
+| Créé | `src/test/kotlin/graphify/schema/GraphSchemaTest.kt` (15)
+| Créé | `src/test/kotlin/graphify/schema/GraphSchemaModelTest.kt` (6)
+| Créé | `src/functionalTest/kotlin/graphify/SchemaFunctionalTest.kt` (3)
+| Créé | `src/test/features/schema_alias.feature` (7)
+| Créé | `src/test/scenarios/graphify/steps/GraphSchemaSteps.kt`
+| Créé | `src/test/scenarios/graphify/steps/CucumberTestRunner.kt`
+| Modifié | `src/main/kotlin/graphify/ScanWorkspaceTask.kt` (littéraux → enums)
+| Modifié | `build.gradle.kts` (functional-test + cucumber + filtre)
+| Modifié | `README.md` + 9 `README.consommateurs/README.*.md`
+|===
+
+== Prochain maillon
+
+EPIC GF-SCHEMA 4/5 US terminées (+ 1 différée). Reste :
+* GF-SCHEMA-5 (`schemaVersion` top-level) — **différé**, exige
+  `@JsonIgnoreProperties` cross-borough bakery/codebase + bump.
+* DFL-5 (fingerprinting incrémental) — toujours au backlog Brooklin Flow.
+* Publication Central 0.0.4 — à la demande pilote.

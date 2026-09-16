@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-09-08 (session 024 — EPIC GF-CORPUS TERMINÉ 3/3 US : audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry, unicité IDs) + scan corpus FPA → office/metiers/FPA/graph-content.json 1989 nœuds. 70/70 PASS (+12).)
-_Session terminee_ : 024 — EPIC GF-CORPUS TERMINÉ 3/3 US (TDD strict + dogfooding)
-_Session en cours_ : 025 — maintenance (borough liquidé, GBL-003 passe aux consommateurs)
+_Derniere mise a jour_ : 2026-09-17 (session 025 — EPIC GF-SCHEMA 4/5 US + 1 différée : domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias), wiring producteur byte-identique, functional TestKit, BDD Cucumber. 91 unit + 3 functional + 7 cucumber, 0 FAIL.)
+_Session terminee_ : 025 — EPIC GF-SCHEMA 4/5 US (TDD/BDD 3 niveaux + cadrage)
+_Session en cours_ : 026 — EPIC GF-SCHEMA clos (reste GF-SCHEMA-5 différé + DFL-5 + PUB 0.0.4)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -44,8 +44,9 @@ graphify-gradle/                     # CONSUMER (dogfooding) + repo git
     │   ├── archives/                # Archives mensuelles
     │   └── encyclopedies/           # Connaissance froide
     └── src/
-        ├── main/kotlin/com/cheroliv/graphify/
-        └── test/                    # 58 tests (24 scan + 14 verifyDagAcyclic + 3 ScanAndVerify + 11 integration + 6 GraphModel)
+        ├── main/kotlin/graphify/            # + schema/ (NodeType, EdgeType, GraphSchema)
+        ├── test/                            # 91 tests unit + 7 scénarios Cucumber (graphify.steps)
+        └── functionalTest/                  # 3 tests TestKit (SchemaFunctionalTest)
 ----
 
 *Note* : `api-key-pool` a migré vers `foundry/public/api-key-pool-gradle/` — librairie N0 standalone
@@ -58,14 +59,17 @@ avec architecture Racine Consommateur + Plugin Indépendant (article 0124).
 | Fichier | Description | Lignes
 | `GraphifyPlugin.kt` | Plugin Gradle — register scanWorkspace + verifyDagAcyclic + scanAndVerify | 30
 | `GraphifyExtension.kt` | DSL — rootDir, outputFile, excludePatterns, dagLevels, foundryDir | 28
-| `ScanWorkspaceTask.kt` | Cœur — Files.walkFileTree, extraction nœuds/arêtes/communautés, Jackson serialization | 297
+| `ScanWorkspaceTask.kt` | Cœur — Files.walkFileTree, extraction nœuds/arêtes/communautés, Jackson serialization (types via `GraphSchema`, zéro littéral) | 380
 | `VerifyDagAcyclicTask.kt` | Détection violations DAG — levelOf résolution suffixes, GradleException avec détails | 88
 | `GraphModel.kt` | Data classes — GraphModel, GraphNode, GraphEdge, GraphCommunity | 28
+| `schema/NodeType.kt` | Enum canonique des 4 types de nœuds produits | 9
+| `schema/EdgeType.kt` | Enum canonique des 6 types d'arêtes produites | 11
+| `schema/GraphSchema.kt` | Registre unique — canonicalisation alias (non destructive), vocabulaire UA réservé | 74
 |===
 
-Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
-+ graphify-plugin : 58/58 PASS ✅ (30 scan + 14 verifyDagAcyclic + 3 ScanAndVerify)
-+ api-key-pool : 66/66 PASS ✅, publishable indépendant
+Total : ~643 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
++ graphify-plugin : 91 unit + 3 functional + 7 cucumber, 0 FAIL ✅
++ api-key-pool : 66/66 PASS ✅ (migré foundry/public/api-key-pool-gradle/)
 
 '''
 == Roadmap
@@ -83,6 +87,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-4 | Publication Gradle Plugin Portal | ✅ TERMINÉ — marker .gradle.plugin sur Maven Central (résolvable via pluginManagement { mavenCentral() }). Portail UI web optionnel. | P2
 | GF-6 | Publication Maven Central (nmcp) — v0.0.2 déployé | ✅ TERMINÉ (session 013) | P0
 | GF-CORPUS | Graphe de connaissance du corpus FPA (GBL-003.2) — audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry) + scan corpus → office/metiers/FPA/graph-content.json | ✅ TERMINÉ (session 024) | P0
+| GF-SCHEMA | Enrichissement schéma `GraphModel` (types + alias, DFL-2) — domaine `graphify.schema` (NodeType/EdgeType/GraphSchema), wiring producteur byte-identique, functional + BDD | ✅ TERMINÉ 4/5 US (session 025) — GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ | P1
 |===
 
 '''
@@ -90,6 +95,7 @@ Total : 471 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 025 | 2026-09-17 | dev | EPIC GF-SCHEMA 4/5 US (+ 1 différée) — domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias, canonicalisation non destructive), wiring `ScanWorkspaceTask` byte-identique, functional TestKit (3), BDD Cucumber (7 scénarios, infra convention plugin 0.0.4), README 10 langues synchronisés. 91 unit + 3 functional + 7 cucumber, 0 FAIL. Révision décision S-024 (Cucumber justifié). | 10/10
 | 024 | 2026-09-08 | dev | EPIC GF-CORPUS TERMINÉ 3/3 US — extension schéma TDD strict (sections, has_section, subsection, toc_entry, IDs uniques) + scan corpus FPA → graph-content.json (1989 nœuds). 70/70 PASS (+12). | 10/10
 | 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS | ✅ TERMINE
 | 019 | 2026-06-24 | docs/i18n | README i18n — 20 fichiers (10 langues × consumer + plugin), badges 0.0.2/58 PASS, switcher, AR/UR RTL | 9/10

@@ -4,6 +4,8 @@ import graphify.model.GraphCommunity
 import graphify.model.GraphEdge
 import graphify.model.GraphModel
 import graphify.model.GraphNode
+import graphify.schema.EdgeType
+import graphify.schema.NodeType
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -97,7 +99,7 @@ open class ScanWorkspaceTask : DefaultTask() {
             nodes = nodes + sections.map { it.node },
             edges = edges
                 + sections.map { section ->
-                    GraphEdge(source = section.fileRelative, target = section.node.id, type = "has_section")
+                    GraphEdge(source = section.fileRelative, target = section.node.id, type = EdgeType.HAS_SECTION.wire)
                 }
                 + buildSubsectionEdges(sections),
             communities = communities
@@ -148,7 +150,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                 GraphNode(
                     id = relative,
                     label = dir.fileName.toString(),
-                    type = if (isProject) "project" else "directory",
+                    type = if (isProject) NodeType.PROJECT.wire else NodeType.DIRECTORY.wire,
                     community = repoMap[dir]
                 )
             )
@@ -161,7 +163,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                 GraphNode(
                     id = relative,
                     label = path.fileName.toString(),
-                    type = "file",
+                    type = NodeType.FILE.wire,
                     community = repoMap[path.parent],
                     metadata = mapOf(
                         "extension" to (path.extension ?: ""),
@@ -185,7 +187,7 @@ open class ScanWorkspaceTask : DefaultTask() {
             val parent = file.parent
             val src = safe { root.relativize(parent).toString() } ?: continue
             val tgt = safe { root.relativize(file).toString() } ?: continue
-            edges.add(GraphEdge(source = src, target = tgt, type = "contains"))
+            edges.add(GraphEdge(source = src, target = tgt, type = EdgeType.CONTAINS.wire))
         }
 
         val kotlinFiles = files.filter { it.extension == "kt" || it.extension == "kts" }
@@ -200,7 +202,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                     if (target != fileParent) {
                         val src = safe { root.relativize(file).toString() } ?: continue
                         edges.add(
-                            GraphEdge(source = src, target = target, type = "import", label = import)
+                            GraphEdge(source = src, target = target, type = EdgeType.IMPORT.wire, label = import)
                         )
                     }
                 }
@@ -217,7 +219,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                 if (targetFile != null && safe { Files.exists(targetFile) } == true) {
                     val src = safe { root.relativize(file).toString() } ?: continue
                     val tgt = safe { root.relativize(targetFile).toString() } ?: continue
-                    edges.add(GraphEdge(source = src, target = tgt, type = "reference"))
+                    edges.add(GraphEdge(source = src, target = tgt, type = EdgeType.REFERENCE.wire))
                 }
             }
             for (ref in tocRefs) {
@@ -225,7 +227,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                 if (targetFile != null && safe { Files.exists(targetFile) } == true) {
                     val src = safe { root.relativize(file).toString() } ?: continue
                     val tgt = safe { root.relativize(targetFile).toString() } ?: continue
-                    edges.add(GraphEdge(source = src, target = tgt, type = "reference", label = "toc_entry"))
+                    edges.add(GraphEdge(source = src, target = tgt, type = EdgeType.REFERENCE.wire, label = "toc_entry"))
                 }
             }
         }
@@ -236,7 +238,7 @@ open class ScanWorkspaceTask : DefaultTask() {
             val agentRefs = extractAgentReferences(content)
             for (ref in agentRefs) {
                 val src = safe { root.relativize(file).toString() } ?: continue
-                edges.add(GraphEdge(source = src, target = ref, type = "agent_reference"))
+                edges.add(GraphEdge(source = src, target = ref, type = EdgeType.AGENT_REFERENCE.wire))
             }
         }
 
@@ -327,7 +329,7 @@ open class ScanWorkspaceTask : DefaultTask() {
         for (section in sections) {
             while (stack.isNotEmpty() && stack.last().level >= section.level) stack.removeAt(stack.lastIndex)
             stack.lastOrNull()?.let { parent ->
-                edges.add(GraphEdge(source = parent.node.id, target = section.node.id, type = "subsection"))
+                edges.add(GraphEdge(source = parent.node.id, target = section.node.id, type = EdgeType.SUBSECTION.wire))
             }
             stack.add(section)
         }
@@ -356,7 +358,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                         node = GraphNode(
                             id = sectionId,
                             label = title,
-                            type = "section",
+                            type = NodeType.SECTION.wire,
                             metadata = mapOf(
                                 "level" to level,
                                 "line" to lineNumber,
