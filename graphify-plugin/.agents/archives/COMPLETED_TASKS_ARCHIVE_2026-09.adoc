@@ -1,5 +1,25 @@
 = Archive Tâches Complétées — Septembre 2026
 
+== Session 029 (2026-09-17) — EPIC D5-RACE TERMINÉ 3/3 US
+
+* D5R-0 ✅ Cadrage — audit 5 constats (garde lit le working tree voisin,
+  verdict racy, Gradle résout déjà le catalogue publié mais ne le transmet pas,
+  parsing TOML inline non testé, pin figé voulu), 7 décisions.
+  Doc `.agents/CADRAGE_EPIC_D5_RACE.adoc`.
+* D5R-1 ✅ Objets purs (source set `test`) `graphify.catalog.VersionCatalogToml`
+  (lecture `[versions]` scopée par section, commentaires, espaces) +
+  `graphify.catalog.PublicationHygiene` (verdict). 13 unit.
+* D5R-2 ✅ Wiring `build.gradle.kts` (`systemProperty` depuis
+  `ws.versions.graphify.plugin.get()`) + refactor garde (zéro accès repo
+  voisin ; propriété absente → erreur explicite). Preuve RED one-shot
+  (propriété forcée `9.9.9` → échec).
+* D5R-3 ✅ BDD `publication_hygiene.feature` 5 scénarios + steps.
+* Insight clé : la garde d'hygiène doit lire la source *publiée*, pas un fichier
+  de travail mutable par une session concurrente — une garde racy pire qu'aucune.
+* Gates : 162 unit + 9 functional + 25 cucumber, 0 FAIL ; `check --rerun-tasks`
+  + `publishToMavenLocal` VERTS. Zéro bump, zéro publication Central.
+* Mission adoption bakery *hors scope* (session parallèle pilote détient bakery).
+
 == Session 028 (2026-09-17) — EPIC GF-SCHEMA COMPLET 5/5 US (GF-SCHEMA-5)
 
 * GF-SV-0 ✅ Cadrage — audit 4 constats (aucune tolérance sur `GraphModel`,

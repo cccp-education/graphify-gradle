@@ -1,7 +1,33 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA TERMINÉ 5/5 US (S-025 + S-028) + GF-FINGERPRINT TERMINÉ (S-026) + PUB 0.0.4/0.0.5 (S-027/S-028)
-_Dernière mise à jour_ : Session 028 (2026-09-17)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA TERMINÉ 5/5 US (S-025 + S-028) + GF-FINGERPRINT TERMINÉ (S-026) + D5-RACE TERMINÉ (S-029) + PUB 0.0.4/0.0.5 (S-027/S-028)
+_Dernière mise à jour_ : Session 029 (2026-09-17)
+
+== Session 029 — EPIC D5-RACE (garde de publication), 2 niveaux
+
+- `src/test/kotlin/graphify/catalog/VersionCatalogToml.kt` : objet pur (source
+  set `test`) — lecture `[versions]` *scopée par section*, commentaires ligne
+  entière et fin de ligne, espaces. 8 unit.
+- `src/test/kotlin/graphify/catalog/PublicationHygiene.kt` : objet pur —
+  verdict `consistent` + message (accord, drift, local manquant, publié
+  manquant). 4 unit.
+- `GraphifyPluginPublicationTest.kt` : refactoré — suppression de
+  `wsCatalogToml()` (plus d'accès au working tree voisin, racy) ; lit la
+  propriété injectée `graphify.publishedCatalog.graphifyVersion` et délègue aux
+  objets purs. Preuve RED one-shot (propriété forcée `9.9.9` → échec).
+- `build.gradle.kts` : `tasks.withType<Test>` injecte
+  `ws.versions.graphify.plugin.get()` en systemProperty (version *publiée*).
+- `src/test/features/publication_hygiene.feature` +
+  `graphify/steps/PublicationHygieneSteps.kt` : 5 scénarios BDD (accord, drift,
+  scoping de section, commentaire, publié manquant). Réutilise
+  `CucumberTestRunner` (pas de nouveau runner).
+- 162 unit (+13) + 9 functional + 25 cucumber (+5), 0 FAIL.
+
+Note méthode : le niveau functional est *délibérément* absent — l'artefact
+modifié est la garde elle-même (un test) ; l'intégration est la gate
+`./gradlew test`, où le test JUnit s'exécute dans le build, alimenté par la
+propriété injectée. Pattern S-024 (pas de test d'intégration quand la
+dépendance est hors périmètre runtime).
 
 == Session 028 — GF-SCHEMA-5 (schemaVersion + tolérance), 3 niveaux
 
@@ -99,7 +125,7 @@ de compilation — les tests de modèle/domaine vont dans `test/`.
 |===
 | Module | Tests | Couverture
 | api-key-pool | 66/66 PASS ✅ | migré `foundry/public/api-key-pool-gradle/`
-| graphify-plugin | 149 unit + 9 functional + 20 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
+| graphify-plugin | 162 unit + 9 functional + 25 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
 |===
 
 Total : 178 PASS (graphify-plugin) + 66 (api-key-pool) ✅
@@ -124,6 +150,9 @@ Total : 178 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 | `incremental_scan.feature` + `IncrementalScanSteps.kt` | 7 cucumber | Cache vide, fast path, drift size/mtime, réutilisation par hash, élagage, round-trip JSON, version inconnue (S-026)
 | `model/GraphModelSchemaVersionTest.kt` | 7 unitaires | Version courante, défaut, sérialisation top-level, round-trip, legacy sans champ, tolérance inconnu top-level/node (S-028)
 | `schema_version.feature` + `SchemaVersionSteps.kt` | 6 cucumber | Version courante, champ top-level, round-trip, legacy, inconnu top-level, inconnu node (S-028)
+| `catalog/VersionCatalogTomlTest.kt` | 9 unitaires | Lecture `[versions]` scopée, alias, clé absente, clé hors section (map + assignation simple), commentaire ligne/fin de ligne, section commentée, espaces (S-029)
+| `catalog/PublicationHygieneTest.kt` | 4 unitaires | Accord, drift, local manquant, publié manquant (S-029)
+| `publication_hygiene.feature` + `PublicationHygieneSteps.kt` | 5 cucumber | Accord, drift, scoping de section, commentaire, publié manquant (S-029)
 |===
 
 == Scan workspace réel (validation GF-2)
@@ -150,7 +179,9 @@ Pas de modification de code source. 58/58 PASS inchangé.
 
 == Prochaine étape
 
-Session 029 — coordination pin catalogue 0.0.46 (2e session parallèle).
-EPIC GF-SCHEMA COMPLET 5/5, GF-FINGERPRINT COMPLET 6/6.
-Dette : garde D5 `GraphifyPluginPublicationTest` lit le working tree voisin
-(racy inter-sessions) — EPIC correctif dédié.
+Session 030 — à la demande pilote. EPIC GF-SCHEMA COMPLET 5/5,
+GF-FINGERPRINT COMPLET 6/6, D5-RACE COMPLET 3/3.
+La dette S-028 (garde racy) est soldée : la garde lit la version *publiée*
+injectée par Gradle, plus le working tree d'un repo voisin.
+Candidat futur non planifié : consolidation de `VersionCatalogToml` vers un
+contrat N0 partagé MEMPHIS (utile à 20+ gardes D5 cross-borough).

@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-09-17 (session 028 — **EPIC GF-SCHEMA COMPLET 5/5 US** : GF-SCHEMA-5 `schemaVersion` top-level + `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 (tolérance livrée par le bump de dépendance). graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs prouvée (bakery 144/0, codebase 37/0). codebase committé `0b614a1`. **COORD-0.0.46 TERMINÉ** : pin aligné sur catalogue 0.0.46 publié (SHA1 Central = mavenLocal `68a3d969`). 149 unit + 9 functional + 20 cucumber, 0 FAIL.)
-_Session terminee_ : 028 — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs + coordination catalogue 0.0.46
-_Session en cours_ : 029 — à la demande pilote (bakery adoption, EPIC D5-RACE garde inter-sessions)
+_Derniere mise a jour_ : 2026-09-17 (session 029 — **EPIC D5-RACE TERMINÉ 3/3 US** : la garde `GraphifyPluginPublicationTest` ne lit plus le working tree du repo voisin (racy inter-sessions) — la version *publiée* du catalogue est *injectée* par Gradle (`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`). Objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]` scopée par section + commentaires) + `graphify.catalog.PublicationHygiene` (verdict), 13 unit ; garde refactorée (zéro accès repo voisin, preuve RED one-shot) ; BDD `publication_hygiene.feature` 5 scénarios. 162 unit + 9 functional + 25 cucumber, 0 FAIL. Zéro bump, zéro publication.)
+_Session terminee_ : 029 — EPIC D5-RACE (garde de publication lue depuis le catalogue publié, dette S-028 soldée)
+_Session en cours_ : 030 — à la demande pilote (backlog ouvert : EPIC PUB optionnel, candidats futurs)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -46,7 +46,8 @@ graphify-gradle/                     # CONSUMER (dogfooding) + repo git
     └── src/
         ├── main/kotlin/graphify/            # + schema/ (NodeType, EdgeType, GraphSchema)
         │                                    # + fingerprint/ (FileFingerprint, ScanCache, …)
-        ├── test/                            # 149 tests unit + 20 scénarios Cucumber (graphify.steps)
+        ├── test/                            # 161 tests unit + 25 scénarios Cucumber (graphify.steps)
+        │                                    # + catalog/ (VersionCatalogToml, PublicationHygiene — test-only)
         └── functionalTest/                  # 9 tests TestKit (SchemaFunctionalTest + IncrementalFunctionalTest)
 ----
 
@@ -76,7 +77,7 @@ avec architecture Racine Consommateur + Plugin Indépendant (article 0124).
 |===
 
 Total : ~1098 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
-+ graphify-plugin : 149 unit + 9 functional + 20 cucumber, 0 FAIL ✅
++ graphify-plugin : 162 unit + 9 functional + 25 cucumber, 0 FAIL ✅
 + api-key-pool : 66/66 PASS ✅ (migré foundry/public/api-key-pool-gradle/)
 
 '''
@@ -99,7 +100,7 @@ Total : ~1098 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-FINGERPRINT | Fingerprinting incrémental (DFL-5) — domaine `graphify.fingerprint` (fast check size/mtime → SHA-256 → parse), `FileExtractor` pur, wiring opt-in byte-identique, functional + BDD | ✅ TERMINÉ 6/6 US (session 026) | P2
 | PUB-3.06 | Publication Maven Central 0.0.4 (GF-SCHEMA + GF-FINGERPRINT) puis 0.0.5 (GF-SCHEMA-5) — bundles `96f87d32` / `895d2e53` | ✅ TERMINÉ (sessions 027 + 028) — repo1 HTTP 200 | P0
 | COORD-0.0.46 | Coordination pin catalogue : `workspace-catalog:0.0.45 → 0.0.46` (0.0.46 publié par la session parallèle porte `graphify-plugin = 0.0.5`) | ✅ TERMINÉ (S-028) — SHA1 Central = mavenLocal `68a3d969`, check VERT | P0
-| D5-RACE | Correctif garde `GraphifyPluginPublicationTest` (lit le working tree voisin, racy entre sessions → lire le catalogue publié) | 🔲 À FAIRE (EPIC dédié, non planifié) | P2
+| D5-RACE | Correctif garde `GraphifyPluginPublicationTest` (lit le working tree voisin, racy entre sessions → lire le catalogue publié) | ✅ TERMINÉ 3/3 US (S-029) — version publiée injectée par Gradle, objets purs `graphify.catalog.*`, BDD | P2
 |===
 
 '''
@@ -107,6 +108,7 @@ Total : ~1098 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 029 | 2026-09-17 | dev | **EPIC D5-RACE TERMINÉ 3/3 US** — garde `GraphifyPluginPublicationTest` racy inter-sessions (dette S-028) soldée : la version *publiée* du catalogue workspace est *injectée* par Gradle (`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`), zéro lecture du working tree voisin. Objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]` *scopée par section* — `graphify-plugin`/`graphify` existent aussi dans `[libraries]`/`[plugins]` — + commentaires ligne/fin de ligne + espaces) et `graphify.catalog.PublicationHygiene` (verdict consistent/violation). Garde refactorée (propriété absente → erreur explicite, jamais de fallback silencieux). Preuve RED one-shot (propriété forcée `9.9.9` → échec). BDD `publication_hygiene.feature` 5 scénarios + `PublicationHygieneSteps` (runner existant). Baby-step strict RED unit (`Unresolved reference`) → RED BDD (5 `UndefinedStepException`) → GREEN → REFACTOR. 162 unit (+13) + 9 functional + 25 cucumber (+5), 0 FAIL, `check --rerun-tasks` + `publishToMavenLocal` VERTS. Zéro bump, zéro publication, zéro secret. Session parallèle pilote sur bakery → mission adoption bakery *hors scope*. | 10/10
 | 028 | 2026-09-17 | dev/cross-borough | **EPIC GF-SCHEMA COMPLET 5/5 US** — GF-SCHEMA-5 : `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 + `schemaVersion: Int = SCHEMA_VERSION (= 1)` (tolérance livrée par le bump, zéro édition consommateur). Garde de forme 3→4 champs, BDD `schema_version.feature` 6 scénarios, README 10×2 synchronisés. graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs : bakery lens 144/0, codebase graph 37/0 + 2 tests de tolérance chacun. codebase committé `0b614a1`. *Collision de session* : workspace-bom/bakery portés en parallèle (0.0.46 + codex 0.0.9) — cédés ; pin à passer sur 0.0.46. 149 unit + 9 functional + 20 cucumber, 0 FAIL. | 10/10
 | 027 | 2026-09-17 | ops/pub | Publication Maven Central graphify-plugin 0.0.4 (bundle `96f87d32`) + MEMPHIS BOM/catalog 0.0.44 (bundle `dbe3ef8e`). Contrainte : version dérivée du catalogue (`ws.versions.graphify.plugin.get()`) → bump MEMPHIS d'abord. *Baseline MEMPHIS rouge à HEAD réparée* (2 gardes périmées : workspace-bom 0.0.36 vs toml 0.0.43, i18n-contracts 0.0.2 vs toml 0.0.4 — piège #10). Adoption graphify (pin 0.0.44, toml local 0.0.4, garde D5). repo1 HTTP 200 en ~7 min. Zéro impact consommateur (adoptions opt-in D3). | 10/10
 | 026 | 2026-09-17 | dev | EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5) — cadrage (audit 8 constats : scan déclaré non-incrémentable, 4m51s/98MB mesurés, 4 sites de lecture non cachés, résolution globale hors cache, état global sections) ; domaine `graphify.fingerprint` (FileFingerprint/Fingerprinter/FileExtraction/ScanCache/ScanCacheStore/ScanExtractionIndex) ; `FileExtractor` pur (5 parsers sortis de ScanWorkspaceTask) ; wiring incrémental opt-in (`incremental`/`cacheFile`, cache élagué, sortie byte-identique) ; functional TestKit 6 ; BDD `incremental_scan.feature` 7 scénarios ; README 10 langues × 2 (plugin + consommateur). Gates : 142 unit + 9 functional + 14 cucumber, 0 FAIL. | 10/10

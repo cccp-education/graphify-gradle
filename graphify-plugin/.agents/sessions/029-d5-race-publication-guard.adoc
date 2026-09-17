@@ -1,0 +1,97 @@
+= Session 029 — EPIC D5-RACE : garde de publication lue depuis le catalogue publié
+
+:toc: left
+:date: 2026-09-17
+:type: dev
+
+== Mission
+
+Reprise à la demande pilote. Le PROMPT_REPRISE S-029 listait 3 missions :
+
+. *Adoption bakery* — committer les 2 fichiers (bump 0.0.5 + 2 tests de
+  tolérance) si l'autre session ne l'a pas fait.
+. *EPIC D5-RACE* — la garde `GraphifyPluginPublicationTest` lit le working tree
+  du repo voisin (`../workspace-bom/gradle/libs.versions.toml`) → racy entre
+  sessions. Correctif : lire le catalogue publié.
+. *Publication* — aucun besoin immédiat (0.0.5 publié ET référencé).
+
+*Arbitrage pilote en séance* : une session opencode parallèle détient le borough
+`bakery-gradle` → la mission 1 est *hors scope* (le pilote a demandé de ne pas
+lancer bakery). La session se concentre sur la mission 2.
+
+== Livrable — EPIC D5-RACE (3 US, ~5 pts)
+
+=== D5R-0 — Cadrage
+
+Audit 5 constats :
+
+. La garde lit le working tree d'un repo voisin, pas le catalogue publié.
+. Le verdict est racy entre sessions (S-028 : passé par coïncidence).
+. Gradle *résout* déjà le catalogue publié (`ws.versions.graphify.plugin.get()`)
+   mais ne le transmet pas au test.
+. Le parsing TOML est inline, non testé, sans scoping de section.
+. Le pin catalogue est figé en dur dans la garde (voulu, D5).
+
+7 décisions. Doc `.agents/CADRAGE_EPIC_D5_RACE.adoc`.
+
+*Décision de niveau* : pas de functional TestKit — l'artefact modifié est *la
+garde elle-même* (un test) ; le niveau d'intégration est la gate `./gradlew test`
+(le test JUnit s'exécute dans le build, alimenté par la propriété injectée).
+Pattern S-024 documenté.
+
+=== D5R-1 — Objets purs (source set `test`)
+
+* `graphify.catalog.VersionCatalogToml` — lecteur minimal `[versions]`
+  *scopé par section* : une clé hors `[versions]` ne peut jamais primer
+  (essentiel : `graphify-plugin` et `graphify` existent aussi dans `[libraries]`
+  / `[plugins]`). Gère commentaires (ligne entière, fin de ligne) et espaces.
+* `graphify.catalog.PublicationHygiene` — verdict pur `consistent` + message
+  (accord, drift, local manquant, publié manquant).
+* 12 tests unit (`VersionCatalogTomlTest` 8 + `PublicationHygieneTest` 4).
+
+Ces objets vivent dans `test/`, jamais dans le wire publié — ce sont des
+utilitaires d'hygiène, pas du code d'extension `graph.json`.
+
+=== D5R-2 — Wiring + refactor de la garde
+
+* `build.gradle.kts` : `systemProperty("graphify.publishedCatalog.graphifyVersion",
+  ws.versions.graphify.plugin.get())` — la version *publiée* résolue par Gradle
+  est injectée dans la JVM de test.
+* `GraphifyPluginPublicationTest` : suppression de `wsCatalogToml()` et de tout
+  accès au repo voisin ; la garde lit la propriété injectée et s'appuie sur les
+  objets purs. Absence de propriété → `error(...)` explicite, jamais un fallback
+  silencieux.
+
+*Preuve par l'absurde* (RED one-shot) : la propriété injectée est forcée à
+`9.9.9` → le test de cohérence *échoue* ; restaurée → passe. La garde lit bien
+la valeur publiée injectée, plus le working tree voisin.
+
+=== D5R-3 — BDD Cucumber
+
+`publication_hygiene.feature` 5 scénarios + `PublicationHygieneSteps` :
+accord, drift (message nommant les deux versions), *scoping de section* (une clé
+hors `[versions]` ne résout pas), commentaire (ne résout pas), version publiée
+manquante. Réutilise le runner existant `CucumberTestRunner` (pattern
+`schema_version.feature`, pas de nouveau runner).
+
+Méthode baby-step strict :
+
+* RED unit : `Unresolved reference 'VersionCatalogToml'` / `'PublicationHygiene'`.
+* RED BDD : 5 `UndefinedStepException` (steps retirés le temps du RED).
+* RED garde : propriété forcée à `9.9.9` → échec, restauration → vert.
+* GREEN : 162 unit + 9 functional + 25 cucumber.
+* REFACTOR : `check --rerun-tasks` VERT.
+
+== Gates
+
+* graphify : **162 unit (+13) + 9 functional + 25 cucumber (+5), 0 FAIL**.
+* `./gradlew check --rerun-tasks` BUILD SUCCESSFUL.
+* `./gradlew publishToMavenLocal` VERT.
+* Zéro secret, zéro bump de version, zéro publication Central (wire inchangé).
+
+== Suites
+
+* Mission 1 (adoption bakery) *hors scope* — session parallèle détient bakery.
+* Le pin `workspace-catalog:0.0.46` reste satisfait (0.0.46 publié, repo1 200,
+  porte `graphify-plugin = "0.0.5"`).
+* Dette S-028 (garde racy) *soldée*.

@@ -1,68 +1,61 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 029
-:session: 029
+= PROMPT_REPRISE — Graphify Gradle — Session 030
+:session: 030
 :date: 2026-09-17
 
-== Session 028 terminée — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs
+== Session 029 terminée — EPIC D5-RACE (garde de publication racy soldée)
 
-*EPIC GF-SCHEMA est désormais COMPLET 5/5 US.* Le schéma est explicite,
-tolérant, versionné, et l'incrémentalité est opt-in.
+`GraphifyPluginPublicationTest` ne lit plus le working tree du repo voisin
+(`../workspace-bom/gradle/libs.versions.toml`, racy entre sessions) : la version
+*publiée* du catalogue workspace est *injectée* par Gradle
+(`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`).
 
-* GF-SV-0 cadrage — audit 4 constats, 7 décisions. Doc
-  `.agents/CADRAGE_EPIC_GF_SCHEMA_VERSION.adoc`.
-* GF-SV-1/2 graphify N0 — `@JsonIgnoreProperties(ignoreUnknown = true)` sur les
-  4 data classes + `schemaVersion: Int = SCHEMA_VERSION (= 1)`. Le producteur
-  émet le champ ; garde de forme 3 → 4 champs ; BDD `schema_version.feature`
-  (6 scénarios) ; README 10 × 2 synchronisés.
-* GF-SV-3 — `graphify-plugin:0.0.5` publié Central (bundle `895d2e53`).
-  Non-régression prouvée : bakery lens 144/0, codebase graph 37/0.
-* codebase committé/poussé `0b614a1` (bump 0.0.5 + 2 tests de tolérance).
-* COORD-0.0.46 : pin aligné sur le catalogue 0.0.46 publié (graphify 0.0.5).
+* D5R-0 cadrage — audit 5 constats, 7 décisions. Doc
+  `.agents/CADRAGE_EPIC_D5_RACE.adoc`.
+* D5R-1 objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]`
+  *scopée par section*, commentaires) + `graphify.catalog.PublicationHygiene`
+  (verdict). 12 tests unit.
+* D5R-2 wiring + refactor garde (zéro accès repo voisin). Preuve RED one-shot
+  (propriété forcée `9.9.9` → échec).
+* D5R-3 BDD `publication_hygiene.feature` 5 scénarios + `PublicationHygieneSteps`.
 
-Gates : 149 unit + 9 functional + 20 cucumber, 0 FAIL. `check --rerun-tasks` +
-`publishToMavenLocal` VERTS. Zéro secret.
+Gates : 162 unit + 9 functional + 25 cucumber, 0 FAIL. `check --rerun-tasks` +
+`publishToMavenLocal` VERTS. Zéro secret, zéro bump, zéro publication Central.
+
+*Les objets d'hygiène vivent dans le source set `test`* — utilitaires de
+publication, jamais dans le wire publié.
 
 == COLLISION DE SESSION — à connaître en ouverture
 
-Une *seconde session opencode* a travaillé en parallèle dans `workspace-bom` et
-`bakery-gradle` pendant S-028. Conséquences :
+Une *seconde session opencode* détient le borough `bakery-gradle` (et
+`workspace-bom`). En S-029 :
 
-* `workspace-bom` : working tree porté à `0.0.46` (avec `graphify-plugin =
-  0.0.5` + `codex-plugin 0.0.9`) par l'autre session. **Non publié** (repo1 404).
-* `workspace-bom/catalog:0.0.45` (publié par l'autre session, `01:21 GMT`)
-  référence `graphify-plugin = "0.0.4"` — *pas* 0.0.5.
-* `bakery-gradle` : 5 fichiers de l'autre session + nos 2 fichiers de bump
-  0.0.5 — **non committé** (cédé à l'autre session).
-* Pin actuel graphify : `workspace-catalog:0.0.45`. Sur *cette machine* il
-  résout 0.0.5 (mavenLocal écrasé par notre `publishToMavenLocal`) ; sur une
-  machine propre il résoudrait 0.0.4 (Central). `graphify:0.0.5` est publié mais
-  référencé par aucun catalogue publié.
+* Mission « adoption bakery » (committer le bump 0.0.5 + 2 tests de tolérance)
+  *hors scope* — le pilote a interdit de lancer bakery.
+* `bakery-gradle` working tree : `graphify = "0.0.5"` + 2 tests de tolérance
+  (`SubgraphExtractorTest`) — **non committés** (vérifié verts en 4/4 isolément
+  avant consigne d'arrêt).
+* Ne PAS travailler dans bakery sans coordination pilote.
 
-== Coordination catalogue — ✅ RÉSOLUE en S-028
+== Mission session 030 — à la demande pilote
 
-Le catalogue `0.0.46` a été publié par l'autre session en cours de clôture et
-porte `graphify-plugin = "0.0.5"` (SHA1 Central = mavenLocal `68a3d969`). Le pin
-a été aligné immédiatement : `workspace-catalog:0.0.46`, garde D5 réalignée,
-`version: 0.0.5` résolue, `check --rerun-tasks` VERT. Le graphe cross-borough est
-cohérent.
+Aucune urgence. Backlog ouvert :
 
-*Reste cédé à l'autre session* : `workspace-bom` (working tree) et
-`bakery-gradle` (5 fichiers tiers + nos 2 fichiers de bump 0.0.5 non committés).
-
-== Mission session 029 — à la demande pilote
-
-1. *Adoption bakery* — committer les 2 fichiers (bump 0.0.5 + 2 tests de
-   tolérance), si l'autre session ne l'a pas fait.
-2. *EPIC D5-RACE* — `GraphifyPluginPublicationTest` lit le *working tree* du
-   repo voisin (`../workspace-bom/gradle/libs.versions.toml`) au lieu du
-   catalogue publié → racy entre sessions. Correctif : lire le catalogue publié.
-3. *Publication* — aucun besoin immédiat (0.0.5 publié ET référencé).
+1. *EPIC PUB* (si accord pilote) — publication Central d'un prochain bump.
+   Aujourd'hui 0.0.5 publié ET référencé par `workspace-catalog:0.0.46`.
+   Aucun besoin immédiat.
+2. *GF-SCHEMA-5* est TERMINÉ ; *GF-FINGERPRINT* TERMINÉ ; *D5-RACE* TERMINÉ.
+3. Candidats futurs (non planifiés) : `schemaVersion` DIFFÉRÉ pour
+   `graph-content.json` (GF-SCHEMA-5-bis, casserait les mappers stricts
+   bakery/codebase du corpus), consolidation de `VersionCatalogToml` vers un
+   contrat N0 partagé MEMPHIS (utile à 20+ gardes D5 cross-borough).
 
 == Rappel
 
-- EPIC GF-SCHEMA COMPLET 5/5 ; EPIC GF-FINGERPRINT COMPLET 6/6.
-- Borough N0, tooling 0.0.5 Central.
+- Borough N0, tooling 0.0.5 Central, pin `workspace-catalog:0.0.46`.
 - Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
 - Filtre `graphify.steps.**` obligatoire sur le task `test`.
 - Le source set `functionalTest` n'a PAS `main` sur son classpath de
-  compilation — les tests de modèle vont dans `test/`.
+  compilation — les tests de modèle/domaine vont dans `test/`.
 - Version propre dérivée du catalogue : tout bump passe par MEMPHIS.
+- La garde de publication exige la propriété
+  `graphify.publishedCatalog.graphifyVersion` (injectée par `build.gradle.kts`).

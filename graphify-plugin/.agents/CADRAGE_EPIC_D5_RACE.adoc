@@ -1,0 +1,131 @@
+= CADRAGE EPIC D5-RACE — Garde de publication lue depuis le catalogue publié
+
+:toc:
+:sectnums:
+:date: 2026-09-17
+:source: Session 029 (dette révélée par la collision de session S-028)
+
+== Contexte — Pourquoi cet EPIC maintenant
+
+La session 028 a vécu une *collision de session* : une seconde session opencode
+travaillait en parallèle dans `workspace-bom` et `bakery-gradle`. La garde
+d'hygiène D5 du borough — `GraphifyPluginPublicationTest` — est passée *par
+coïncidence* : elle lit le *working tree* du repo voisin
+(`../workspace-bom/gradle/libs.versions.toml`), pas le catalogue *publié*.
+
+C'est un défaut structurel : la garde prétend vérifier que la version locale
+coïncide avec la version *publiée du catalogue*, mais elle lit un fichier de
+travail modifiable par n'importe quelle session concurrente. Une garde qui peut
+mentir est pire qu'une absence de garde.
+
+== Audit — 5 constats
+
+[cols="1,3,3", options="header"]
+|===
+| # | Constat | Preuve
+
+| 1
+| La garde lit le working tree d'un repo voisin, pas le catalogue publié
+| `GraphifyPluginPublicationTest.wsCatalogToml()` : `rootDir.parentFile?.resolve("workspace-bom/gradle/libs.versions.toml")`.
+
+| 2
+| Le verdict est *racy* entre sessions
+| S-028 : le working tree a été porté à `graphify-plugin = "0.0.5"` par une autre session ; le test est passé, pas parce que le catalogue publié 0.0.45 disait 0.0.5 (il disait 0.0.4), mais parce que le fichier voisin avait été édité.
+
+| 3
+| Gradle *résout* déjà le catalogue publié — la garde l'ignore
+| `build.gradle.kts` : `version = ws.versions.graphify.plugin.get()` ; `settings.gradle.kts` : `create("ws") { from("education.cccp:workspace-catalog:0.0.46") }`. La source de vérité est disponible au build, jamais transmise au test.
+
+| 4
+| Le parsing TOML est *inline, non testé*
+| `graphifyVersionFrom(content)` — `lineSequence().first { startsWith("graphify-plugin =") ... }`. Zéro scoping de section : une clé `graphify-plugin` dans `[libraries]` matcherait aussi. Zéro gestion de commentaire.
+
+| 5
+| Le pin catalogue est *figé en dur* dans la garde
+| `settings pins the workspace catalog` épingle `workspace-catalog:0.0.46`. Voulu (un bump de catalogue doit toucher la garde), mais la chaîne est dupliquée dans le message d'échec et dans l'assertion.
+
+|===
+
+== Décisions architecturales
+
+. *La version publiée est *injectée* par Gradle, jamais relue d'un fichier voisin.*
+   `build.gradle.kts` extrait `ws.versions.graphify.plugin.get()` (le catalogue
+   résolu par Gradle depuis le pin publié) et l'injecte dans la JVM de test via
+   `systemProperty("graphify.publishedCatalog.graphifyVersion", ...)`. La garde
+   lit `System.getProperty(...)`. Zéro accès au repo voisin.
+
+. *Le parsing TOML devient un objet pur, testé.*
+   `graphify.catalog.VersionCatalogToml` — lecteur minimal `[versions]`
+   *scopé par section* : une clé hors `[versions]` ne peut jamais primer. Il
+   remplace le `graphifyVersionFrom` inline du test.
+
+. *Le verdict d'hygiène devient un objet pur, testé.*
+   `graphify.catalog.PublicationHygiene` — compare version locale et version
+   publiée, rend `consistent` + un message de violation. Le test JUnit devient
+   une coquille mince qui alimente ces objets avec des fichiers réels et la
+   propriété injectée.
+
+. *Ces objets vivent dans le source set `test`, jamais dans le wire publié.*
+   Ce sont des utilitaires d'hygiène de publication, pas du code d'extension
+   `graph.json`. Les livrer sur Maven Central polluerait l'artefact. `main`
+   reste inchangé (zéro bump de contenu publié).
+
+. *Le pin catalogue reste figé en dur* — un bump de catalogue est un acte
+   délibéré qui doit toucher la garde (D5). On ne dérive pas le pin de lui-même
+   (ce serait circulaire).
+
+. *English only* — code, identifiants, commentaires, Gherkin.
+
+. *Méthode* : baby-step DDD/TDD/BDD strict RED → GREEN → REFACTOR.
+
+=== Niveau functional — décision explicite
+
+L'artefact modifié par cet EPIC est *la garde elle-même* (un test). Un test
+TestKit « qui teste le test » serait du cargo-culting : `functionalTest` a pour
+objet le comportement *runtime* du plugin (`collectFromWorkspace`), que cet EPIC
+ne touche pas. Le niveau d'intégration est ici la gate réelle
+`./gradlew test` (le test JUnit s'exécute *dans* le build Gradle, alimenté par
+la propriété injectée). Décision documentée, pattern S-024 (§ pas de Cucumber
+quand la dépendance est hors périmètre).
+
+== Découpage US (~6 pts)
+
+[cols="1,3,2,1", options="header"]
+|===
+| US | Description | Statut | Pts
+
+| D5R-0
+| Cadrage (ce document)
+| ✅ TERMINÉ (S-029)
+| 1
+
+| D5R-1
+| Objets purs `VersionCatalogToml` + `PublicationHygiene` (source set test) —
+   lecture `[versions]` scopée, gestion commentaires, alias, absence de clé ;
+   verdict d'hygiène. TDD unit strict.
+| 🔲 À FAIRE
+| 2
+
+| D5R-2
+| Wiring : `systemProperty` injecté dans `build.gradle.kts` depuis
+   `ws.versions.graphify.plugin.get()` ; refactor `GraphifyPluginPublicationTest`
+   (suppression de `wsCatalogToml()` et de tout accès au repo voisin).
+| 🔲 À FAIRE
+| 2
+
+| D5R-3
+| BDD Cucumber `publication_hygiene.feature` + steps (cohérence, drift, scoping
+   de section, commentaire).
+| 🔲 À FAIRE
+| 1
+|===
+
+== Gates et risques
+
+* *Propriété absente hors Gradle* : lancer la garde depuis un IDE sans la
+  propriété échoue explicitement (`error(...)`), jamais silencieusement contre
+  un fichier voisin. Le build Gradle l'injecte toujours.
+* *Zéro impact wire* : le JSON `graph.json` et l'artefact publié sont
+  inchangés — aucun bump de version, aucune publication Central.
+* *Non-régression* : `check` VERT (unit + functional + cucumber). La garde
+  épinglant `workspace-catalog:0.0.46` reste satisfaite (0.0.46 publié).

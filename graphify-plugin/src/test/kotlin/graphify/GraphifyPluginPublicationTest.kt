@@ -1,5 +1,7 @@
 package graphify
 
+import graphify.catalog.PublicationHygiene
+import graphify.catalog.VersionCatalogToml
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -13,13 +15,24 @@ import kotlin.text.Charsets.UTF_8
  * source of truth.
  * D4: the borough pins the catalog once in settings.gradle.kts.
  * D5 hygiene: the local toml self version and the ws catalog version must agree.
+ *
+ * D5R-2 (S-029): the *published* ws catalog version is injected by Gradle as the
+ * `graphify.publishedCatalog.graphifyVersion` system property. The guard never
+ * reads a neighbour repository's working tree — that was racy between sessions
+ * (S-028 collision).
  */
 class GraphifyPluginPublicationTest {
     private val pluginDir = File(System.getProperty("user.dir")).absoluteFile
 
-    private val rootDir =
-        pluginDir.parentFile
-            ?: throw IllegalStateException("Cannot resolve repo root from plugin dir")
+    private val publishedVersion: String
+        get() =
+            System.getProperty("graphify.publishedCatalog.graphifyVersion")
+                ?: error(
+                    "graphify.publishedCatalog.graphifyVersion is not set — run through Gradle " +
+                        "(build.gradle.kts injects the published ws catalog version)"
+                )
+
+    private val selfVersionKeys = listOf("graphify-plugin", "graphify")
 
     @Test
     fun `plugin version matches ws catalog version`() {
@@ -34,14 +47,18 @@ class GraphifyPluginPublicationTest {
             .withFailMessage("build.gradle.kts version must derive from the published workspace catalog (ws.versions.graphify.plugin)")
             .contains("ws.versions.graphify.plugin.get()")
 
-        // Hygiene (D5): local toml self version must match the ws catalog version —
-        // the ws catalog (workspace-bom repo) is the cross-borough source of truth.
-        val pluginCatalogVersion = graphifyVersionFrom(pluginDir.resolve("gradle/libs.versions.toml").readText(UTF_8))
-        val wsCatalogVersion = graphifyVersionFrom(wsCatalogToml())
+        // Hygiene (D5): local toml self version must match the published ws catalog version.
+        val localVersion =
+            VersionCatalogToml.versionOf(
+                pluginDir.resolve("gradle/libs.versions.toml").readText(UTF_8),
+                selfVersionKeys
+            )
 
-        assertThat(pluginCatalogVersion)
-            .withFailMessage("plugin catalog graphify version ($pluginCatalogVersion) must match ws catalog graphify-plugin version ($wsCatalogVersion)")
-            .isEqualTo(wsCatalogVersion)
+        val verdict = PublicationHygiene.check(localVersion, publishedVersion)
+
+        assertThat(verdict.consistent)
+            .withFailMessage(verdict.message)
+            .isTrue()
     }
 
     @Test
@@ -67,24 +84,4 @@ class GraphifyPluginPublicationTest {
         assertThat(buildScript).contains("group = \"education.cccp\"")
         assertThat(idLine.substringAfter("\"").substringBefore("\"")).isEqualTo("education.cccp.graphify")
     }
-
-    /**
-     * Reads the `ws` catalog toml and extracts the `graphify-plugin` version.
-     * Fallback: parse the local MEMPHIS repo toml (same source file as the
-     * published catalog).
-     */
-    private fun wsCatalogToml(): String {
-        val wsRepoToml = rootDir.parentFile
-            ?.resolve("workspace-bom/gradle/libs.versions.toml")
-        if (wsRepoToml != null && wsRepoToml.exists()) return wsRepoToml.readText(UTF_8)
-        error("ws catalog toml introuvable — résolution ws impossible pour l'hygiène")
-    }
-
-    private fun graphifyVersionFrom(content: String): String =
-        content
-            .lineSequence()
-            .map { it.substringBefore('#').trim() }
-            .first { it.startsWith("graphify-plugin =") || it.startsWith("graphify =") }
-            .substringAfter("\"")
-            .substringBefore("\"")
 }

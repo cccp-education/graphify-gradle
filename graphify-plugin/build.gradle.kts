@@ -24,6 +24,11 @@ dependencies {
 
 tasks.withType<Test> {
     outputs.cacheIf { true }
+
+    // D5R-2 — inject the *published* workspace catalog version resolved by Gradle
+    // (from the published catalog pin). The publication hygiene guard must never
+    // read a neighbour repository's working tree: that is racy between sessions.
+    systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())
 }
 
 // Exclude the Cucumber runner + step glue from the unit `test` task.
