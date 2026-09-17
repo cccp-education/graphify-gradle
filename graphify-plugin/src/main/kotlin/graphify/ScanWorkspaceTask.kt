@@ -1,5 +1,8 @@
 package graphify
 
+import graphify.fingerprint.ScanCache
+import graphify.fingerprint.ScanCacheStore
+import graphify.fingerprint.ScanExtractionIndex
 import graphify.model.GraphCommunity
 import graphify.model.GraphEdge
 import graphify.model.GraphModel
@@ -36,7 +39,11 @@ open class ScanWorkspaceTask : DefaultTask() {
     @get:Internal
     var excludePatterns: List<String> = emptyList()
 
-    private val headingRegex = Regex("""^(=+)\s+(.+?)\s*$""")
+    @get:Internal
+    var incremental: Boolean = false
+
+    @get:Internal
+    var cacheFile: File? = null
 
     private val mapper: ObjectMapper = ObjectMapper()
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -91,9 +98,11 @@ open class ScanWorkspaceTask : DefaultTask() {
 
         val repoMap = buildRepoMap(root, allFiles)
         val nodes = extractNodes(root, allFileData, dirs, projects, repoMap)
-        val edges = extractEdges(allFiles, projectDirs, root)
+        val previousCache = if (incremental) cacheFile?.let { ScanCacheStore.load(it) } ?: ScanCache() else ScanCache()
+        val index = ScanExtractionIndex(previous = previousCache, incremental = incremental)
+        val edges = extractEdges(root, allFiles, projectDirs, index)
         val communities = extractCommunities(repoMap)
-        val sections = extractSections(root, allFiles)
+        val sections = extractSections(root, allFiles, index)
 
         val graph = GraphModel(
             nodes = nodes + sections.map { it.node },
@@ -107,7 +116,19 @@ open class ScanWorkspaceTask : DefaultTask() {
 
         output.parentFile.mkdirs()
         mapper.writerWithDefaultPrettyPrinter().writeValue(output, graph)
+        persistCache(index, allFiles, root)
         logger.lifecycle("Graphify scan complete: ${nodes.size} nodes, ${edges.size} edges, ${communities.size} communities -> ${output.absolutePath}")
+    }
+
+    private fun persistCache(index: ScanExtractionIndex, allFiles: List<Path>, root: Path) {
+        if (!incremental) return
+        val cache = cacheFile ?: return
+        val livePaths = allFiles.mapNotNull { safe { root.relativize(it).toString() } }.toSet()
+        ScanCacheStore.save(cache, index.updatedCache(livePaths))
+        val stats = index.stats
+        logger.lifecycle(
+            "Graphify incremental cache: ${stats.trusted} trusted, ${stats.reusedByHash} reused by hash, ${stats.parsed} parsed -> ${cache.absolutePath}"
+        )
     }
 
     private val excludedDirNames = setOf("build", "node_modules", ".gradle", ".git", ".idea", "target")
@@ -177,9 +198,10 @@ open class ScanWorkspaceTask : DefaultTask() {
     }
 
     private fun extractEdges(
+        root: Path,
         files: List<Path>,
         projectDirs: Set<Path>,
-        root: Path
+        index: ScanExtractionIndex
     ): List<GraphEdge> {
         val edges = mutableListOf<GraphEdge>()
 
@@ -192,8 +214,8 @@ open class ScanWorkspaceTask : DefaultTask() {
 
         val kotlinFiles = files.filter { it.extension == "kt" || it.extension == "kts" }
         for (file in kotlinFiles) {
-            val content = safe { Files.readString(file) } ?: continue
-            val imports = extractKotlinImports(content)
+            val relative = safe { root.relativize(file).toString() } ?: continue
+            val imports = index.extraction(file, relative).imports
             for (import in imports) {
                 val targetDir = resolveImportToDir(import, projectDirs, root)
                 if (targetDir != null) {
@@ -211,10 +233,9 @@ open class ScanWorkspaceTask : DefaultTask() {
 
         val adocFiles = files.filter { it.extension == "adoc" || it.extension == "ad" }
         for (file in adocFiles) {
-            val content = safe { Files.readString(file) } ?: continue
-            val refs = extractAdocReferences(content)
-            val tocRefs = extractTocTableReferences(content)
-            for (ref in refs) {
+            val relative = safe { root.relativize(file).toString() } ?: continue
+            val extraction = index.extraction(file, relative)
+            for (ref in extraction.adocReferences) {
                 val targetFile = safe { resolveReferenceToFile(file.parent, ref) }
                 if (targetFile != null && safe { Files.exists(targetFile) } == true) {
                     val src = safe { root.relativize(file).toString() } ?: continue
@@ -222,7 +243,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                     edges.add(GraphEdge(source = src, target = tgt, type = EdgeType.REFERENCE.wire))
                 }
             }
-            for (ref in tocRefs) {
+            for (ref in extraction.tocReferences) {
                 val targetFile = resolveTocReference(file, ref, files)
                 if (targetFile != null && safe { Files.exists(targetFile) } == true) {
                     val src = safe { root.relativize(file).toString() } ?: continue
@@ -234,8 +255,8 @@ open class ScanWorkspaceTask : DefaultTask() {
 
         val idxFiles = files.filter { it.fileName.toString() == "INDEX.adoc" }
         for (file in idxFiles) {
-            val content = safe { Files.readString(file) } ?: continue
-            val agentRefs = extractAgentReferences(content)
+            val relative = safe { root.relativize(file).toString() } ?: continue
+            val agentRefs = index.extraction(file, relative).agentReferences
             for (ref in agentRefs) {
                 val src = safe { root.relativize(file).toString() } ?: continue
                 edges.add(GraphEdge(source = src, target = ref, type = EdgeType.AGENT_REFERENCE.wire))
@@ -245,11 +266,6 @@ open class ScanWorkspaceTask : DefaultTask() {
         return edges
     }
 
-    private fun extractKotlinImports(content: String): List<String> {
-        val regex = Regex("""^import\s+([\w.]+)""", RegexOption.MULTILINE)
-        return regex.findAll(content).map { it.groupValues[1] }.toList()
-    }
-
     private fun resolveImportToDir(import: String, projectDirs: Set<Path>, root: Path): Path? {
         for (projDir in projectDirs) {
             val srcDir = projDir.resolve("src/main/kotlin")
@@ -257,20 +273,6 @@ open class ScanWorkspaceTask : DefaultTask() {
             if (safe { Files.isDirectory(packageDir) } == true) return projDir
         }
         return null
-    }
-
-    private fun extractAdocReferences(content: String): List<String> {
-        val refs = mutableListOf<String>()
-        val linkRegex = Regex("""(?:link|include|xref|image):([^\[\]\s]+)\[""")
-        refs.addAll(linkRegex.findAll(content).map { it.groupValues[1] }.toList())
-        val pathRegex = Regex("""`([\w./-]+\.(?:adoc|ad|kt|kts|yml|yaml|json|java|md))`""")
-        refs.addAll(pathRegex.findAll(content).map { it.groupValues[1] }.toList())
-        return refs
-    }
-
-    private fun extractTocTableReferences(content: String): List<String> {
-        val cellRegex = Regex("""\|\s*([\w./-]+\.(?:adoc|ad))\s*(?:\||$)""", RegexOption.MULTILINE)
-        return cellRegex.findAll(content).map { it.groupValues[1] }.toList()
     }
 
     private fun resolveTocReference(fromFile: Path, ref: String, allFiles: List<Path>): Path? {
@@ -286,14 +288,6 @@ open class ScanWorkspaceTask : DefaultTask() {
             Path.of(ref)
         )
         return candidates.firstOrNull { safe { Files.isRegularFile(it) } == true }
-    }
-
-    private fun extractAgentReferences(content: String): List<String> {
-        val regex = Regex("""[\w.-]+/[\w.-]+(?:/[\w.-]+)*""")
-        return regex.findAll(content)
-            .map { it.value }
-            .filter { it.contains("/") }
-            .toList()
     }
 
     private fun buildRepoMap(root: Path, files: List<Path>): Map<Path, String> {
@@ -336,37 +330,30 @@ open class ScanWorkspaceTask : DefaultTask() {
         return edges
     }
 
-    private fun extractSections(root: Path, files: List<Path>): List<SectionInfo> {
+    private fun extractSections(root: Path, files: List<Path>, index: ScanExtractionIndex): List<SectionInfo> {
         val sections = mutableListOf<SectionInfo>()
         val adocFiles = files.filter { it.extension == "adoc" || it.extension == "ad" }
         val idCounts = mutableMapOf<String, Int>()
         for (file in adocFiles) {
-            val content = safe { Files.readString(file) } ?: continue
             val fileRelative = safe { root.relativize(file).toString() } ?: continue
-            val lines = content.lines()
-            var lineNumber = 0
-            for (line in lines) {
-                lineNumber++
-                val match = headingRegex.find(line) ?: continue
-                val level = match.groupValues[1].length
-                val title = match.groupValues[2]
-                val baseId = "$fileRelative#$title"
+            for (section in index.extraction(file, fileRelative).sections) {
+                val baseId = "$fileRelative#${section.title}"
                 val count = idCounts.merge(baseId, 1, Int::plus) ?: 1
                 val sectionId = if (count == 1) baseId else "$baseId~$count"
                 sections.add(
                     SectionInfo(
                         node = GraphNode(
                             id = sectionId,
-                            label = title,
+                            label = section.title,
                             type = NodeType.SECTION.wire,
                             metadata = mapOf(
-                                "level" to level,
-                                "line" to lineNumber,
+                                "level" to section.level,
+                                "line" to section.line,
                                 "source" to fileRelative
                             )
                         ),
                         fileRelative = fileRelative,
-                        level = level
+                        level = section.level
                     )
                 )
             }

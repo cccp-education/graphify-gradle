@@ -68,7 +68,7 @@ Enregistrées par `GraphifyPlugin` (`graphify.GraphifyPlugin`) :
 | `collectAndVerify`     | `DefaultTask` (depends + finalizedBy) | collect |
 
 Nom de l'extension : `graphify` (`GraphifyExtension`). Propriétés :
-`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`.
+`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`, `incremental`, `cacheFile`.
 
 Les deux tâches scan/verify portent `@DisableCachingByDefault` (dépendent du FS / état
 du workspace) ; `collectFromWorkspace` appelle en plus `doNotTrackState(...)`.
@@ -88,6 +88,10 @@ du workspace) ; `collectFromWorkspace` appelle en plus `doNotTrackState(...)`.
 - Les communautés proviennent de `buildRepoMap` : le répertoire englobant le plus proche
   contenant un dossier ou fichier `.git` devient l'id de communauté.
 - La sortie est sérialisée via Jackson `ObjectMapper` (inclusion NON_NULL, pretty-print).
+- Avec `incremental` activé, l'analyse par fichier est mémorisée par hachage du
+  contenu (`graphify.fingerprint`) ; le parcours s'exécute toujours en entier et le
+  graphe émis est identique octet pour octet. Le cache réside sous `cacheFile` (par
+  défaut `build/graphify/fingerprints.json`) et n'est jamais committé.
 
 ## Vérification du DAG (`VerifyDagAcyclicTask`)
 

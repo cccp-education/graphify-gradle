@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-09-17 (session 025 — EPIC GF-SCHEMA 4/5 US + 1 différée : domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias), wiring producteur byte-identique, functional TestKit, BDD Cucumber. 91 unit + 3 functional + 7 cucumber, 0 FAIL.)
-_Session terminee_ : 025 — EPIC GF-SCHEMA 4/5 US (TDD/BDD 3 niveaux + cadrage)
-_Session en cours_ : 026 — EPIC GF-SCHEMA clos (reste GF-SCHEMA-5 différé + DFL-5 + PUB 0.0.4)
+_Derniere mise a jour_ : 2026-09-17 (session 026 — EPIC GF-FINGERPRINT TERMINÉ 6/6 US : domaine `graphify.fingerprint` (fast check size/mtime → SHA-256 → parse), `FileExtractor` pur, wiring `ScanWorkspaceTask` incrémental opt-in byte-identique, functional TestKit 6, BDD Cucumber 7. 142 unit + 9 functional + 14 cucumber, 0 FAIL.)
+_Session terminee_ : 026 — EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5, TDD/BDD 3 niveaux + cadrage)
+_Session en cours_ : 027 — Publication Maven Central graphify-plugin 0.0.4 (GF-SCHEMA + GF-FINGERPRINT)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -45,8 +45,9 @@ graphify-gradle/                     # CONSUMER (dogfooding) + repo git
     │   └── encyclopedies/           # Connaissance froide
     └── src/
         ├── main/kotlin/graphify/            # + schema/ (NodeType, EdgeType, GraphSchema)
-        ├── test/                            # 91 tests unit + 7 scénarios Cucumber (graphify.steps)
-        └── functionalTest/                  # 3 tests TestKit (SchemaFunctionalTest)
+        │                                    # + fingerprint/ (FileFingerprint, ScanCache, …)
+        ├── test/                            # 142 tests unit + 14 scénarios Cucumber (graphify.steps)
+        └── functionalTest/                  # 9 tests TestKit (SchemaFunctionalTest + IncrementalFunctionalTest)
 ----
 
 *Note* : `api-key-pool` a migré vers `foundry/public/api-key-pool-gradle/` — librairie N0 standalone
@@ -57,18 +58,25 @@ avec architecture Racine Consommateur + Plugin Indépendant (article 0124).
 
 |===
 | Fichier | Description | Lignes
-| `GraphifyPlugin.kt` | Plugin Gradle — register scanWorkspace + verifyDagAcyclic + scanAndVerify | 30
-| `GraphifyExtension.kt` | DSL — rootDir, outputFile, excludePatterns, dagLevels, foundryDir | 28
-| `ScanWorkspaceTask.kt` | Cœur — Files.walkFileTree, extraction nœuds/arêtes/communautés, Jackson serialization (types via `GraphSchema`, zéro littéral) | 380
+| `GraphifyPlugin.kt` | Plugin Gradle — register scanWorkspace + verifyDagAcyclic + scanAndVerify | 37
+| `GraphifyExtension.kt` | DSL — rootDir, outputFile, excludePatterns, dagLevels, foundryDir, incremental, cacheFile | 32
+| `ScanWorkspaceTask.kt` | Cœur — Files.walkFileTree, extraction nœuds/arêtes/communautés, Jackson serialization (types via `GraphSchema`, parsers via `FileExtractor`) | 367
 | `VerifyDagAcyclicTask.kt` | Détection violations DAG — levelOf résolution suffixes, GradleException avec détails | 88
 | `GraphModel.kt` | Data classes — GraphModel, GraphNode, GraphEdge, GraphCommunity | 28
 | `schema/NodeType.kt` | Enum canonique des 4 types de nœuds produits | 9
 | `schema/EdgeType.kt` | Enum canonique des 6 types d'arêtes produites | 11
 | `schema/GraphSchema.kt` | Registre unique — canonicalisation alias (non destructive), vocabulaire UA réservé | 74
+| `fingerprint/FileFingerprint.kt` | Empreinte (size/mtime/sha256) + fast check | 17
+| `fingerprint/Fingerprinter.kt` | Producteur stateless (fingerprint, sha256, digest) | 31
+| `fingerprint/FileExtraction.kt` | Faits file-local (+ `SectionExtraction`) | 37
+| `fingerprint/FileExtractor.kt` | Extracteur pur `(fileName, content) → FileExtraction` | 74
+| `fingerprint/ScanCache.kt` | Double index chemins/hash + `prunedTo` | 51
+| `fingerprint/ScanCacheStore.kt` | Persistance JSON versionnée, dégradation silencieuse | 50
+| `fingerprint/ScanExtractionIndex.kt` | Mémoïsation par scan (fast path → hash → parse) | 102
 |===
 
-Total : ~643 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
-+ graphify-plugin : 91 unit + 3 functional + 7 cucumber, 0 FAIL ✅
+Total : ~1079 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
++ graphify-plugin : 142 unit + 9 functional + 14 cucumber, 0 FAIL ✅
 + api-key-pool : 66/66 PASS ✅ (migré foundry/public/api-key-pool-gradle/)
 
 '''
@@ -88,6 +96,7 @@ Total : ~643 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-6 | Publication Maven Central (nmcp) — v0.0.2 déployé | ✅ TERMINÉ (session 013) | P0
 | GF-CORPUS | Graphe de connaissance du corpus FPA (GBL-003.2) — audit schéma + extension TDD strict (nœuds section, edges has_section/subsection/toc_entry) + scan corpus → office/metiers/FPA/graph-content.json | ✅ TERMINÉ (session 024) | P0
 | GF-SCHEMA | Enrichissement schéma `GraphModel` (types + alias, DFL-2) — domaine `graphify.schema` (NodeType/EdgeType/GraphSchema), wiring producteur byte-identique, functional + BDD | ✅ TERMINÉ 4/5 US (session 025) — GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ | P1
+| GF-FINGERPRINT | Fingerprinting incrémental (DFL-5) — domaine `graphify.fingerprint` (fast check size/mtime → SHA-256 → parse), `FileExtractor` pur, wiring opt-in byte-identique, functional + BDD | ✅ TERMINÉ 6/6 US (session 026) | P2
 |===
 
 '''
@@ -95,6 +104,7 @@ Total : ~643 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 
 |===
 | # | Date | Type | Sujet | Score
+| 026 | 2026-09-17 | dev | EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5) — cadrage (audit 8 constats : scan déclaré non-incrémentable, 4m51s/98MB mesurés, 4 sites de lecture non cachés, résolution globale hors cache, état global sections) ; domaine `graphify.fingerprint` (FileFingerprint/Fingerprinter/FileExtraction/ScanCache/ScanCacheStore/ScanExtractionIndex) ; `FileExtractor` pur (5 parsers sortis de ScanWorkspaceTask) ; wiring incrémental opt-in (`incremental`/`cacheFile`, cache élagué, sortie byte-identique) ; functional TestKit 6 ; BDD `incremental_scan.feature` 7 scénarios ; README 10 langues × 2 (plugin + consommateur). Gates : 142 unit + 9 functional + 14 cucumber, 0 FAIL. | 10/10
 | 025 | 2026-09-17 | dev | EPIC GF-SCHEMA 4/5 US (+ 1 différée) — domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias, canonicalisation non destructive), wiring `ScanWorkspaceTask` byte-identique, functional TestKit (3), BDD Cucumber (7 scénarios, infra convention plugin 0.0.4), README 10 langues synchronisés. 91 unit + 3 functional + 7 cucumber, 0 FAIL. Révision décision S-024 (Cucumber justifié). | 10/10
 | 024 | 2026-09-08 | dev | EPIC GF-CORPUS TERMINÉ 3/3 US — extension schéma TDD strict (sections, has_section, subsection, toc_entry, IDs uniques) + scan corpus FPA → graph-content.json (1989 nœuds). 70/70 PASS (+12). | 10/10
 | 021 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées, -62 lignes, compileKotlin SUCCESS | ✅ TERMINE

@@ -1,49 +1,51 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 026
-:session: 026
+= PROMPT_REPRISE — Graphify Gradle — Session 027
+:session: 027
 :date: 2026-09-17
 
-== Session 025 terminée — EPIC GF-SCHEMA 4/5 US (+ 1 différée)
+== Session 026 terminée — EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5)
 
-Déblocage consommateur Brooklin Flow (DFL-2, cross-borough S-216).
+Fingerprinting incrémental du scan, deuxième item laissé à graphify (N0) par
+le cadrage DSH-BOUNDARY (S-216).
 
-* GF-SCHEMA-0 cadrage ✅ — audit 7 constats, doc
-  `.agents/CADRAGE_EPIC_GF_SCHEMA.adoc`.
-* GF-SCHEMA-1 domaine `graphify.schema` ✅ — `NodeType`/`EdgeType` +
-  `GraphSchema` (alias, canonicalisation, vocabulaire UA réservé).
-* GF-SCHEMA-2 wiring producteur ✅ — `ScanWorkspaceTask` zéro littéral de type,
-  sortie **byte-identique**.
-* GF-SCHEMA-3 functional TestKit ✅ — 3 tests (contrat canonique, top-level
-  strict-safe, déterminisme).
-* GF-SCHEMA-4 BDD Cucumber ✅ — `schema_alias.feature` 7 scénarios, infra
-  minimale via convention plugin 0.0.4.
-* GF-SCHEMA-5 (`schemaVersion` top-level) ⏳ **DIFFÉRÉ** — casserait bakery +
-  codebase (mappers stricts). Exige `@JsonIgnoreProperties` cross-borough.
-* README 10 langues synchronisés (section/has_section/subsection).
+* Domaine `graphify.fingerprint` (7 fichiers, 362 lignes) : `FileFingerprint`,
+  `Fingerprinter`, `FileExtraction`/`SectionExtraction`, `ScanCache`,
+  `ScanCacheStore` (JSON versionné), `ScanExtractionIndex` (fast path →
+  hash de contenu → parse, stats trusted/reused/parsed).
+* `FileExtractor` pur — les 5 parsers quittent `ScanWorkspaceTask`.
+* Wiring `ScanWorkspaceTask` : `incremental` (opt-in, défaut false) +
+  `cacheFile` (défaut `build/graphify/fingerprints.json`), cache élagué,
+  *sortie byte-identique* prouvée par les 91 tests historiques.
+* Functional TestKit 6 tests, BDD `incremental_scan.feature` 7 scénarios.
+* README EN + 9 traductions (plugin + consommateur) synchronisés.
+* Doc cadrage : `.agents/CADRAGE_EPIC_GF_FINGERPRINT.adoc`.
 
-Gates : 91 unit + 3 functional + 7 cucumber, 0 FAIL. `check` + 
-`publishToMavenLocal` VERTS. Zéro secret.
+Gates : 142 unit (+51) + 9 functional (+6) + 14 cucumber (+7), 0 FAIL.
+`check` + `publishToMavenLocal` VERTS. Zéro secret.
 
-== Prochaine Session (026)
+== Prochaine Session (027) — Publication Central 0.0.4 (P0, à la demande)
 
-EPIC GF-SCHEMA clos pour sa partie sûre. Le schéma est désormais un domaine
-explicite, tolérant et versionné en code (enums), sans casse consommateur.
-Brooklin Flow (DSH-BOUNDARY-5) peut consommer `graph.json` canonique.
+Ordre pilote acté : 2 (fait) → *3* → 1.
 
-Priorités possibles (décision pilote) :
-1. *GF-SCHEMA-5* (P2) — `schemaVersion` top-level : chantier cross-borough
-   (bakery + codebase `@JsonIgnoreProperties(ignoreUnknown = true)` + bump
-   dépendances). Ne pas démarrer sans accord pilote explicite.
-2. *DFL-5* (P2) — fingerprinting incrémental (optimisation production,
-   toujours au backlog Brooklin Flow).
-3. *Publication Central 0.0.4* (P0, à la demande) — contenu : GF-SCHEMA.
+* Contenu 0.0.4 : EPIC GF-SCHEMA (S-025) + EPIC GF-FINGERPRINT (S-026).
+* Version code : `ws.versions.graphify.plugin` = `0.0.3` → bump `0.0.4`.
+* Procédure DAG : `graphify-plugin` n'a aucune dépendance N0 amont.
+* Commande : `./gradlew publishAggregationToCentralPortal --no-daemon`
+  (nmcp 1.5.0, AUTOMATIC, settings.gradle.kts déjà câblé).
+* Vérifier repo1 HTTP 200 sur `education.cccp:graphify-plugin:0.0.4`.
+* Puis mettre à jour le catalogue MEMPHIS (`workspace-catalog`) si le pilote
+  le demande — ne pas amorcer spontanément un bump cross-borough.
 
-Zéro initiative : publication/bump uniquement à la demande pilote.
+== Puis Session 028 — GF-SCHEMA-5 `schemaVersion` (P2, cross-borough)
+
+Chantier multi-borough, gate = adoption consommateurs. Nécessite
+`@JsonIgnoreProperties(ignoreUnknown = true)` chez bakery + codebase avant
+d'ajouter le champ top-level `schemaVersion` à `GraphModel`, puis bump des
+dépendances. *Ne pas démarrer sans accord pilote explicite.*
 
 == Rappel
 
-- Borough N0, tooling stable 0.0.3 Central (0.0.4 en attente).
+- Borough N0, tooling 0.0.3 Central (0.0.4 en cours de session 027).
 - Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
-- *Révision S-024* : l'infra Cucumber est désormais en place (convention
-  plugin 0.0.4) — un contrat public le justifie. Ne plus la retirer.
 - Filtre `graphify.steps.**` obligatoire sur le task `test` (sinon les
   scénarios Cucumber sont rejoués par l'unit test).
+- Le cache incrémental vit sous `build/`, jamais committé.

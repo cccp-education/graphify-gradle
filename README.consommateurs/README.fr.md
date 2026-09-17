@@ -108,8 +108,30 @@ graphify {
         "**/build/**", "**/node_modules/**", "**/.gradle/**",
         "**/.git/**", "**/.idea/**", "**/target/**"
     ))
+
+    // Rescan incrémental opt-in (défaut : false → scan complet).
+    incremental.set(true)
+
+    // Où le cache d'empreintes est stocké (défaut : build/graphify/fingerprints.json).
+    cacheFile.set(layout.buildDirectory.file("graphify/fingerprints.json").get().asFile)
 }
 ```
+
+## Scan incrémental
+
+`collectFromWorkspace` parcourt l'arborescence entière dans les deux modes ; c'est le
+parcours qui détecte les fichiers ajoutés et supprimés. Avec `incremental.set(true)`, le
+*parsing par fichier* est mémoïsé :
+
+- un fichier dont la taille et le mtime sont inchangés réutilise son extraction en cache (aucune lecture) ;
+- un fichier dont le mtime a changé mais dont le contenu est inchangé est détecté par SHA-256
+  et réutilise l'extraction d'un fichier identique (par ex. après `git checkout`) ;
+- seul le contenu réellement nouveau est re-parsé.
+
+Le cache est un document JSON sous `build/` (jamais commité) et est élagué aux
+fichiers présents à chaque scan. Ce n'est qu'une optimisation : un cache manquant, corrompu
+ou de version inconnue se dégrade silencieusement en un scan complet, et le `graph.json`
+produit est byte-identique à une exécution non incrémentale.
 
 ## Prérequis
 

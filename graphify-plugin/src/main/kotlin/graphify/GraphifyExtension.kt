@@ -13,8 +13,11 @@ open class GraphifyExtension @Inject constructor(objects: ObjectFactory) {
     val excludePatterns: ListProperty<String> = objects.listProperty(String::class.java)
     val dagLevels: MapProperty<String, Int> = objects.mapProperty(String::class.java, Int::class.java)
     val foundryDir: Property<File> = objects.property(File::class.java)
+    val incremental: Property<Boolean> = objects.property(Boolean::class.java)
+    val cacheFile: Property<File> = objects.property(File::class.java)
 
     init {
+        incremental.convention(false)
         excludePatterns.convention(
             listOf(
                 "**/build/**",

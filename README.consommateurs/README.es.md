@@ -105,8 +105,30 @@ graphify {
         "**/build/**", "**/node_modules/**", "**/.gradle/**",
         "**/.git/**", "**/.idea/**", "**/target/**"
     ))
+
+    // Rescan incremental opcional (por defecto: false → escaneo completo).
+    incremental.set(true)
+
+    // Dónde se almacena la caché de huellas (por defecto: build/graphify/fingerprints.json).
+    cacheFile.set(layout.buildDirectory.file("graphify/fingerprints.json").get().asFile)
 }
 ```
+
+## Escaneo incremental
+
+`collectFromWorkspace` recorre todo el árbol en ambos modos; es el
+recorrido lo que detecta los archivos añadidos y eliminados. Con `incremental.set(true)`, el
+*análisis por archivo* se memoriza:
+
+- un archivo cuyo tamaño y mtime no cambian reutiliza su extracción en caché (sin lectura);
+- un archivo cuyo mtime cambió pero cuyo contenido no cambió se detecta mediante SHA-256
+  y reutiliza la extracción de un archivo idéntico (p. ej. tras `git checkout`);
+- solo el contenido realmente nuevo se vuelve a analizar.
+
+La caché es un documento JSON bajo `build/` (nunca comprometido) y se poda a
+los archivos presentes en cada escaneo. Es solo una optimización: una caché ausente, corrupta
+o de versión desconocida se degrada silenciosamente a un escaneo completo, y el `graph.json`
+producido es byte-idéntico a una ejecución no incremental.
 
 ## Requisitos previos
 

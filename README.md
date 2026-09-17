@@ -108,8 +108,30 @@ graphify {
         "**/build/**", "**/node_modules/**", "**/.gradle/**",
         "**/.git/**", "**/.idea/**", "**/target/**"
     ))
+
+    // Opt-in incremental rescan (default: false → full scan).
+    incremental.set(true)
+
+    // Where the fingerprint cache is stored (default: build/graphify/fingerprints.json).
+    cacheFile.set(layout.buildDirectory.file("graphify/fingerprints.json").get().asFile)
 }
 ```
+
+## Incremental scan
+
+`collectFromWorkspace` scans the whole tree in either mode; the walk is what
+detects added and removed files. With `incremental.set(true)`, the *per-file
+parsing* is memoised:
+
+- a file whose size and mtime are unchanged reuses its cached extraction (no read);
+- a file whose mtime moved but whose content is unchanged is detected by SHA-256
+  and reuses the extraction of an identical file (e.g. after `git checkout`);
+- only genuinely new content is re-parsed.
+
+The cache is a JSON document under `build/` (never committed) and is pruned to
+the files present at each scan. It is an optimisation only: a missing, corrupted
+or unknown-version cache silently degrades to a full scan, and the produced
+`graph.json` is byte-identical to a non-incremental run.
 
 ## Prerequisites
 

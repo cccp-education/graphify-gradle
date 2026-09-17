@@ -4,7 +4,7 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-17 (S-025 — EPIC GF-SCHEMA 4/5 US + 1 différée, réponse à DFL-2 Brooklin Flow : domaine `graphify.schema` (NodeType/EdgeType/GraphSchema + alias non destructifs), wiring producteur byte-identique, functional TestKit (3), BDD Cucumber (7 scénarios). 91 unit + 3 functional + 7 cucumber, 0 FAIL. GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ — exige `@JsonIgnoreProperties` cross-borough bakery/codebase.)_
+_Dernière mise à jour : 2026-09-17 (S-026 — EPIC GF-FINGERPRINT TERMINÉ 6/6 US, réponse à DFL-5 Brooklin Flow : domaine `graphify.fingerprint` (FileFingerprint/Fingerprinter/FileExtraction/ScanCache/ScanCacheStore/ScanExtractionIndex), extracteur pur `FileExtractor`, wiring `ScanWorkspaceTask` incrémental opt-in (byte-identique), functional TestKit 6, BDD Cucumber 7 scénarios. 142 unit + 9 functional + 14 cucumber, 0 FAIL. Session précédente S-025 : EPIC GF-SCHEMA 4/5 US, GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ.)_
 
 '''
 == EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) ✅ TERMINÉ (S-024)
@@ -43,15 +43,24 @@ JSON. Les alias sont résolus *à l'entrée* (canonicalisation) ; le vocabulaire
 (`imports`/`references`, `domain`/`flow`/…) est *déclaré réservé*, non émis.
 
 '''
-== EPIC GF-FINGERPRINT — Fingerprinting incrémental (DFL-5, P2)
+== EPIC GF-FINGERPRINT — Fingerprinting incrémental (DFL-5, P2) ✅ TERMINÉ 6/6 US (S-026)
 
 _Origine : DFL-5 Brooklin Flow. Optimisation de production, pas un contrat de
-schéma — hors périmètre GF-SCHEMA._
+schéma — hors périmètre GF-SCHEMA. Cadrage : `graphify-plugin/.agents/CADRAGE_EPIC_GF_FINGERPRINT.adoc`._
 
-* `FileFingerprint` (SHA256 + mtime) par fichier dans `ScanWorkspaceTask` ;
-  comparaison avec le scan précédent, re-analyse delta uniquement.
-* Tests unitaires sur les fingerprints.
-* Statut : 🔲 À FAIRE (non planifié — à la demande pilote).
+|===
+| US | Description | Pts | Statut
+| GF-FP-0 | Cadrage EPIC (audit 8 constats + 10 décisions) | 1 | ✅ TERMINÉ (S-026)
+| GF-FP-1 | Domaine `graphify.fingerprint` — FileFingerprint/Fingerprinter/FileExtraction/ScanCache/ScanCacheStore/ScanExtractionIndex | 2 | ✅ TERMINÉ (S-026)
+| GF-FP-2 | Extracteur pur `FileExtractor` (parsers sortis de ScanWorkspaceTask) | 1 | ✅ TERMINÉ (S-026)
+| GF-FP-3 | Wiring `ScanWorkspaceTask` incrémental (opt-in, cache élagué, byte-identique) | 1 | ✅ TERMINÉ (S-026)
+| GF-FP-4 | Functional TestKit (byte-identité 2e run, cache corrompu, delta) | 1 | ✅ TERMINÉ (S-026)
+| GF-FP-5 | BDD Cucumber `incremental_scan.feature` (7 scénarios) | 1 | ✅ TERMINÉ (S-026)
+|===
+
+_Opt-in par défaut false_ : le comportement historique (scan complet,
+byte-identique) reste le défaut. Le cache vit sous `build/`, jamais committé.
+Dégradation silencieuse (cache absent/corrompu/version inconnue → scan complet).
 
 '''
 == EPIC PUB — Publication Maven Central
@@ -62,8 +71,9 @@ Plugin N0 d'extraction de graphe de connaissance. VAGUE 2 (apres BOM).
 **Priorite** : P0
 **Estimation** : 1 pt
 **Dependances** : PUB-0 et PUB-1 complets (DNS TXT + GPG)
+**Statut** : 🟡 À FAIRE (S-027 — publication 0.0.4, contenu GF-SCHEMA + GF-FINGERPRINT)
 
-. `cd foundry/public/graphify-gradle && ./gradlew publish closeAndRelease`
+. `cd foundry/public/graphify-gradle/graphify-plugin && ./gradlew publishAggregationToCentralPortal --no-daemon`
 . Artefacts : `education.cccp.graphify` (plugin) + `education.cccp:graphify-plugin` (library)
 . Verifier sur https://central.sonatype.com/artifact/education.cccp/graphify-plugin
 
@@ -71,6 +81,7 @@ Plugin N0 d'extraction de graphe de connaissance. VAGUE 2 (apres BOM).
 **Priorite** : P1
 **Estimation** : 1 pt
 **Dependances** : Aucune
+**Statut** : ✅ CADUQUE (S-016 — plus de commentaire RELOCATION dans le build ; vérifié S-026 : `grep RELOCATION` = 0)
 
 Dans le `build.gradle.kts` de graphify-plugin, remplacer le commentaire :
 

@@ -68,7 +68,7 @@ graphify-gradle/
 | `collectAndVerify`     | `DefaultTask` (depends + finalizedBy) | collect |
 
 एक्सटेंशन नाम: `graphify` (`GraphifyExtension`)। गुण:
-`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`।
+`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`, `incremental`, `cacheFile`।
 
 दोनों scan/verify कार्यों पर `@DisableCachingByDefault` है (फाइलसिस्टम / वर्कस्पेस-स्थिति
 पर निर्भर); `collectFromWorkspace` अतिरिक्त रूप से `doNotTrackState(...)` कॉल करता है।
@@ -88,6 +88,10 @@ graphify-gradle/
 - कम्युनिटीज़ `buildRepoMap` से आती हैं: `.git` डायरेक्टरी या फाइल रखने वाली निकटतम संलग्न डायरेक्टरी
   कम्युनिटी id बन जाती है।
 - आउटपुट Jackson `ObjectMapper` द्वारा क्रमबद्ध (NON_NULL inclusion, pretty-print)।
+- `incremental` सक्षम होने पर, प्रति-फाइल पार्सिंग कंटेंट हैश
+  (`graphify.fingerprint`) द्वारा मेमोइज़ की जाती है; वॉक पूरी तरह चलता रहता है और उत्सर्जित ग्राफ
+  बाइट-समान रहता है। कैश `cacheFile` के अंतर्गत रहता है (डिफ़ॉल्ट
+  `build/graphify/fingerprints.json`) और कभी कमिट नहीं किया जाता।
 
 ## DAG सत्यापन (`VerifyDagAcyclicTask`)
 

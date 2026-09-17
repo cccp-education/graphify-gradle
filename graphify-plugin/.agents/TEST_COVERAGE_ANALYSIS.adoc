@@ -1,7 +1,32 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025)
-_Dernière mise à jour_ : Session 025 (2026-09-17)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025) + GF-FINGERPRINT TERMINÉ (S-026)
+_Dernière mise à jour_ : Session 026 (2026-09-17)
+
+== Session 026 — EPIC GF-FINGERPRINT (fingerprinting incrémental), 3 niveaux
+
+- `fingerprint/FileFingerprint.kt` + `Fingerprinter.kt` + `FileExtraction.kt`
+  + `ScanCache.kt` + `ScanCacheStore.kt` + `ScanExtractionIndex.kt` : domaine
+  pur (nouvelles sources).
+- `fingerprint/FileExtractor.kt` : les 5 parsers historiques sortis de
+  `ScanWorkspaceTask` (fonction pure `(fileName, content) → FileExtraction`).
+- `ScanWorkspaceTask.kt` : options `incremental`/`cacheFile`, `extractEdges`/
+  `extractSections` via l'index, parsers privés supprimés. Sortie byte-identique
+  (les 91 tests historiques inchangés restent la garde).
+- `src/test/kotlin/graphify/fingerprint/FingerprintDomainTest.kt` : 29 unit
+  (fast check, sha256, ScanCache record/fast path/hash path/pruning,
+  ScanCacheStore round-trip + dégradations).
+- `src/test/kotlin/graphify/fingerprint/FileExtractorTest.kt` : 13 unit
+  (imports, refs adoc/toc/agent, sections, block delimiters, dispatch, pureté).
+- `src/test/kotlin/graphify/fingerprint/ScanExtractionIndexTest.kt` : 9 unit
+  (parse unique, fast path sans lecture, hash path, cache ignoré si off,
+  updatedCache élagué, stats).
+- `src/functionalTest/kotlin/graphify/IncrementalFunctionalTest.kt` : 6 functional
+  (TestKit — byte-identité 2e run, contrat canonique sur cache hit, fichier
+  modifié/supprimé, cache corrompu, opt-in).
+- `src/test/features/incremental_scan.feature` + `graphify/steps/IncrementalScanSteps.kt`
+  : 7 scénarios BDD.
+- 142 unit (+51) + 9 functional (+6) + 14 cucumber (+7), 0 FAIL.
 
 == Session 025 — EPIC GF-SCHEMA (types + alias), 3 niveaux
 
@@ -45,15 +70,13 @@ _Dernière mise à jour_ : Session 025 (2026-09-17)
 
 == Couverture actuelle
 
-== Couverture actuelle
-
 |===
 | Module | Tests | Couverture
 | api-key-pool | 66/66 PASS ✅ | migré `foundry/public/api-key-pool-gradle/`
-| graphify-plugin | 91 unit + 3 functional + 7 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
+| graphify-plugin | 142 unit + 9 functional + 14 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
 |===
 
-Total : 101 PASS (graphify-plugin) + 66 (api-key-pool) ✅
+Total : 165 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 
 == Tests par composant (graphify-plugin)
 
@@ -68,6 +91,11 @@ Total : 101 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 | `schema/GraphSchemaModelTest.kt` | 6 unitaires | `canonicalize(model)` entier, préservation champs non-type, conformance producteur (S-025)
 | `SchemaFunctionalTest.kt` | 3 functional | TestKit end-to-end : contrat canonique, top-level 3 champs strict-safe, déterminisme byte-identique (S-025)
 | `schema_alias.feature` + `GraphSchemaSteps.kt` | 7 cucumber | Canonicalisation métier, alias, préservation, idempotence, round-trip legacy (S-025)
+| `fingerprint/FingerprintDomainTest.kt` | 29 unitaires | Fast check size/mtime, sha256, ScanCache (record, fast path, hash path, pruning), ScanCacheStore round-trip + dégradations (S-026)
+| `fingerprint/FileExtractorTest.kt` | 13 unitaires | Parsers purs : imports, refs adoc/toc/agent, sections, block delimiters, dispatch extension, pureté (S-026)
+| `fingerprint/ScanExtractionIndexTest.kt` | 9 unitaires | Mémoïsation par scan : parse unique, fast path sans lecture, hash path, cache ignoré si off, updatedCache élagué, stats (S-026)
+| `IncrementalFunctionalTest.kt` | 6 functional | TestKit : byte-identité 2e run, contrat canonique sur cache hit, fichier modifié/supprimé, cache corrompu, opt-in (S-026)
+| `incremental_scan.feature` + `IncrementalScanSteps.kt` | 7 cucumber | Cache vide, fast path, drift size/mtime, réutilisation par hash, élagage, round-trip JSON, version inconnue (S-026)
 |===
 
 == Scan workspace réel (validation GF-2)
@@ -94,5 +122,6 @@ Pas de modification de code source. 58/58 PASS inchangé.
 
 == Prochaine étape
 
-GF-SCHEMA-5 (`schemaVersion` top-level) différé — exige `@JsonIgnoreProperties`
-cross-borough bakery/codebase + bump. DFL-5 (fingerprinting) au backlog.
+Session 027 — Publication Maven Central `graphify-plugin` 0.0.4 (contenu :
+GF-SCHEMA + GF-FINGERPRINT). Puis GF-SCHEMA-5 (`schemaVersion` top-level) —
+différé, exige `@JsonIgnoreProperties` cross-borough bakery/codebase + bump.

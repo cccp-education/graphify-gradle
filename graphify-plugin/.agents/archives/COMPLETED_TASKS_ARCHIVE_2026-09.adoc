@@ -1,5 +1,30 @@
 = Archive Tâches Complétées — Septembre 2026
 
+== Session 026 (2026-09-17) — EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5)
+
+* GF-FP-0 ✅ Cadrage — audit 8 constats (scan déclaré non-incrémentable,
+  coût 4m51s/98MB mesuré, 4 sites de lecture non cachés, résolution globale
+  hors cache, état global sections), 10 décisions.
+  Doc `.agents/CADRAGE_EPIC_GF_FINGERPRINT.adoc`.
+* GF-FP-1 ✅ Domaine `graphify.fingerprint` — `FileFingerprint` (size/mtime/
+  sha256 + fast check), `Fingerprinter`, `FileExtraction`/`SectionExtraction`,
+  `ScanCache` (double index chemins/hash + `prunedTo`), `ScanCacheStore`
+  (JSON versionné, dégradation silencieuse), `ScanExtractionIndex`
+  (fast path → hash de contenu → parse, stats). 38 unit.
+* GF-FP-2 ✅ `FileExtractor` pur — 5 parsers sortis de `ScanWorkspaceTask`,
+  regexes identiques. 13 unit.
+* GF-FP-3 ✅ Wiring `ScanWorkspaceTask` — `incremental` (opt-in, défaut false)
+  + `cacheFile` (défaut `build/graphify/fingerprints.json`), cache élagué,
+  résolution hors cache, sortie *byte-identique*. 9 unit index.
+* GF-FP-4 ✅ Functional TestKit — 6 tests (byte-identité 2e run, contrat
+  canonique sur cache hit, fichier modifié/supprimé, cache corrompu, opt-in).
+* GF-FP-5 ✅ BDD Cucumber — `incremental_scan.feature` 7 scénarios.
+* ✅ README 10 langues × 2 (plugin + consommateur) synchronisés.
+* 2 bugs attrapés par TDD : DTO Jackson à getter calculé (round-trip vide),
+  propriété `isEmpty` sérialisée (`@get:JsonIgnore`).
+* Gates : 142 unit + 9 functional + 14 cucumber, 0 FAIL. `check` +
+  `publishToMavenLocal` VERTS. Zéro secret.
+
 == Session 025 (2026-09-17) — EPIC GF-SCHEMA 4/5 US (+ 1 différée) — débloque Brooklin Flow (DFL-2)
 
 * GF-SCHEMA-0 ✅ Cadrage — audit 7 constats (littéraux dispersés, module

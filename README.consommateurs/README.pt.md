@@ -108,8 +108,30 @@ graphify {
         "**/build/**", "**/node_modules/**", "**/.gradle/**",
         "**/.git/**", "**/.idea/**", "**/target/**"
     ))
+
+    // Rescan incremental opt-in (predefinição: false → análise completa).
+    incremental.set(true)
+
+    // Onde o cache de impressões digitais é armazenado (predefinição: build/graphify/fingerprints.json).
+    cacheFile.set(layout.buildDirectory.file("graphify/fingerprints.json").get().asFile)
 }
 ```
+
+## Varredura incremental
+
+`collectFromWorkspace` varre toda a árvore em ambos os modos; é a
+varredura que deteta os ficheiros adicionados e removidos. Com `incremental.set(true)`, a
+*análise por ficheiro* é memoizada:
+
+- um ficheiro cujo tamanho e mtime não mudaram reutiliza a sua extração em cache (sem leitura);
+- um ficheiro cujo mtime mudou mas cujo conteúdo não mudou é detetado por SHA-256
+  e reutiliza a extração de um ficheiro idêntico (por exemplo, após `git checkout`);
+- apenas o conteúdo genuinamente novo é reanalisado.
+
+A cache é um documento JSON sob `build/` (nunca commitado) e é podada para
+os ficheiros presentes em cada varredura. É apenas uma otimização: uma cache ausente, corrompida
+ou de versão desconhecida degrada silenciosamente para uma varredura completa, e o `graph.json`
+produzido é byte-idêntico a uma execução não incremental.
 
 ## Pré-requisitos
 

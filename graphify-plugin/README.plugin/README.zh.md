@@ -68,7 +68,7 @@ Kotlin stdlib + Jackson。
 | `collectAndVerify`     | `DefaultTask`（depends + finalizedBy） | collect |
 
 扩展名：`graphify`（`GraphifyExtension`）。属性：
-`rootDir`、`outputFile`、`foundryDir`、`dagLevels`、`excludePatterns`。
+`rootDir`、`outputFile`、`foundryDir`、`dagLevels`、`excludePatterns`、`incremental`、`cacheFile`。
 
 两个 scan/verify 任务都标注了 `@DisableCachingByDefault`（依赖文件系统 / 工作区状态）；
 `collectFromWorkspace` 额外调用了 `doNotTrackState(...)`。
@@ -86,6 +86,9 @@ Kotlin stdlib + Jackson。
   - `agent_reference` —— `INDEX.adoc` 中斜杠分隔的路径（agent 指针）
 - 社区来源于 `buildRepoMap`：最近的包含 `.git` 目录或文件的祖先目录成为社区 id。
 - 输出由 Jackson `ObjectMapper` 序列化（NON_NULL 包含，pretty-print）。
+- 启用 `incremental` 时，逐文件解析按内容哈希（`graphify.fingerprint`）进行记忆化；
+  遍历仍然完整执行，输出的图在字节层面完全一致。缓存位于 `cacheFile` 下（默认
+  `build/graphify/fingerprints.json`），永不提交。
 
 ## DAG 验证（`VerifyDagAcyclicTask`）
 

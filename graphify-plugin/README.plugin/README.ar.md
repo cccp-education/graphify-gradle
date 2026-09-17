@@ -68,7 +68,7 @@ graphify مكتفٍ ذاتيًا: Kotlin stdlib + Jackson.
 | `collectAndVerify`     | `DefaultTask` (depends + finalizedBy) | collect |
 
 اسم الامتداد: `graphify` (`GraphifyExtension`). الخصائص:
-`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`.
+`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`, `incremental`, `cacheFile`.
 
 تحمل مهمتا scan/verify كلاهما `@DisableCachingByDefault` (تعتمدان على FS / حالة
 مساحة العمل)؛ `collectFromWorkspace` يستدعي إضافيًا `doNotTrackState(...)`.
@@ -88,6 +88,10 @@ graphify مكتفٍ ذاتيًا: Kotlin stdlib + Jackson.
 - المجتمعات تأتي من `buildRepoMap`: أقرب دليل حاوي يحوي دليلًا أو ملف `.git`
   يصبح معرّف المجتمع.
 - المخرجات تُسلسل عبر Jackson `ObjectMapper` (إدراج NON_NULL, pretty-print).
+- عند تمكين `incremental`، يُحفظ تحليل كل ملف مؤقتًا حسب بصمة المحتوى
+  (`graphify.fingerprint`)؛ يظل الاجتياز يعمل بالكامل ويظل الرسم البياني المُصدَر
+  مطابقًا بايت ببايت. تعيش الذاكرة المؤقتة تحت `cacheFile` (الافتراضي
+  `build/graphify/fingerprints.json`) ولا تُودع في المستودع أبدًا.
 
 ## التحقق من DAG (`VerifyDagAcyclicTask`)
 

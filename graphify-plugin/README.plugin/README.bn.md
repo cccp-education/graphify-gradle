@@ -68,7 +68,7 @@ graphify স্বয়ংসম্পূর্ণ: Kotlin stdlib + Jackson।
 | `collectAndVerify`     | `DefaultTask` (depends + finalizedBy) | collect |
 
 এক্সটেনশন নাম: `graphify` (`GraphifyExtension`)। বৈশিষ্ট্য:
-`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`।
+`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`, `incremental`, `cacheFile`।
 
 দুটি scan/verify টাস্কই `@DisableCachingByDefault` বহন করে (FS / ওয়ার্কস্পেস-স্টেট
 নির্ভর); `collectFromWorkspace` অতিরিক্তভাবে `doNotTrackState(...)` কল করে।
@@ -88,6 +88,10 @@ graphify স্বয়ংসম্পূর্ণ: Kotlin stdlib + Jackson।
 - কমিউনিটি `buildRepoMap` থেকে আসে: `.git` ডাইরেক্টরি বা ফাইল ধারণকারী নিকটতম আবদ্ধ
   ডাইরেক্টরি কমিউনিটি id হয়ে যায়।
 - আউটপুট Jackson `ObjectMapper` দ্বারা সিরিয়ালাইজ করা (NON_NULL inclusion, pretty-print)।
+- `incremental` সক্রিয় থাকলে, প্রতি-ফাইল পার্সিং কনটেন্ট হ্যাশ
+  (`graphify.fingerprint`) দ্বারা মেমোইজ করা হয়; ওয়াক সম্পূর্ণভাবে চলে এবং নির্গত গ্রাফ
+  বাইট-অভিন্ন থাকে। ক্যাশ `cacheFile`-এর অধীনে থাকে (ডিফল্ট
+  `build/graphify/fingerprints.json`) এবং কখনও কমিট করা হয় না।
 
 ## DAG যাচাই (`VerifyDagAcyclicTask`)
 

@@ -105,8 +105,29 @@ graphify {
         "**/build/**", "**/node_modules/**", "**/.gradle/**",
         "**/.git/**", "**/.idea/**", "**/target/**"
     ))
+
+    // 可选的增量重扫描（默认：false → 完整扫描）。
+    incremental.set(true)
+
+    // 指纹缓存的存储位置（默认：build/graphify/fingerprints.json）。
+    cacheFile.set(layout.buildDirectory.file("graphify/fingerprints.json").get().asFile)
 }
 ```
+
+## 增量扫描
+
+`collectFromWorkspace` 在两种模式下都会扫描整棵树；正是遍历过程
+检测到新增和删除的文件。使用 `incremental.set(true)` 后，*逐文件解析*
+会被记忆化：
+
+- 大小和 mtime 均未改变的文件会复用其缓存提取结果（无需读取）；
+- mtime 已变化但内容未变的文件会通过 SHA-256 检测，
+  并复用相同文件的提取结果（例如 `git checkout` 之后）；
+- 只有真正的新内容才会被重新解析。
+
+缓存是 `build/` 下的一个 JSON 文档（绝不提交），并在每次扫描时
+修剪为当前存在的文件。它仅是一种优化：缺失、损坏或版本未知的缓存
+会静默退化为完整扫描，生成的 `graph.json` 与非增量运行字节完全一致。
 
 ## 前置条件
 

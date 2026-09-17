@@ -68,7 +68,7 @@ N0 معاہدہ_dependencies** مُعلَن نہیں — graphify خودکفیل
 | `collectAndVerify`     | `DefaultTask` (depends + finalizedBy) | collect |
 
 ایکسٹینشن نام: `graphify` (`GraphifyExtension`)۔ خصوصیات:
-`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`۔
+`rootDir`, `outputFile`, `foundryDir`, `dagLevels`, `excludePatterns`, `incremental`, `cacheFile`۔
 
 دونوں scan/verify ٹاسکس پر `@DisableCachingByDefault` ہے (FS / ورک اسپیس حالت پر
 منحصر); `collectFromWorkspace` مزید `doNotTrackState(...)` کال کرتا ہے۔
@@ -88,6 +88,10 @@ N0 معاہدہ_dependencies** مُعلَن نہیں — graphify خودکفیل
 - کمیونٹیز `buildRepoMap` سے آتی ہیں: `.git` ڈائریکٹری یا فائل رکھنے والی قریب ترین
   احاطہ بند ڈائریکٹری کمیونٹی id بن جاتی ہے۔
 - آؤٹ پُٹ Jackson `ObjectMapper` سے سیریلائز (NON_NULL inclusion, pretty-print)۔
+- `incremental` فعال ہونے پر، فی فائل پارسنگ مواد ہیش
+  (`graphify.fingerprint`) کے ذریعے محفوظ کی جاتی ہے؛ واک پوری طرح چلتی رہتی ہے اور خارج کردہ گراف
+  بائٹ بہ بائٹ یکساں رہتا ہے۔ کیش `cacheFile` کے تحت رہتا ہے (ڈیفالٹ
+  `build/graphify/fingerprints.json`) اور کبھی کمٹ نہیں کیا جاتا۔
 
 ## DAG تصدیق (`VerifyDagAcyclicTask`)
 

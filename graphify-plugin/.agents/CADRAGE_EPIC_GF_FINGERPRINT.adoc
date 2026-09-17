@@ -1,0 +1,184 @@
+= CADRAGE EPIC GF-FINGERPRINT — Fingerprinting incrémental du scan
+
+:toc: macro
+:sectnums:
+:date: 2026-09-17
+:source: Session 026 (origine DFL-5 Brooklin Flow, S-216 cross-borough)
+
+toc::[]
+
+== Contexte — Pourquoi cet EPIC maintenant
+
+Le cadrage DSH-BOUNDARY (cross-borough S-216) a laissé deux items au backlog
+graphify (N0), parce que la structure du graphe est produite par graphify,
+jamais par le dashboard :
+
+|===
+| Item | Sujet | Pts | Statut
+| DFL-2 | Enrichissement schéma `GraphModel` (types + alias) | 5 | ✅ TERMINÉ (S-025, EPIC GF-SCHEMA)
+| DFL-5 | Fingerprinting incrémental | 5 | 🟡 À FAIRE (cet EPIC)
+|===
+
+`GF-SCHEMA` a traité DFL-2. *Cet EPIC traite DFL-5* : réduire le coût d'un
+re-scan sur un workspace majoritairement stable, sans jamais casser le contrat
+`graph.json` (byte-identité).
+
+== Audit — 8 constats
+
+[cols="1,3,3", options="header"]
+|===
+| # | Constat | Preuve
+
+| 1
+| Le scan se *déclare* non-incrémentable — assumé, jamais mesuré
+| `GraphifyPlugin.kt:16` : `task.doNotTrackState("Full filesystem scan — inherently non-incremental")`.
+
+| 2
+| Le coût réel est documenté et lourd
+| `TEST_COVERAGE_ANALYSIS.adoc:73-82` : 203 204 nœuds, 188 365 arêtes,
+  26 communautés, *4m 51s*, 98 MB. `graph.json` courant = 114 MB.
+
+| 3
+| Quatre sites de lecture de contenu, tous non cachés
+| `ScanWorkspaceTask.kt:195` (kt/kts → imports), `:214` (adoc → refs + toc),
+  `:237` (INDEX.adoc → agent refs), `:344` (adoc → sections). Chacun
+  `Files.readString(file)` à chaque scan.
+
+| 4
+| Le *walk* est obligatoire, la *lecture+parse* est ce qui coûte
+| Ajouter/supprimer un fichier ne se détecte qu'en marchant l'arbre. En
+  revanche, pour un fichier dont (taille, mtime, contenu) sont inchangés, le
+  re-parse (regex + readString) est du travail perdu.
+
+| 5
+| Seule *l'extraction brute est locale au contenu* — la résolution est globale
+| `resolveImportToDir` dépend de l'ensemble `projectDirs` ; `resolveReferenceToFile`
+  et `resolveTocReference` dépendent de l'existence d'autres fichiers. Ces étapes
+  sont en mémoire, bon marché, et *ne doivent pas* être cachées par fichier.
+
+| 6
+| L'assemblage des sections porte un *état global* (dédup + hiérarchie)
+| `ScanWorkspaceTask.kt:342-355` : `idCounts` (unicité `~N`) et
+  `buildSubsectionEdges` (pile hiérarchique) traversent tous les fichiers.
+  Seule la liste brute `(title, level, line)` est cacheable par fichier.
+
+| 7
+| Le contrat de sortie est *déjà prouvé déterministe*
+| `SchemaFunctionalTest.kt:82` (`produces byte-identical graph across two runs`).
+  L'incrémental doit préserver exactement cette propriété.
+
+| 8
+| Aucun cache n'existe, et `graph.json` est *gitignoré*
+| `.gitignore:3` ignore `graph.json`. Le cache d'incrémentalité est un artefact
+  de build : il ne doit jamais être committé (défaut sous `build/`).
+
+|===
+
+== Décisions architecturales
+
+. *Opt-in strict.* `graphify { incremental = true }` (défaut `false`). Le
+   comportement actuel — scan complet, byte-identique — reste le défaut. Zéro
+   risque pour les 3 consommateurs (bakery, codebase, runner).
+
+. *Domaine `graphify.fingerprint`* (Gradle-free, objet pur) : `FileFingerprint`,
+   `FileExtraction`, `SectionExtraction`, `ScanCache`, `ScanCacheStore`.
+   Single source of truth de la logique d'incrémentalité.
+
+. *Fast check `(path, size, mtime)` puis SHA-256.* Le SHA-256 n'est calculé
+   *que* si le fast check échoue. Le cache d'extraction est clé par SHA-256 :
+   un fichier *touché* (mtime change, contenu identique) réutilise son
+   extraction sans re-parse — Loi Économie d'Encre.
+
+. *Extracteur pur `FileExtractor` extrait de `ScanWorkspaceTask`.* Les 4
+   parsers (`kotlinImports`, `adocReferences`, `tocTableReferences`,
+   `agentReferences`, `sections`) deviennent une fonction pure
+   `content → FileExtraction`, unit-testable, et consommée par le producteur.
+
+. *La résolution reste hors cache.* Import → dir, refs → fichiers existants,
+   dédup sections et hiérarchie `subsection` sont recalculées à chaque scan :
+   elles dépendent du monde, pas du fichier. Cache = matière première, pas
+   décision.
+
+. *Le walk reste inconditionnel.* Aucune suppression d'arête cachée : le
+   graphe est toujours assemblé depuis la liste de fichiers courante. Le cache
+   n'accélère que la matière première.
+
+. *Cache = un fichier JSON versionné (`version: 1`), écrit après scan.* Défaut
+   `build/graphify/fingerprints.json` (gitignoré par `build/`), configurable via
+   `graphify { cacheFile = ... }`. Écriture *après* succès du scan, élagué aux
+   fichiers présents (empreintes mortes et extractions orphelines retirées).
+
+. *Dégradation silencieuse.* Cache absent, illisible, corrompu ou de version
+   inconnue → scan complet, jamais d'échec. Un cache est une optimisation,
+   pas une dépendance.
+
+. *Byte-identité garantie par garde.* Le functional TestKit compare le 2e run
+   incrémental au 1er run octet pour octet, et vérifie que la modification d'un
+   fichier est bien prise en compte (ré-analyse). Les 91 tests existants
+   restent la garde de non-régression.
+
+. *English only* — code, commentaires, Gherkin (règle transverse).
+
+. *Méthode* : baby-step DDD/TDD/BDD strict RED → GREEN → REFACTOR, 3 niveaux
+   (unit → functional → cucumber), pattern établi S-025.
+
+== Découpage US (~6 pts)
+
+[cols="1,3,2,1", options="header"]
+|===
+| US | Description | Statut | Pts
+
+| GF-FP-0
+| Cadrage EPIC (gouvernance pure, zéro code — ce document)
+| ✅ TERMINÉ (S-026)
+| 1
+
+| GF-FP-1
+| *Domaine `graphify.fingerprint`* : `FileFingerprint` (size/mtime/sha256),
+  `FileExtraction`/`SectionExtraction`, `ScanCache` (`isFastUnchanged`,
+  `extraction(sha256)`, `with*`, `prunedTo`), `ScanCacheStore` (JSON load/save
+  versionné). TDD unit strict.
+| 🔲 À FAIRE
+| 2
+
+| GF-FP-2
+| *Extracteur pur `FileExtractor`* : parsers extraits de `ScanWorkspaceTask`
+  (imports, adoc refs, toc refs, agent refs, sections), contenu → `FileExtraction`.
+  TDD unit strict.
+| 🔲 À FAIRE
+| 1
+
+| GF-FP-3
+| *Wiring `ScanWorkspaceTask` incrémental* : options `incremental`/`cacheFile`,
+  consultation du cache, écriture élaguée, sortie *byte-identique*. Ré-analyse
+  du delta uniquement.
+| 🔲 À FAIRE
+| 1
+
+| GF-FP-4
+| *Functional (TestKit)* : 2e run incrémental byte-identique + cache écrit ;
+  fichier modifié → ré-analyse ; fichier supprimé → nœud absent.
+| 🔲 À FAIRE
+| 1
+
+| GF-FP-5
+| *BDD Cucumber* : `incremental_scan.feature` — fast check, réutilisation par
+  SHA-256 (touch), élagage, round-trip JSON du cache, fallback cache corrompu.
+| 🔲 À FAIRE
+| 1
+|===
+
+== Gates et risques
+
+* *Non-régression* : les 91 unit + 3 functional + 7 cucumber existants restent
+  VERTS, sans modification de leur intention.
+* *Byte-identité* : le 2e run (incrémental) doit égaler le 1er run octet pour
+  octet — garde functional dédiée.
+* *`mtime` non fiable* : les outils (git checkout, tar) peuvent restaurer des
+  mtime. Le SHA-256 départage un contenu inchangé avec mtime neuf
+  (réutilisation) ; un contenu changé avec mtime identique reste un angle mort
+  standard (make/Gradle), documenté, non bloquant.
+* *Cache volumineux* : ~200k empreintes = dizaines de Mo de JSON. Acceptable,
+  gitignoré, hors graphe de publication.
+* *Complexité* : l'EPIC touche le cœur du producteur. Découpage baby-step strict
+  et opt-in par défaut neutralisent le risque.
