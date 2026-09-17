@@ -1,7 +1,14 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025) + GF-FINGERPRINT TERMINÉ (S-026)
-_Dernière mise à jour_ : Session 026 (2026-09-17)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025) + GF-FINGERPRINT TERMINÉ (S-026) + PUB 0.0.4 (S-027)
+_Dernière mise à jour_ : Session 027 (2026-09-17)
+
+== Session 027 — Publication 0.0.4 (aucun test modifié, 1 garde réalignée)
+
+- `GraphifyPluginPublicationTest` : pin catalogue `workspace-catalog:0.0.33`
+  → `0.0.44` (hygiène D4/D5, bump MEMPHIS).
+- Aucune modification de test produit ; `check --rerun-tasks` VERT
+  (142 unit + 9 functional + 14 cucumber, 0 FAIL).
 
 == Session 026 — EPIC GF-FINGERPRINT (fingerprinting incrémental), 3 niveaux
 
@@ -122,6 +129,6 @@ Pas de modification de code source. 58/58 PASS inchangé.
 
 == Prochaine étape
 
-Session 027 — Publication Maven Central `graphify-plugin` 0.0.4 (contenu :
-GF-SCHEMA + GF-FINGERPRINT). Puis GF-SCHEMA-5 (`schemaVersion` top-level) —
-différé, exige `@JsonIgnoreProperties` cross-borough bakery/codebase + bump.
+Session 028 — GF-SCHEMA-5 (`schemaVersion` top-level) — cross-borough,
+gate = accord pilote. Exige `@JsonIgnoreProperties` chez bakery/codebase
+d'abord. Publication 0.0.4 ✅ TERMINÉE S-027.

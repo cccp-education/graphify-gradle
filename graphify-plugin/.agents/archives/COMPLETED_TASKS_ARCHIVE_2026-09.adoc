@@ -1,5 +1,20 @@
 = Archive Tâches Complétées — Septembre 2026
 
+== Session 027 (2026-09-17) — Publication Maven Central 0.0.4 + MEMPHIS BOM/catalog 0.0.44
+
+* Contrainte : version propre dérivée du catalogue (`ws.versions.graphify.plugin.get()`)
+  → bump MEMPHIS préalable obligatoire (RELEASE_PROTOCOL).
+* *Baseline MEMPHIS rouge à HEAD réparée* — `PlatformCatalogAlignmentTest`
+  épinglait `workspace-bom 0.0.36` (vs toml 0.0.43) et `i18n-contracts 0.0.2`
+  (vs toml 0.0.4, dérive S-217). Réalignées (piège #10).
+* MEMPHIS : toml `workspace-bom 0.0.43→0.0.44`, `graphify-plugin 0.0.3→0.0.4`,
+  `contracts.catalog.*` VERT, `publishToMavenLocal` VERT.
+* graphify : pin `workspace-catalog 0.0.33→0.0.44`, toml local `graphify 0.0.4`,
+  garde D5 réalignée, `version: 0.0.4`, `check --rerun-tasks` VERT.
+* Central : `graphify-plugin:0.0.4` (bundle `96f87d32`) +
+  `workspace-bom/catalog:0.0.44` (bundle `dbe3ef8e`), repo1 HTTP 200 ~7 min.
+* Zéro impact consommateur. Zéro secret.
+
 == Session 026 (2026-09-17) — EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5)
 
 * GF-FP-0 ✅ Cadrage — audit 8 constats (scan déclaré non-incrémentable,

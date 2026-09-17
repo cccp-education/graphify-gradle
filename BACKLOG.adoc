@@ -4,7 +4,7 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-17 (S-026 — EPIC GF-FINGERPRINT TERMINÉ 6/6 US, réponse à DFL-5 Brooklin Flow : domaine `graphify.fingerprint` (FileFingerprint/Fingerprinter/FileExtraction/ScanCache/ScanCacheStore/ScanExtractionIndex), extracteur pur `FileExtractor`, wiring `ScanWorkspaceTask` incrémental opt-in (byte-identique), functional TestKit 6, BDD Cucumber 7 scénarios. 142 unit + 9 functional + 14 cucumber, 0 FAIL. Session précédente S-025 : EPIC GF-SCHEMA 4/5 US, GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ.)_
+_Dernière mise à jour : 2026-09-17 (S-027 — publication Maven Central graphify-plugin 0.0.4 (bundle `96f87d32`, contenu GF-SCHEMA + GF-FINGERPRINT) + MEMPHIS BOM/catalog 0.0.44 (bundle `dbe3ef8e`, graphify-plugin 0.0.4 + réparation gardes périmées S-213/S-217). S-026 : EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5) — domaine `graphify.fingerprint`, wiring incrémental opt-in byte-identique. S-025 : EPIC GF-SCHEMA 4/5 US, GF-SCHEMA-5 `schemaVersion` DIFFÉRÉ.)_
 
 '''
 == EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) ✅ TERMINÉ (S-024)
@@ -71,7 +71,7 @@ Plugin N0 d'extraction de graphe de connaissance. VAGUE 2 (apres BOM).
 **Priorite** : P0
 **Estimation** : 1 pt
 **Dependances** : PUB-0 et PUB-1 complets (DNS TXT + GPG)
-**Statut** : 🟡 À FAIRE (S-027 — publication 0.0.4, contenu GF-SCHEMA + GF-FINGERPRINT)
+**Statut** : ✅ TERMINÉ (S-027 — publication 0.0.4, contenu GF-SCHEMA + GF-FINGERPRINT, bundle `96f87d32`, repo1 HTTP 200)
 
 . `cd foundry/public/graphify-gradle/graphify-plugin && ./gradlew publishAggregationToCentralPortal --no-daemon`
 . Artefacts : `education.cccp.graphify` (plugin) + `education.cccp:graphify-plugin` (library)

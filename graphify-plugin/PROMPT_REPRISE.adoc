@@ -1,51 +1,50 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 027
-:session: 027
+= PROMPT_REPRISE — Graphify Gradle — Session 028
+:session: 028
 :date: 2026-09-17
 
-== Session 026 terminée — EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5)
+== Session 027 terminée — Publication Central graphify-plugin 0.0.4
 
-Fingerprinting incrémental du scan, deuxième item laissé à graphify (N0) par
-le cadrage DSH-BOUNDARY (S-216).
+Ordre pilote acté : 2 (S-026) → *3 (fait)* → 1.
 
-* Domaine `graphify.fingerprint` (7 fichiers, 362 lignes) : `FileFingerprint`,
-  `Fingerprinter`, `FileExtraction`/`SectionExtraction`, `ScanCache`,
-  `ScanCacheStore` (JSON versionné), `ScanExtractionIndex` (fast path →
-  hash de contenu → parse, stats trusted/reused/parsed).
-* `FileExtractor` pur — les 5 parsers quittent `ScanWorkspaceTask`.
-* Wiring `ScanWorkspaceTask` : `incremental` (opt-in, défaut false) +
-  `cacheFile` (défaut `build/graphify/fingerprints.json`), cache élagué,
-  *sortie byte-identique* prouvée par les 91 tests historiques.
-* Functional TestKit 6 tests, BDD `incremental_scan.feature` 7 scénarios.
-* README EN + 9 traductions (plugin + consommateur) synchronisés.
-* Doc cadrage : `.agents/CADRAGE_EPIC_GF_FINGERPRINT.adoc`.
+* Contrainte découverte : la version propre du borough est *dérivée du
+  catalogue workspace* (`version = ws.versions.graphify.plugin.get()`), donc
+  publier 0.0.4 exigeait d'abord un bump MEMPHIS (RELEASE_PROTOCOL).
+* *Baseline MEMPHIS rouge à HEAD réparée* : `PlatformCatalogAlignmentTest`
+  épinglait `workspace-bom 0.0.36` (vs toml 0.0.43) et `i18n-contracts 0.0.2`
+  (vs toml 0.0.4, dérive S-217 LANG-22). Réalignées (piège #10).
+* MEMPHIS : toml `workspace-bom 0.0.43→0.0.44` + `graphify-plugin 0.0.3→0.0.4`,
+  gardes réparées, `contracts.catalog.*` VERT, mavenLocal 0.0.44 VERT.
+* graphify : pin `workspace-catalog 0.0.33→0.0.44`, toml local `graphify 0.0.4`,
+  garde D5 réalignée, `version: 0.0.4` résolue,
+  `check --rerun-tasks` VERT (165 tests 0 FAIL).
+* Central : `graphify-plugin:0.0.4` (bundle `96f87d32`) +
+  `workspace-bom/catalog:0.0.44` (bundle `dbe3ef8e`), repo1 HTTP 200 en ~7 min.
+* Consommateurs : aucun impact (bakery pinné 0.0.43, adoptions opt-in D3).
 
-Gates : 142 unit (+51) + 9 functional (+6) + 14 cucumber (+7), 0 FAIL.
-`check` + `publishToMavenLocal` VERTS. Zéro secret.
+== Prochaine Session (028) — GF-SCHEMA-5 `schemaVersion` (P2, cross-borough)
 
-== Prochaine Session (027) — Publication Central 0.0.4 (P0, à la demande)
+*Restant du seul EPIC inachevé* (GF-SCHEMA 4/5 US). Chantier multi-borough.
 
-Ordre pilote acté : 2 (fait) → *3* → 1.
-
-* Contenu 0.0.4 : EPIC GF-SCHEMA (S-025) + EPIC GF-FINGERPRINT (S-026).
-* Version code : `ws.versions.graphify.plugin` = `0.0.3` → bump `0.0.4`.
-* Procédure DAG : `graphify-plugin` n'a aucune dépendance N0 amont.
-* Commande : `./gradlew publishAggregationToCentralPortal --no-daemon`
-  (nmcp 1.5.0, AUTOMATIC, settings.gradle.kts déjà câblé).
-* Vérifier repo1 HTTP 200 sur `education.cccp:graphify-plugin:0.0.4`.
-* Puis mettre à jour le catalogue MEMPHIS (`workspace-catalog`) si le pilote
-  le demande — ne pas amorcer spontanément un bump cross-borough.
-
-== Puis Session 028 — GF-SCHEMA-5 `schemaVersion` (P2, cross-borough)
-
-Chantier multi-borough, gate = adoption consommateurs. Nécessite
-`@JsonIgnoreProperties(ignoreUnknown = true)` chez bakery + codebase avant
-d'ajouter le champ top-level `schemaVersion` à `GraphModel`, puis bump des
-dépendances. *Ne pas démarrer sans accord pilote explicite.*
+* Contenu : ajouter un champ top-level `schemaVersion` à `GraphModel`.
+* *Gate bloquant* : bakery + codebase désérialisent en strict
+  (`ObjectMapper().registerKotlinModule()` + `readValue<GraphModel>`,
+  `FAIL_ON_UNKNOWN_PROPERTIES = true`). Ajouter le champ *casse* les 2
+  consommateurs aujourd'hui.
+* Séquence obligatoire :
+  . `@JsonIgnoreProperties(ignoreUnknown = true)` chez bakery + codebase
+     (S-025 constat #6) — publication + bump de leurs dépendances ;
+  . *ensuite* seulement le champ `schemaVersion` dans `GraphModel` (graphify)
+     + publication + bump catalogue ;
+  . adoption consommateurs (pin catalogue).
+* Fichiers concernés : `bakery/lens/SubgraphExtractor.kt:39`,
+  `codebase/graph/GraphContext.kt:33`, `codebase/graph/SubgraphExtractor.kt`.
+* *NE PAS démarrer sans accord pilote explicite* — c'est un chantier
+  cross-borough qui doit être sa propre session.
 
 == Rappel
 
-- Borough N0, tooling 0.0.3 Central (0.0.4 en cours de session 027).
+- Borough N0, tooling 0.0.4 Central (à jour).
 - Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
-- Filtre `graphify.steps.**` obligatoire sur le task `test` (sinon les
-  scénarios Cucumber sont rejoués par l'unit test).
+- Filtre `graphify.steps.**` obligatoire sur le task `test`.
 - Le cache incrémental vit sous `build/`, jamais committé.
+- Version propre dérivée du catalogue — tout bump de version passe par MEMPHIS.

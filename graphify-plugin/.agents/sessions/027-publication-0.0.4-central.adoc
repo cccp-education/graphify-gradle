@@ -1,0 +1,96 @@
+= Session 027 — Publication Maven Central graphify-plugin 0.0.4 + MEMPHIS BOM/catalog 0.0.44
+:toc: left
+:date: 2026-09-17
+:type: ops/pub
+
+== Mission
+
+Item 3 de l'ordre pilote acté (2 → 3 → 1) : publication Maven Central de
+`graphify-plugin:0.0.4` (contenu GF-SCHEMA S-025 + GF-FINGERPRINT S-026).
+
+== Contrainte découverte — version dérivée du catalogue
+
+L'EPIC MEM-CAT-ROLLOUT-6 (S-214/S-215) a câblé la version propre des boroughs
+sur le catalogue workspace publié :
+
+[source,kotlin]
+----
+version = ws.versions.graphify.plugin.get()
+----
+
+`Settings.gradle.kts` épinglait `workspace-catalog:0.0.33`, qui portait
+`graphify-plugin = 0.0.3`. Publier 0.0.4 exigeait donc *d'abord* un bump du
+catalogue MEMPHIS — c'est le pattern de la chaîne release documenté dans
+`.agents/RELEASE_PROTOCOL.adoc` (MEMPHIS).
+
+La garde `GraphifyPluginPublicationTest` (hygiène D5) impose de plus que le
+toml local et le toml central s'accordent — le bump est donc vérifié.
+
+== Étape 1 — Réparation baseline MEMPHIS (piège #10)
+
+La commande de vérification `./gradlew test --tests 'contracts.catalog.*'`
+depuis `agent-contracts/` a révélé une *baseline rouge à HEAD* (2 gardes
+périmées, jamais réalignées) :
+
+[cols="2,3", options="header"]
+|===
+| Garde | Dérive
+| `PlatformCatalogAlignmentTest.workspace-bom` | épinglée `0.0.36` vs toml `0.0.43` (raté S-213/S-217)
+| `PlatformCatalogAlignmentTest.i18n-contracts` | épinglée `0.0.2` vs toml `0.0.4` (dérive S-217 LANG-22)
+|===
+
+Les deux gardes sont réalignées dans le même commit que le bump (piège #10).
+Toutes les autres assertions étaient déjà alignées (agent/codebase/llm-pool/
+opencode-session/pipeline/runtime/ocr/conventions/document).
+
+*Constat de gouvernance* : la baseline MEMPHIS était rouge depuis S-217. Le
+fait qu'elle n'ait pas été détectée indique que `contracts.catalog.*` n'est pas
+systématiquement lancé en fin de session MEMPHIS.
+
+== Étape 2 — Bump MEMPHIS
+
+* `gradle/libs.versions.toml` : `workspace-bom = "0.0.43"` → `"0.0.44"`,
+  `graphify-plugin = "0.0.3"` → `"0.0.4"`.
+* Gardes réalignées (cf. étape 1).
+* Gates : `contracts.catalog.*` VERT, `publishToMavenLocal` VERT (toml mavenLocal
+  0.0.44 vérifié : `graphify-plugin = "0.0.4"` + `workspace-bom = "0.0.44"`).
+
+== Étape 3 — Adoption graphify
+
+* `settings.gradle.kts` : pin `workspace-catalog:0.0.33` → `0.0.44`.
+* `gradle/libs.versions.toml` : `graphify = "0.0.3"` → `"0.0.4"` (hygiène D5).
+* Garde `GraphifyPluginPublicationTest` : pin catalogue réaligné 0.0.44.
+* `./gradlew properties` → `version: 0.0.4` (dérivée du catalogue).
+* Gates : `check --rerun-tasks` BUILD SUCCESSFUL (142 unit + 9 functional +
+  14 cucumber, 0 FAIL).
+
+== Étape 4 — Publication Central
+
+[cols="2,2,3", options="header"]
+|===
+| Artefact | Bundle nmcp | Vérification
+| `education.cccp:graphify-plugin:0.0.4` | `96f87d32-3692-4340-9751-fe5bda9fdd83` | repo1 HTTP 200, POM version 0.0.4
+| `education.cccp:workspace-bom:0.0.44` + `workspace-catalog:0.0.44` | `dbe3ef8e-4c28-442a-a4e2-daf27169d888` | repo1 HTTP 200, toml list graphify-plugin 0.0.4 + workspace-bom 0.0.44
+|===
+
+Publication AUTOMATIC, repo1 confirmé en ~7 min. Ordre DAG respecté :
+graphify (N0, zéro dépendance amont) puis MEMPHIS (agrégat).
+
+== Impact consommateurs
+
+Aucun : bakery pinné `0.0.43` et codebase sur son propre pin — le bump 0.0.44
+est opt-in (D3 : le BOM câble ENTRE, pas DEDANS). Zéro régression.
+
+== Gates
+
+* MEMPHIS : `contracts.catalog.*` VERT (2 gardes réparées).
+* graphify : `check --rerun-tasks` VERT, 165 tests 0 FAIL, `publishToMavenLocal`
+  VERT, version résolue 0.0.4.
+* Central : 2 bundles publiés, repo1 vérifié.
+* Zéro secret.
+
+== Suivant
+
+Session 028 — GF-SCHEMA-5 `schemaVersion` cross-borough (bakery + codebase
+`@JsonIgnoreProperties` + bump). Gate : accord pilote explicite — chantier
+multi-borough qui casse les mappers stricts si mal séquencé.
