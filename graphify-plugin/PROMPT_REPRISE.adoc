@@ -16,6 +16,7 @@ tolérant, versionné, et l'incrémentalité est opt-in.
 * GF-SV-3 — `graphify-plugin:0.0.5` publié Central (bundle `895d2e53`).
   Non-régression prouvée : bakery lens 144/0, codebase graph 37/0.
 * codebase committé/poussé `0b614a1` (bump 0.0.5 + 2 tests de tolérance).
+* COORD-0.0.46 : pin aligné sur le catalogue 0.0.46 publié (graphify 0.0.5).
 
 Gates : 149 unit + 9 functional + 20 cucumber, 0 FAIL. `check --rerun-tasks` +
 `publishToMavenLocal` VERTS. Zéro secret.
@@ -36,24 +37,25 @@ Une *seconde session opencode* a travaillé en parallèle dans `workspace-bom` e
   machine propre il résoudrait 0.0.4 (Central). `graphify:0.0.5` est publié mais
   référencé par aucun catalogue publié.
 
-== Mission session 029 — COORDINATION (bloquant)
+== Coordination catalogue — ✅ RÉSOLUE en S-028
 
-*Dès que l'autre session publie `workspace-bom/catalog:0.0.46`* :
+Le catalogue `0.0.46` a été publié par l'autre session en cours de clôture et
+porte `graphify-plugin = "0.0.5"` (SHA1 Central = mavenLocal `68a3d969`). Le pin
+a été aligné immédiatement : `workspace-catalog:0.0.46`, garde D5 réalignée,
+`version: 0.0.5` résolue, `check --rerun-tasks` VERT. Le graphe cross-borough est
+cohérent.
 
-. Bumper `settings.gradle.kts` : `workspace-catalog:0.0.45 → 0.0.46`.
-. Réaligner `GraphifyPluginPublicationTest` (pin + message d'échec) sur 0.0.46.
-. Vérifier `./gradlew properties` → `version: 0.0.5` résolue depuis Central.
-. Puis `check --rerun-tasks` + `publishToMavenLocal`.
+*Reste cédé à l'autre session* : `workspace-bom` (working tree) et
+`bakery-gradle` (5 fichiers tiers + nos 2 fichiers de bump 0.0.5 non committés).
 
-*Ne pas publier MEMPHIS soi-même* — 0.0.45 est pris, 0.0.46 appartient à
-l'autre session. Toute ré-invocation nmcp est rejetée ou collisionne.
+== Mission session 029 — à la demande pilote
 
-Puis, à la demande pilote :
-1. *Adoption bakery* — committer les 2 fichiers (bump 0.0.5 + 2 tests), si
-   l'autre session ne l'a pas fait.
-2. *EPIC correctif garde D5* — `GraphifyPluginPublicationTest` lit le *working
-   tree* du repo voisin (`../workspace-bom/gradle/libs.versions.toml`), donc
-   racy entre sessions. Lire le catalogue publié, pas le working tree.
+1. *Adoption bakery* — committer les 2 fichiers (bump 0.0.5 + 2 tests de
+   tolérance), si l'autre session ne l'a pas fait.
+2. *EPIC D5-RACE* — `GraphifyPluginPublicationTest` lit le *working tree* du
+   repo voisin (`../workspace-bom/gradle/libs.versions.toml`) au lieu du
+   catalogue publié → racy entre sessions. Correctif : lire le catalogue publié.
+3. *Publication* — aucun besoin immédiat (0.0.5 publié ET référencé).
 
 == Rappel
 

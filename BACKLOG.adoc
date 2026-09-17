@@ -4,7 +4,7 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-17 (S-028 — **EPIC GF-SCHEMA COMPLET 5/5 US** : GF-SCHEMA-5 `schemaVersion` top-level + `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 (tolérance livrée par le bump, zéro édition consommateur). graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs prouvée (bakery lens 144/0, codebase graph 37/0). codebase committé `0b614a1`. EPIC COORD-0.0.46 ouvert (collision de session : workspace-bom porté à 0.0.46 en parallèle, pin à aligner quand publié). S-027 : publication 0.0.4. S-026 : EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5).)_
+_Dernière mise à jour : 2026-09-17 (S-028 — **EPIC GF-SCHEMA COMPLET 5/5 US** : GF-SCHEMA-5 `schemaVersion` top-level + `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 (tolérance livrée par le bump, zéro édition consommateur). graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs prouvée (bakery lens 144/0, codebase graph 37/0). codebase committé `0b614a1`. **COORD-0.0.46 TERMINÉ** : catalogue 0.0.46 publié (SHA1 Central = mavenLocal `68a3d969`, référence `graphify-plugin = "0.0.5"`), pin aligné. S-027 : publication 0.0.4. S-026 : EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5).)_
 
 '''
 == EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) ✅ TERMINÉ (S-024)
@@ -65,13 +65,15 @@ byte-identique) reste le défaut. Le cache vit sous `build/`, jamais committé.
 Dégradation silencieuse (cache absent/corrompu/version inconnue → scan complet).
 
 '''
-== EPIC COORD-0.0.46 — Coordination catalogue (bloquant externe, P0)
+== EPIC COORD-0.0.46 — Coordination catalogue (P0) ✅ TERMINÉ 1/2 US (S-028)
 
-_Origine : collision de session S-028 (2e session opencode sur workspace-bom)._
+_Origine : collision de session S-028 (2e session opencode sur workspace-bom).
+Le catalogue 0.0.46 a été publié par l'autre session et porte
+`graphify-plugin = "0.0.5"` — le pin a été aligné._
 
 |===
 | US | Description | Pts | Statut
-| COORD-0.0.46-1 | Bumper pin `workspace-catalog:0.0.45 → 0.0.46` + garde D5 quand l'autre session publie 0.0.46 (qui porte déjà `graphify-plugin = 0.0.5`) | 1 | 🟡 À FAIRE (session 029)
+| COORD-0.0.46-1 | Bumper pin `workspace-catalog:0.0.45 → 0.0.46` + garde D5 quand l'autre session publie 0.0.46 (qui porte déjà `graphify-plugin = 0.0.5`) | 1 | ✅ TERMINÉ (S-028, catalogue 0.0.46 publié — SHA1 Central = mavenLocal `68a3d969`, `version: 0.0.5` résolue, check VERT)
 | D5-RACE | Correctif garde `GraphifyPluginPublicationTest` — elle lit le *working tree* du repo voisin (racy inter-sessions) au lieu du catalogue publié | 2 | 🔲 À FAIRE (EPIC dédié)
 |===
 

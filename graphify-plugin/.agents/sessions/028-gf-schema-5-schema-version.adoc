@@ -98,13 +98,20 @@ Elle est donc sensible à toute session parallèle qui édite ce fichier. Elle
 passe aujourd'hui par coïncidence (le working tree dit 0.0.5). À corriger dans
 un EPIC dédié (lire le catalogue publié, pas le working tree voisin).
 
-== Action de coordination requise
+== Action de coordination requise — ✅ RÉSOLUE EN SESSION
 
-Quand l'autre session publiera `workspace-bom/catalog:0.0.46` (qui porte
-`graphify-plugin = "0.0.5"`), graphify devra :
-. bumper son pin `settings.gradle.kts` `workspace-catalog:0.0.45 → 0.0.46` ;
-. réaligner `GraphifyPluginPublicationTest` sur 0.0.46 ;
-. vérifier `version: 0.0.5` résolue depuis Central (pas mavenLocal).
+Le catalogue `0.0.46` a été publié par l'autre session en cours de clôture et
+porte `graphify-plugin = "0.0.5"` (vérifié : SHA1 Central = SHA1 mavenLocal
+`68a3d969db8a2c405d6351b61c1403954ecf1e86`). Le pin a donc été aligné
+immédiatement :
+
+. `settings.gradle.kts` : `workspace-catalog:0.0.45 → 0.0.46` ✅ ;
+. `GraphifyPluginPublicationTest` réaligné sur 0.0.46 ✅ ;
+. `version: 0.0.5` résolue ✅ ;
+. `check --rerun-tasks` VERT (149 + 9 + 20) ✅.
+
+Le graphe cross-borough est désormais cohérent : `graphify-plugin:0.0.5` est
+publié ET référencé par un catalogue publié.
 
 == Gates
 

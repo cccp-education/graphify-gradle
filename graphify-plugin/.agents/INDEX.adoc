@@ -6,9 +6,9 @@ _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
-_Derniere mise a jour_ : 2026-09-17 (session 028 — **EPIC GF-SCHEMA COMPLET 5/5 US** : GF-SCHEMA-5 `schemaVersion` top-level + `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 (tolérance livrée par le bump de dépendance). graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs prouvée (bakery 144/0, codebase 37/0). codebase committé `0b614a1`. 149 unit + 9 functional + 20 cucumber, 0 FAIL. *Collision de session* : `workspace-bom`/`bakery` portés en parallèle par une 2e session — pin à passer sur catalogue 0.0.46 quand publié.)
-_Session terminee_ : 028 — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs (cross-borough)
-_Session en cours_ : 029 — COORDINATION pin catalogue 0.0.46 (session parallèle)
+_Derniere mise a jour_ : 2026-09-17 (session 028 — **EPIC GF-SCHEMA COMPLET 5/5 US** : GF-SCHEMA-5 `schemaVersion` top-level + `@JsonIgnoreProperties(ignoreUnknown = true)` sur les 4 data classes N0 (tolérance livrée par le bump de dépendance). graphify-plugin 0.0.5 Central (bundle `895d2e53`). Non-régression consommateurs prouvée (bakery 144/0, codebase 37/0). codebase committé `0b614a1`. **COORD-0.0.46 TERMINÉ** : pin aligné sur catalogue 0.0.46 publié (SHA1 Central = mavenLocal `68a3d969`). 149 unit + 9 functional + 20 cucumber, 0 FAIL.)
+_Session terminee_ : 028 — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs + coordination catalogue 0.0.46
+_Session en cours_ : 029 — à la demande pilote (bakery adoption, EPIC D5-RACE garde inter-sessions)
 
 '''
 == RÈGLES ABSOLUES (résumé)
@@ -98,7 +98,7 @@ Total : ~1098 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 | GF-SCHEMA | Enrichissement schéma `GraphModel` (types + alias, DFL-2) — domaine `graphify.schema` (NodeType/EdgeType/GraphSchema), wiring producteur byte-identique, functional + BDD | ✅ **TERMINÉ 5/5 US** (S-025 + S-028) — GF-SCHEMA-5 `schemaVersion` + tolérance N0 livrés | P1
 | GF-FINGERPRINT | Fingerprinting incrémental (DFL-5) — domaine `graphify.fingerprint` (fast check size/mtime → SHA-256 → parse), `FileExtractor` pur, wiring opt-in byte-identique, functional + BDD | ✅ TERMINÉ 6/6 US (session 026) | P2
 | PUB-3.06 | Publication Maven Central 0.0.4 (GF-SCHEMA + GF-FINGERPRINT) puis 0.0.5 (GF-SCHEMA-5) — bundles `96f87d32` / `895d2e53` | ✅ TERMINÉ (sessions 027 + 028) — repo1 HTTP 200 | P0
-| COORD-0.0.46 | Coordination pin catalogue : `workspace-catalog:0.0.45 → 0.0.46` quand l'autre session publie (0.0.46 porte déjà `graphify-plugin = 0.0.5`) | 🟡 À FAIRE (session 029, bloquant externe) | P0
+| COORD-0.0.46 | Coordination pin catalogue : `workspace-catalog:0.0.45 → 0.0.46` (0.0.46 publié par la session parallèle porte `graphify-plugin = 0.0.5`) | ✅ TERMINÉ (S-028) — SHA1 Central = mavenLocal `68a3d969`, check VERT | P0
 | D5-RACE | Correctif garde `GraphifyPluginPublicationTest` (lit le working tree voisin, racy entre sessions → lire le catalogue publié) | 🔲 À FAIRE (EPIC dédié, non planifié) | P2
 |===
 
