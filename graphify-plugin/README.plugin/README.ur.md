@@ -92,6 +92,11 @@ N0 معاہدہ_dependencies** مُعلَن نہیں — graphify خودکفیل
   (`graphify.fingerprint`) کے ذریعے محفوظ کی جاتی ہے؛ واک پوری طرح چلتی رہتی ہے اور خارج کردہ گراف
   بائٹ بہ بائٹ یکساں رہتا ہے۔ کیش `cacheFile` کے تحت رہتا ہے (ڈیفالٹ
   `build/graphify/fingerprints.json`) اور کبھی کمٹ نہیں کیا جاتا۔
+- تیار کردہ دستاویز اعلیٰ سطحی `schemaVersion` رکھتی ہے (integer، جو
+  *wire schema* بیان کرتا ہے، پلگ ان ورژن سے آزاد)۔ `graphify.model.GraphModel`
+  پر `@JsonIgnoreProperties(ignoreUnknown = true)` کی تشریح ہے، لہٰذا کوئی سخت صارف
+  اپنی ڈپینڈنسی بَمپ کرنے پر مستقبل کے فیلڈز کو بغیر کسی کوڈ تبدیلی کے برداشت کرتا ہے، اور
+  `schemaVersion` کے بغیر پرانا `graph.json` اب بھی ڈیفالٹ کے ساتھ پڑھا جاتا ہے۔
 
 ## DAG تصدیق (`VerifyDagAcyclicTask`)
 

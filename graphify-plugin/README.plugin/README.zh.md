@@ -89,6 +89,10 @@ Kotlin stdlib + Jackson。
 - 启用 `incremental` 时，逐文件解析按内容哈希（`graphify.fingerprint`）进行记忆化；
   遍历仍然完整执行，输出的图在字节层面完全一致。缓存位于 `cacheFile` 下（默认
   `build/graphify/fingerprints.json`），永不提交。
+- 生成文档带有顶层 `schemaVersion`（integer，描述 *wire schema*，与插件版本无关）。
+  `graphify.model.GraphModel` 标注了 `@JsonIgnoreProperties(ignoreUnknown = true)`，
+  因此升级依赖的严格消费者无需任何代码更改即可容忍未来字段，而不带 `schemaVersion` 的
+  旧版 `graph.json` 仍以默认值读取。
 
 ## DAG 验证（`VerifyDagAcyclicTask`）
 

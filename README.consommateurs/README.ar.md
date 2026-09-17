@@ -73,11 +73,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` عدد صحيح يصف *مخطط النقل* (wire schema)، مستقل عن إصدار الإضافة. يحمل `graphify.model.GraphModel` أيضًا `@JsonIgnoreProperties(ignoreUnknown = true)`، لذا فإن المستهلك الصارم الذي يحدّث تبعيته يتسامح مع الحقول المستقبلية دون أي تغيير في الكود، ويظل `graph.json` القديم الذي يفتقر إلى `schemaVersion` يُقرأ بالقيمة الافتراضية.
 
 ## المهام المتاحة
 

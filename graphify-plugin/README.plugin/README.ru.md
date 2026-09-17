@@ -92,6 +92,11 @@ graphify-gradle/
   содержимого (`graphify.fingerprint`); обход по-прежнему выполняется полностью, а
   выдаваемый граф побайтово идентичен. Кэш хранится в `cacheFile` (по умолчанию
   `build/graphify/fingerprints.json`) и никогда не коммитится.
+- Создаваемый документ несёт `schemaVersion` верхнего уровня (integer, описывающий
+  *wire schema*, независимо от версии плагина). `graphify.model.GraphModel`
+  аннотирован `@JsonIgnoreProperties(ignoreUnknown = true)`, поэтому строгий потребитель,
+  обновляющий свою зависимость, терпит будущие поля без каких-либо изменений кода, а
+  устаревший `graph.json` без `schemaVersion` всё ещё читается со значением по умолчанию.
 
 ## Проверка DAG (`VerifyDagAcyclicTask`)
 

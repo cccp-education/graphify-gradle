@@ -1,0 +1,115 @@
+= Session 028 — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs (cross-borough)
+:toc: left
+:date: 2026-09-17
+:type: dev/cross-borough
+
+== Mission
+
+Dernière US de l'EPIC GF-SCHEMA (4/5 US livrées S-025, GF-SCHEMA-5 différée).
+Ordre pilote acté : 2 (DFL-5) → 3 (publication 0.0.4) → 1 (GF-SCHEMA-5).
+
+== Constat de cadrage — le gate est dans la classe partagée
+
+L'audit (`.agents/CADRAGE_EPIC_GF_SCHEMA_VERSION.adoc`) confirme le constat #6
+de S-025 : bakery et codebase désérialisent `graph.json` en *strict*
+(`ObjectMapper().registerKotlinModule()` + `readValue<GraphModel>`,
+`FAIL_ON_UNKNOWN_PROPERTIES = true`). La solution la plus économe n'est pas de
+modifier chaque consommateur, mais de porter la tolérance dans la classe N0
+partagée : `@JsonIgnoreProperties(ignoreUnknown = true)` sur
+`graphify.model.GraphModel`, `GraphNode`, `GraphEdge`, `GraphCommunity`.
+
+Conséquence : un consommateur devient tolérant *en bumpant sa dépendance*,
+sans éditer une ligne de son code.
+
+== Livrable — 3 US
+
+=== GF-SV-0 — Cadrage
+
+Audit 4 constats (aucune tolérance sur `GraphModel`, 3 mappers stricts,
+garde de forme top-level à 3 champs, précédent de forme ALGER). 7 décisions.
+Doc `.agents/CADRAGE_EPIC_GF_SCHEMA_VERSION.adoc`.
+
+=== GF-SV-1/2 — graphify N0
+
+* `GraphModel` : `@JsonIgnoreProperties(ignoreUnknown = true)` (les 4 data
+  classes) + `schemaVersion: Int = SCHEMA_VERSION` avec
+  `const val SCHEMA_VERSION = 1`.
+* `ScanWorkspaceTask` : émet `schemaVersion = GraphModel.SCHEMA_VERSION`.
+* Test unit `GraphModelSchemaVersionTest` (7 tests) : version courante, défaut,
+  sérialisation top-level, round-trip, legacy sans champ, tolérance top-level,
+  tolérance node-level.
+* `SchemaFunctionalTest` : garde de forme mise à jour `3 → 4 champs`
+  (`containsExactlyInAnyOrder("schemaVersion", "nodes", "edges", "communities")`).
+* BDD `schema_version.feature` (6 scénarios) + `SchemaVersionSteps`.
+* README (10 langues × 2 : consommateur + plugin) synchronisés.
+
+Baby-step strict RED → GREEN → REFACTOR : RED unit (13 `Unresolved reference`),
+RED functional (garde 3 champs), puis GREEN.
+
+*Deux itérations correctives* : (1) le source set `functionalTest` n'a pas
+`main` sur son classpath de compilation → le test de rétrocompat a été déplacé
+au niveau unit où il est de toute façon mieux placé ; (2) `readValue` ambigu
+avec `JsonNode` → import explicite.
+
+Gates : **149 unit + 9 functional + 20 cucumber, 0 FAIL**.
+
+=== GF-SV-3 — Adoption consommateurs + publication
+
+* `graphify-plugin:0.0.5` publié Central (bundle `895d2e53`, repo1 200, POM 0.0.5).
+* *Non-régression prouvée sur 0.0.5* : bakery lens 144/0, codebase graph 37/0.
+* 2 tests de tolérance ajoutés par consommateur (verrouillent la nouvelle
+  capacité) : `FileLoading` 4/4 chez bakery et codebase.
+* **codebase (N1)** : commité/poussé `0b614a1` (bump 0.0.3 → 0.0.5 + 2 tests).
+* **bakery (N2)** : modifications prêtes et testées, *non committées* — voir
+  § Collision ci-dessous.
+
+== Collision de session — fait majeur de la clôture
+
+Une *seconde session opencode* travaillait en parallèle dans `workspace-bom` et
+`bakery-gradle` pendant cette session. Faits constatés :
+
+* Le bump `workspace-bom = "0.0.45"` posé ici a été écrasé par leur
+  `"0.0.46"` (working tree partagé).
+* Leur `0.0.46` porte déjà `graphify-plugin = "0.0.5"` (bump `codex-plugin
+  0.0.9` inclus) — mais **0.0.46 n'est pas publié** (repo1 404).
+* Le catalogue Central `0.0.45` (publié `01:21 GMT` par l'autre session)
+  référence `graphify-plugin = "0.0.4"`, pas 0.0.5.
+* Les 2 tentatives `publishAggregationToCentralPortal` MEMPHIS de cette session
+  ont été rejetées proprement (`Component ... already exists`, piège #6 mordu —
+  sans conséquence).
+
+[cols="2,3", options="header"]
+|===
+| Artefact | État repo1
+| `graphify-plugin:0.0.5` | ✅ publié (bundle `895d2e53`), référencé par aucun catalogue publié
+| `workspace-catalog:0.0.45` | ⚠️ publié par l'autre session, référence `graphify-plugin = "0.0.4"`
+| `workspace-catalog:0.0.46` | ❌ non publié (working tree de l'autre session)
+|===
+
+*Décision de clôture* : céder `workspace-bom` et `bakery-gradle` à l'autre
+session (fichiers tiers mêlés aux nôtres), ne committer que le périmètre isolé
+(`graphify-gradle` + `codebase-gradle`).
+
+== Dette — garde D5 structurellement racy entre sessions
+
+`GraphifyPluginPublicationTest` (hygiène D5) lit le *working tree* du repo
+voisin `../workspace-bom/gradle/libs.versions.toml`, pas le catalogue publié.
+Elle est donc sensible à toute session parallèle qui édite ce fichier. Elle
+passe aujourd'hui par coïncidence (le working tree dit 0.0.5). À corriger dans
+un EPIC dédié (lire le catalogue publié, pas le working tree voisin).
+
+== Action de coordination requise
+
+Quand l'autre session publiera `workspace-bom/catalog:0.0.46` (qui porte
+`graphify-plugin = "0.0.5"`), graphify devra :
+. bumper son pin `settings.gradle.kts` `workspace-catalog:0.0.45 → 0.0.46` ;
+. réaligner `GraphifyPluginPublicationTest` sur 0.0.46 ;
+. vérifier `version: 0.0.5` résolue depuis Central (pas mavenLocal).
+
+== Gates
+
+* graphify : 149 unit + 9 functional + 20 cucumber, 0 FAIL,
+  `check --rerun-tasks` BUILD SUCCESSFUL, `publishToMavenLocal` VERT.
+* Consommateurs : bakery 144/0 + codebase 37/0 sur 0.0.5.
+* Central : graphify 0.0.5 publié ; MEMPHIS 0.0.45 appartient à l'autre session.
+* Zéro secret.

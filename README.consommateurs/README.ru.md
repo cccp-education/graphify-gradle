@@ -73,11 +73,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` — это целое число, описывающее *схему передачи*, независимо от версии плагина. `graphify.model.GraphModel` также несёт `@JsonIgnoreProperties(ignoreUnknown = true)`, поэтому строгий потребитель, обновляющий свою зависимость, терпит будущие поля без каких-либо изменений кода, а унаследованный `graph.json` без `schemaVersion` по-прежнему читается со значением по умолчанию.
 
 ## Доступные задачи
 

@@ -70,11 +70,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` 是一个描述*传输模式*（wire schema）的整数，独立于插件版本。`graphify.model.GraphModel` 还带有 `@JsonIgnoreProperties(ignoreUnknown = true)`，因此，升级依赖的严格消费者无需任何代码更改即可容忍未来的字段，而缺少 `schemaVersion` 的旧版 `graph.json` 仍会以默认值读取。
 
 ## 可用任务
 

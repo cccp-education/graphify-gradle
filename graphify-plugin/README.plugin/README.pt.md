@@ -92,6 +92,11 @@ workspace); `collectFromWorkspace` chama ainda `doNotTrackState(...)`.
   conteúdo (`graphify.fingerprint`); a travessia continua a correr na íntegra e o
   grafo emitido é idêntico byte a byte. A cache reside em `cacheFile` (por omissão
   `build/graphify/fingerprints.json`) e nunca é commitada.
+- O documento produzido carrega um `schemaVersion` de nível superior (integer, que
+  descreve o *wire schema*, independente da versão do plugin). `graphify.model.GraphModel`
+  está anotado com `@JsonIgnoreProperties(ignoreUnknown = true)`, pelo que um consumidor estrito
+  que atualize a sua dependência tolera campos futuros sem qualquer alteração de código, e um
+  `graph.json` legado sem `schemaVersion` ainda é lido com o valor por omissão.
 
 ## Verificação do DAG (`VerifyDagAcyclicTask`)
 

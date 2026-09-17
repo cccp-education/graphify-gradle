@@ -105,6 +105,7 @@ open class ScanWorkspaceTask : DefaultTask() {
         val sections = extractSections(root, allFiles, index)
 
         val graph = GraphModel(
+            schemaVersion = GraphModel.SCHEMA_VERSION,
             nodes = nodes + sections.map { it.node },
             edges = edges
                 + sections.map { section ->

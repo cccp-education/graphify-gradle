@@ -70,11 +70,14 @@ Forma del `graph.json` generado:
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` es un entero que describe el *esquema de transmisión*, independiente de la versión del plugin. `graphify.model.GraphModel` también lleva `@JsonIgnoreProperties(ignoreUnknown = true)`, de modo que un consumidor estricto que actualiza su dependencia tolera campos futuros sin ningún cambio de código, y un `graph.json` heredado sin `schemaVersion` todavía se lee con el valor por defecto.
 
 ## Tareas disponibles
 

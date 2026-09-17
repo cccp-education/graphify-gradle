@@ -70,11 +70,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` एक पूर्णांक है जो *वायर स्कीमा* का वर्णन करता है, जो प्लगइन संस्करण से स्वतंत्र है। `graphify.model.GraphModel` भी `@JsonIgnoreProperties(ignoreUnknown = true)` धारण करता है, इसलिए अपनी निर्भरता अपडेट करने वाला सख्त उपभोक्ता बिना किसी कोड परिवर्तन के भविष्य के फ़ील्ड सहन करता है, और `schemaVersion` रहित विरासती `graph.json` अब भी डिफ़ॉल्ट मान के साथ पढ़ा जाता है।
 
 ## उपलब्ध कार्य
 

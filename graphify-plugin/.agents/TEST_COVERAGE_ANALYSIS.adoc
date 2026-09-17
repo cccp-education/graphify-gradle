@@ -1,7 +1,26 @@
 = Test Coverage Analysis — Graphify Gradle
 
-_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA 4/5 US (S-025) + GF-FINGERPRINT TERMINÉ (S-026) + PUB 0.0.4 (S-027)
-_Dernière mise à jour_ : Session 027 (2026-09-17)
+_Statut_ : EPIC A TERMINÉ (GF-2 + GF-3) + GF-CORPUS TERMINÉ (S-024) + GF-SCHEMA TERMINÉ 5/5 US (S-025 + S-028) + GF-FINGERPRINT TERMINÉ (S-026) + PUB 0.0.4/0.0.5 (S-027/S-028)
+_Dernière mise à jour_ : Session 028 (2026-09-17)
+
+== Session 028 — GF-SCHEMA-5 (schemaVersion + tolérance), 3 niveaux
+
+- `model/GraphModel.kt` : `@JsonIgnoreProperties(ignoreUnknown = true)` sur les
+  4 data classes + `schemaVersion: Int = SCHEMA_VERSION (= 1)` (companion).
+- `ScanWorkspaceTask.kt` : émet `schemaVersion = GraphModel.SCHEMA_VERSION`.
+- `src/test/kotlin/graphify/model/GraphModelSchemaVersionTest.kt` : 7 unit
+  (version courante, défaut, sérialisation top-level, round-trip, legacy sans
+  champ, tolérance top-level, tolérance node-level).
+- `src/functionalTest/kotlin/graphify/SchemaFunctionalTest.kt` : garde de forme
+  passée de 3 à 4 champs top-level (+ assertion `schemaVersion == 1`).
+- `src/test/features/schema_version.feature` + `graphify/steps/SchemaVersionSteps.kt`
+  : 6 scénarios BDD.
+- 149 unit (+7) + 9 functional + 20 cucumber (+6), 0 FAIL.
+- Non-régression consommateurs sur 0.0.5 : bakery lens 144/0, codebase 37/0
+  (+ 2 tests de tolérance chacun).
+
+Note méthode : le source set `functionalTest` n'a pas `main` sur son classpath
+de compilation — les tests de modèle/domaine vont dans `test/`.
 
 == Session 027 — Publication 0.0.4 (aucun test modifié, 1 garde réalignée)
 
@@ -80,10 +99,10 @@ _Dernière mise à jour_ : Session 027 (2026-09-17)
 |===
 | Module | Tests | Couverture
 | api-key-pool | 66/66 PASS ✅ | migré `foundry/public/api-key-pool-gradle/`
-| graphify-plugin | 142 unit + 9 functional + 14 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
+| graphify-plugin | 149 unit + 9 functional + 20 cucumber, 0 FAIL ✅ | voir tableau ci-dessous
 |===
 
-Total : 165 PASS (graphify-plugin) + 66 (api-key-pool) ✅
+Total : 178 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 
 == Tests par composant (graphify-plugin)
 
@@ -103,6 +122,8 @@ Total : 165 PASS (graphify-plugin) + 66 (api-key-pool) ✅
 | `fingerprint/ScanExtractionIndexTest.kt` | 9 unitaires | Mémoïsation par scan : parse unique, fast path sans lecture, hash path, cache ignoré si off, updatedCache élagué, stats (S-026)
 | `IncrementalFunctionalTest.kt` | 6 functional | TestKit : byte-identité 2e run, contrat canonique sur cache hit, fichier modifié/supprimé, cache corrompu, opt-in (S-026)
 | `incremental_scan.feature` + `IncrementalScanSteps.kt` | 7 cucumber | Cache vide, fast path, drift size/mtime, réutilisation par hash, élagage, round-trip JSON, version inconnue (S-026)
+| `model/GraphModelSchemaVersionTest.kt` | 7 unitaires | Version courante, défaut, sérialisation top-level, round-trip, legacy sans champ, tolérance inconnu top-level/node (S-028)
+| `schema_version.feature` + `SchemaVersionSteps.kt` | 6 cucumber | Version courante, champ top-level, round-trip, legacy, inconnu top-level, inconnu node (S-028)
 |===
 
 == Scan workspace réel (validation GF-2)
@@ -129,6 +150,7 @@ Pas de modification de code source. 58/58 PASS inchangé.
 
 == Prochaine étape
 
-Session 028 — GF-SCHEMA-5 (`schemaVersion` top-level) — cross-borough,
-gate = accord pilote. Exige `@JsonIgnoreProperties` chez bakery/codebase
-d'abord. Publication 0.0.4 ✅ TERMINÉE S-027.
+Session 029 — coordination pin catalogue 0.0.46 (2e session parallèle).
+EPIC GF-SCHEMA COMPLET 5/5, GF-FINGERPRINT COMPLET 6/6.
+Dette : garde D5 `GraphifyPluginPublicationTest` lit le working tree voisin
+(racy inter-sessions) — EPIC correctif dédié.

@@ -1,5 +1,23 @@
 = Archive Tâches Complétées — Septembre 2026
 
+== Session 028 (2026-09-17) — EPIC GF-SCHEMA COMPLET 5/5 US (GF-SCHEMA-5)
+
+* GF-SV-0 ✅ Cadrage — audit 4 constats (aucune tolérance sur `GraphModel`,
+  3 mappers stricts, garde de forme 3 champs, précédent ALGER), 7 décisions.
+  Doc `.agents/CADRAGE_EPIC_GF_SCHEMA_VERSION.adoc`.
+* GF-SV-1/2 ✅ graphify N0 — `@JsonIgnoreProperties(ignoreUnknown = true)` sur
+  les 4 data classes + `schemaVersion: Int = SCHEMA_VERSION (= 1)` ; le
+  producteur émet le champ ; garde de forme 3→4 champs ; 7 unit ; BDD
+  `schema_version.feature` 6 scénarios ; README 10×2 synchronisés.
+* GF-SV-3 ✅ `graphify-plugin:0.0.5` Central (bundle `895d2e53`) ;
+  non-régression consommateurs (bakery lens 144/0, codebase graph 37/0) ;
+  codebase committé `0b614a1` (bump 0.0.5 + 2 tests de tolérance).
+* Insight clé : la tolérance se porte dans la *classe partagée N0* → zéro
+  édition consommateur, livrée par le bump de dépendance.
+* ⚠️ Collision de session (2e session opencode sur workspace-bom/bakery) :
+  workspace-bom/bakery cédés ; pin à passer sur catalogue 0.0.46 quand publié.
+* Gates : 149 unit + 9 functional + 20 cucumber, 0 FAIL.
+
 == Session 027 (2026-09-17) — Publication Maven Central 0.0.4 + MEMPHIS BOM/catalog 0.0.44
 
 * Contrainte : version propre dérivée du catalogue (`ws.versions.graphify.plugin.get()`)

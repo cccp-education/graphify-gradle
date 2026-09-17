@@ -92,6 +92,11 @@ graphify مكتفٍ ذاتيًا: Kotlin stdlib + Jackson.
   (`graphify.fingerprint`)؛ يظل الاجتياز يعمل بالكامل ويظل الرسم البياني المُصدَر
   مطابقًا بايت ببايت. تعيش الذاكرة المؤقتة تحت `cacheFile` (الافتراضي
   `build/graphify/fingerprints.json`) ولا تُودع في المستودع أبدًا.
+- يحمل المستند المُنتَج `schemaVersion` على المستوى الأعلى (integer، يصف
+  *wire schema*، مستقل عن إصدار الإضافة). `graphify.model.GraphModel`
+  موسوم بـ `@JsonIgnoreProperties(ignoreUnknown = true)`، لذا فإن المستهلك الصارم
+  الذي يرفع تبعيته يتحمّل الحقول المستقبلية دون أي تغيير في الكود، كما يظل
+  `graph.json` القديم بدون `schemaVersion` يُقرأ بالقيمة الافتراضية.
 
 ## التحقق من DAG (`VerifyDagAcyclicTask`)
 

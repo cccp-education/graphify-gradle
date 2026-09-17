@@ -60,7 +60,7 @@ class SchemaFunctionalTest {
     }
 
     @Test
-    fun `produced graph keeps the three-field top-level shape a strict consumer expects`() {
+    fun `produced graph keeps the four-field top-level shape a strict consumer expects`() {
         writeProject()
         writeFile("my-app/.git/HEAD", "ref: refs/heads/main")
         writeFile("my-app/README.adoc", "= Readme\n== Intro")
@@ -73,7 +73,8 @@ class SchemaFunctionalTest {
 
         val graph = readGraph()
         assertThat(graph.fieldNames().asSequence().toList())
-            .containsExactlyInAnyOrder("nodes", "edges", "communities")
+            .containsExactlyInAnyOrder("schemaVersion", "nodes", "edges", "communities")
+        assertThat(graph.get("schemaVersion").asInt()).isEqualTo(1)
         assertThat(graph.get("nodes")).isNotEmpty
         assertThat(graph.get("communities")).isNotEmpty
     }

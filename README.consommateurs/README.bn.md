@@ -73,11 +73,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` একটি পূর্ণসংখ্যা যা *ওয়্যার স্কিমা* বর্ণনা করে, প্লাগইন সংস্করণ থেকে স্বাধীন। `graphify.model.GraphModel`-এও `@JsonIgnoreProperties(ignoreUnknown = true)` রয়েছে, তাই যে কঠোর ভোক্তা তার নির্ভরতা আপডেট করে সে কোনো কোড পরিবর্তন ছাড়াই ভবিষ্যতের ফিল্ড সহ্য করে, এবং `schemaVersion` ছাড়া একটি পুরোনো `graph.json` এখনও ডিফল্ট মান দিয়ে পড়া যায়।
 
 ## উপলব্ধ টাস্ক
 

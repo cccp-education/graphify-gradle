@@ -92,6 +92,11 @@ graphify-gradle/
   (`graphify.fingerprint`) द्वारा मेमोइज़ की जाती है; वॉक पूरी तरह चलता रहता है और उत्सर्जित ग्राफ
   बाइट-समान रहता है। कैश `cacheFile` के अंतर्गत रहता है (डिफ़ॉल्ट
   `build/graphify/fingerprints.json`) और कभी कमिट नहीं किया जाता।
+- उत्पादित डॉक्युमेंट शीर्ष-स्तरीय `schemaVersion` रखता है (integer, जो
+  *wire schema* का वर्णन करता है, प्लगइन संस्करण से स्वतंत्र)। `graphify.model.GraphModel`
+  पर `@JsonIgnoreProperties(ignoreUnknown = true)` एनोटेशन है, इसलिए कोई सख्त उपभोक्ता
+  अपनी निर्भरता बंप करने पर भविष्य के फ़ील्ड्स को बिना किसी कोड बदलाव के सहन करता है, और
+  `schemaVersion` के बिना पुराना `graph.json` अब भी डिफ़ॉल्ट के साथ पढ़ा जाता है।
 
 ## DAG सत्यापन (`VerifyDagAcyclicTask`)
 

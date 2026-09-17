@@ -73,11 +73,18 @@ The output `graph.json` shape:
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` is an integer describing the *wire schema*, independent of the
+plugin version. `graphify.model.GraphModel` also carries
+`@JsonIgnoreProperties(ignoreUnknown = true)`, so a strict consumer that bumps
+its dependency tolerates future fields without any code change, and a legacy
+`graph.json` without `schemaVersion` still reads with the default.
 
 ## Available tasks
 

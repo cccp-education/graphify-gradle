@@ -1,50 +1,66 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 028
-:session: 028
+= PROMPT_REPRISE — Graphify Gradle — Session 029
+:session: 029
 :date: 2026-09-17
 
-== Session 027 terminée — Publication Central graphify-plugin 0.0.4
+== Session 028 terminée — GF-SCHEMA-5 `schemaVersion` + tolérance consommateurs
 
-Ordre pilote acté : 2 (S-026) → *3 (fait)* → 1.
+*EPIC GF-SCHEMA est désormais COMPLET 5/5 US.* Le schéma est explicite,
+tolérant, versionné, et l'incrémentalité est opt-in.
 
-* Contrainte découverte : la version propre du borough est *dérivée du
-  catalogue workspace* (`version = ws.versions.graphify.plugin.get()`), donc
-  publier 0.0.4 exigeait d'abord un bump MEMPHIS (RELEASE_PROTOCOL).
-* *Baseline MEMPHIS rouge à HEAD réparée* : `PlatformCatalogAlignmentTest`
-  épinglait `workspace-bom 0.0.36` (vs toml 0.0.43) et `i18n-contracts 0.0.2`
-  (vs toml 0.0.4, dérive S-217 LANG-22). Réalignées (piège #10).
-* MEMPHIS : toml `workspace-bom 0.0.43→0.0.44` + `graphify-plugin 0.0.3→0.0.4`,
-  gardes réparées, `contracts.catalog.*` VERT, mavenLocal 0.0.44 VERT.
-* graphify : pin `workspace-catalog 0.0.33→0.0.44`, toml local `graphify 0.0.4`,
-  garde D5 réalignée, `version: 0.0.4` résolue,
-  `check --rerun-tasks` VERT (165 tests 0 FAIL).
-* Central : `graphify-plugin:0.0.4` (bundle `96f87d32`) +
-  `workspace-bom/catalog:0.0.44` (bundle `dbe3ef8e`), repo1 HTTP 200 en ~7 min.
-* Consommateurs : aucun impact (bakery pinné 0.0.43, adoptions opt-in D3).
+* GF-SV-0 cadrage — audit 4 constats, 7 décisions. Doc
+  `.agents/CADRAGE_EPIC_GF_SCHEMA_VERSION.adoc`.
+* GF-SV-1/2 graphify N0 — `@JsonIgnoreProperties(ignoreUnknown = true)` sur les
+  4 data classes + `schemaVersion: Int = SCHEMA_VERSION (= 1)`. Le producteur
+  émet le champ ; garde de forme 3 → 4 champs ; BDD `schema_version.feature`
+  (6 scénarios) ; README 10 × 2 synchronisés.
+* GF-SV-3 — `graphify-plugin:0.0.5` publié Central (bundle `895d2e53`).
+  Non-régression prouvée : bakery lens 144/0, codebase graph 37/0.
+* codebase committé/poussé `0b614a1` (bump 0.0.5 + 2 tests de tolérance).
 
-== Prochaine Session (028) — GF-SCHEMA-5 `schemaVersion` (P2, cross-borough)
+Gates : 149 unit + 9 functional + 20 cucumber, 0 FAIL. `check --rerun-tasks` +
+`publishToMavenLocal` VERTS. Zéro secret.
 
-*Restant du seul EPIC inachevé* (GF-SCHEMA 4/5 US). Chantier multi-borough.
+== COLLISION DE SESSION — à connaître en ouverture
 
-* Contenu : ajouter un champ top-level `schemaVersion` à `GraphModel`.
-* *Gate bloquant* : bakery + codebase désérialisent en strict
-  (`ObjectMapper().registerKotlinModule()` + `readValue<GraphModel>`,
-  `FAIL_ON_UNKNOWN_PROPERTIES = true`). Ajouter le champ *casse* les 2
-  consommateurs aujourd'hui.
-* Séquence obligatoire :
-  . `@JsonIgnoreProperties(ignoreUnknown = true)` chez bakery + codebase
-     (S-025 constat #6) — publication + bump de leurs dépendances ;
-  . *ensuite* seulement le champ `schemaVersion` dans `GraphModel` (graphify)
-     + publication + bump catalogue ;
-  . adoption consommateurs (pin catalogue).
-* Fichiers concernés : `bakery/lens/SubgraphExtractor.kt:39`,
-  `codebase/graph/GraphContext.kt:33`, `codebase/graph/SubgraphExtractor.kt`.
-* *NE PAS démarrer sans accord pilote explicite* — c'est un chantier
-  cross-borough qui doit être sa propre session.
+Une *seconde session opencode* a travaillé en parallèle dans `workspace-bom` et
+`bakery-gradle` pendant S-028. Conséquences :
+
+* `workspace-bom` : working tree porté à `0.0.46` (avec `graphify-plugin =
+  0.0.5` + `codex-plugin 0.0.9`) par l'autre session. **Non publié** (repo1 404).
+* `workspace-bom/catalog:0.0.45` (publié par l'autre session, `01:21 GMT`)
+  référence `graphify-plugin = "0.0.4"` — *pas* 0.0.5.
+* `bakery-gradle` : 5 fichiers de l'autre session + nos 2 fichiers de bump
+  0.0.5 — **non committé** (cédé à l'autre session).
+* Pin actuel graphify : `workspace-catalog:0.0.45`. Sur *cette machine* il
+  résout 0.0.5 (mavenLocal écrasé par notre `publishToMavenLocal`) ; sur une
+  machine propre il résoudrait 0.0.4 (Central). `graphify:0.0.5` est publié mais
+  référencé par aucun catalogue publié.
+
+== Mission session 029 — COORDINATION (bloquant)
+
+*Dès que l'autre session publie `workspace-bom/catalog:0.0.46`* :
+
+. Bumper `settings.gradle.kts` : `workspace-catalog:0.0.45 → 0.0.46`.
+. Réaligner `GraphifyPluginPublicationTest` (pin + message d'échec) sur 0.0.46.
+. Vérifier `./gradlew properties` → `version: 0.0.5` résolue depuis Central.
+. Puis `check --rerun-tasks` + `publishToMavenLocal`.
+
+*Ne pas publier MEMPHIS soi-même* — 0.0.45 est pris, 0.0.46 appartient à
+l'autre session. Toute ré-invocation nmcp est rejetée ou collisionne.
+
+Puis, à la demande pilote :
+1. *Adoption bakery* — committer les 2 fichiers (bump 0.0.5 + 2 tests), si
+   l'autre session ne l'a pas fait.
+2. *EPIC correctif garde D5* — `GraphifyPluginPublicationTest` lit le *working
+   tree* du repo voisin (`../workspace-bom/gradle/libs.versions.toml`), donc
+   racy entre sessions. Lire le catalogue publié, pas le working tree.
 
 == Rappel
 
-- Borough N0, tooling 0.0.4 Central (à jour).
+- EPIC GF-SCHEMA COMPLET 5/5 ; EPIC GF-FINGERPRINT COMPLET 6/6.
+- Borough N0, tooling 0.0.5 Central.
 - Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
 - Filtre `graphify.steps.**` obligatoire sur le task `test`.
-- Le cache incrémental vit sous `build/`, jamais committé.
-- Version propre dérivée du catalogue — tout bump de version passe par MEMPHIS.
+- Le source set `functionalTest` n'a PAS `main` sur son classpath de
+  compilation — les tests de modèle vont dans `test/`.
+- Version propre dérivée du catalogue : tout bump passe par MEMPHIS.

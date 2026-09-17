@@ -92,6 +92,11 @@ graphify স্বয়ংসম্পূর্ণ: Kotlin stdlib + Jackson।
   (`graphify.fingerprint`) দ্বারা মেমোইজ করা হয়; ওয়াক সম্পূর্ণভাবে চলে এবং নির্গত গ্রাফ
   বাইট-অভিন্ন থাকে। ক্যাশ `cacheFile`-এর অধীনে থাকে (ডিফল্ট
   `build/graphify/fingerprints.json`) এবং কখনও কমিট করা হয় না।
+- উৎপাদিত ডকুমেন্টটি শীর্ষ-স্তরের `schemaVersion` বহন করে (integer, যা
+  *wire schema* বর্ণনা করে, প্লাগইন সংস্করণ থেকে স্বাধীন)। `graphify.model.GraphModel`
+  `@JsonIgnoreProperties(ignoreUnknown = true)` দিয়ে টীকিত, তাই কঠোর কোনো ভোক্তা
+  তার নির্ভরতা বাম্প করলে ভবিষ্যতের ফিল্ড কোনো কোড পরিবর্তন ছাড়াই সহনীয় হয়, এবং
+  `schemaVersion` ছাড়া পুরোনো `graph.json` এখনও ডিফল্ট নিয়ে পড়া যায়।
 
 ## DAG যাচাই (`VerifyDagAcyclicTask`)
 

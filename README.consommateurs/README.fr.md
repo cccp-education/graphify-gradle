@@ -73,11 +73,14 @@ Structure du `graph.json` produit :
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` est un entier décrivant le *schéma de transport*, indépendant de la version du plugin. `graphify.model.GraphModel` porte aussi `@JsonIgnoreProperties(ignoreUnknown = true)`, de sorte qu'un consommateur strict qui met à jour sa dépendance tolère les futurs champs sans aucune modification de code, et qu'un `graph.json` hérité dépourvu de `schemaVersion` se lit toujours avec la valeur par défaut.
 
 ## Tâches disponibles
 

@@ -1,0 +1,120 @@
+= CADRAGE EPIC GF-SCHEMA-5 — `schemaVersion` top-level + tolérance consommateurs
+
+:toc:
+:sectnums:
+:date: 2026-09-17
+:source: Session 028 (reste de l'EPIC GF-SCHEMA, différé S-025)
+
+== Contexte
+
+GF-SCHEMA (S-025) a livré 4/5 US et *différé* GF-SCHEMA-5 : ajouter un champ
+top-level `schemaVersion` à `GraphModel`. Raison du report (constat #6 de
+`CADRAGE_EPIC_GF_SCHEMA.adoc`) : les consommateurs désérialisent en *strict*
+(`ObjectMapper().registerKotlinModule()` + `readValue<GraphModel>`,
+`FAIL_ON_UNKNOWN_PROPERTIES = true`). Ajouter le champ casse silencieusement
+bakery ET codebase.
+
+== Audit — 4 constats
+
+[cols="1,3,3", options="header"]
+|===
+| # | Constat | Preuve
+
+| 1
+| `GraphModel` n'a *aucune* tolérance aux champs inconnus
+| `GraphModel.kt` — `data class` brute, zéro annotation.
+
+| 2
+| Les 3 mappers consommateurs sont stricts et *ne sont pas tolérants*
+| `bakery/lens/SubgraphExtractor.kt:39` et
+  `codebase/graph/SubgraphExtractor.kt:42` : `ObjectMapper().registerKotlinModule()`.
+  (Note : `bakery/scaffold/ScaffoldGenerator.kt:161` est déjà tolérant, mais
+  pour un *autre* contrat — scaffold YAML.)
+
+| 3
+| La garde de forme top-level épingle *3 champs*
+| `SchemaFunctionalTest.kt:75-76` : `containsExactlyInAnyOrder("nodes",
+  "edges", "communities")`. Ajouter `schemaVersion` la fait échouer — c'est
+  voulu : la garde doit être mise à jour *dans le même changement*.
+
+| 4
+| Le champ `schemaVersion` a déjà un précédent de forme
+| `dashboard-data.mock.json:3` (ALGER) : `"schemaVersion": "0.0.0-mock"`
+  (String). Pour `graph.json`, un *entier* est préférable : le schéma du
+  graphe est versionné indépendamment de la version de l'artefact.
+
+|===
+
+== Décisions architecturales
+
+. *La tolérance vit dans la classe partagée (N0), pas chez chaque consommateur.*
+   `@JsonIgnoreProperties(ignoreUnknown = true)` sur `graphify.model.GraphModel`.
+   C'est la solution « cross-borough » la plus économe : bakery, codebase et
+   tout futur consommateur deviennent tolérants *en bumpant leur dépendance*,
+   sans modifier une ligne de leur code. L'annotation sur la classe l'emporte
+   sur le `FAIL_ON_UNKNOWN_PROPERTIES = true` du mapper appelant.
+
+. *`schemaVersion` = entier, porté par `GraphModel`.*
+   `const val SCHEMA_VERSION = 1` dans le companion ; champ `schemaVersion: Int`
+   avec valeur par défaut. Le défaut garantit qu'un `GraphModel()` construit en
+   mémoire (tests consommateurs) reste valide sans changement.
+
+. *Le défaut est le pont de rétrocompatibilité.*
+   Un `graph.json` *legacy* (sans `schemaVersion`) se désérialise avec la valeur
+   par défaut : zéro casse pour les fichiers existants.
+
+. *Ordre de sûreté.* La tolérance et le champ sont livrés *ensemble* dans
+   graphify, puis les consommateurs bumpent. Comme la tolérance est portée par
+   la classe, un consommateur qui bumpe obtient les deux garanties d'un coup.
+
+. *`graph.json` byte-identique entre deux runs* — la garde S-025
+   (`SchemaFunctionalTest` déterminisme) reste en vigueur : `schemaVersion`
+   est constant, donc le JSON reste stable.
+
+. *English only* — code, commentaires, Gherkin.
+
+. *Méthode* : baby-step DDD/TDD/BDD strict RED → GREEN → REFACTOR, 3 niveaux
+   (unit → functional → cucumber), pattern établi S-025/S-026.
+
+== Découpage US (~5 pts, cross-borough)
+
+[cols="1,3,2,1", options="header"]
+|===
+| US | Description | Statut | Pts
+
+| GF-SV-0
+| Cadrage (ce document)
+| ✅ TERMINÉ (S-028)
+| 1
+
+| GF-SV-1
+| *graphify N0* : `@JsonIgnoreProperties(ignoreUnknown = true)` +
+  `schemaVersion: Int = GraphModel.SCHEMA_VERSION` (const = 1). TDD unit.
+| 🔲 À FAIRE
+| 2
+
+| GF-SV-2
+| *graphify producteur* : `ScanWorkspaceTask` émet `schemaVersion` ;
+  functional TestKit mis à jour (4 champs top-level) + garde rétrocompat
+  (legacy sans `schemaVersion`). BDD Cucumber.
+| 🔲 À FAIRE
+| 1
+
+| GF-SV-3
+| *Publication + adoption* : graphify 0.0.5 Central, MEMPHIS BOM/catalog
+  0.0.45, bump bakery + codebase (tolérance obtenue via la classe partagée),
+  non-régression consommateurs.
+| 🔲 À FAIRE
+| 1
+|===
+
+== Gates et risques
+
+* *Non-régression bakery/codebase* : leurs tests (`SubgraphExtractorTest`,
+  `GraphifyContextProviderTest`, `SubgraphWorld`) doivent rester VERTS après
+  bump. Le défaut `schemaVersion` évite toute casse des constructions en
+  mémoire ; l'annotation évite toute casse des lectures de fichier.
+* *Garde de forme* : `SchemaFunctionalTest` doit être mise à jour *dans le même
+  commit* que l'ajout du champ (sinon RED).
+* *Dette de publication* : graphify 0.0.5 + MEMPHIS 0.0.45 = chaîne DAG
+  (version dérivée du catalogue). Même protocole que S-027.

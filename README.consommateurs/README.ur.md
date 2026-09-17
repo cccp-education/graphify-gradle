@@ -73,11 +73,14 @@ graphify {
 
 ```json
 {
+  "schemaVersion": 1,
   "nodes":       [{ "id": "...", "label": "...", "type": "project|directory|file|section", "community": "...", "metadata": {} }],
   "edges":       [{ "source": "...", "target": "...", "type": "contains|import|reference|agent_reference|has_section|subsection", "label": null }],
   "communities": [{ "id": "...", "label": "...", "size": 0 }]
 }
 ```
+
+`schemaVersion` ایک صحیح عدد ہے جو *وائر اسکیما* کی وضاحت کرتا ہے، جو پلگ ان ورژن سے آزاد ہے۔ `graphify.model.GraphModel` بھی `@JsonIgnoreProperties(ignoreUnknown = true)` رکھتا ہے، اس لیے اپنی ڈیپنڈنسی اپ ڈیٹ کرنے والا سخت صارف بغیر کسی کوڈ تبدیلی کے مستقبل کے فیلڈز کو برداشت کرتا ہے، اور `schemaVersion` کے بغیر پرانا `graph.json` اب بھی ڈیفالٹ ویلیو کے ساتھ پڑھا جاتا ہے۔
 
 ## دستیاب ٹاسکس
 
