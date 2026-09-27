@@ -1,10 +1,10 @@
 plugins {
     `java-library`
     alias(libs.plugins.publish)
-    id("education.cccp.build.gradle-plugin") version "0.0.4"
-    id("education.cccp.build.publishing") version "0.0.4"
-    id("education.cccp.build.functional-test") version "0.0.4"
-    id("education.cccp.build.cucumber") version "0.0.4"
+    id("education.cccp.build.gradle-plugin") version "0.0.7"
+    id("education.cccp.build.publishing") version "0.0.7"
+    id("education.cccp.build.functional-test") version "0.0.7"
+    id("education.cccp.build.cucumber") version "0.0.7"
 }
 
 group = "education.cccp"
