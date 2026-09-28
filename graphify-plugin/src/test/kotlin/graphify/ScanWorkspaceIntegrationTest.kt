@@ -439,7 +439,7 @@ class ScanWorkspaceIntegrationTest {
     }
 
     @Nested
-    inner class FpaCorpusKnowledgeGraph {
+    inner class CorpusKnowledgeGraph {
 
         @TempDir
         lateinit var corpusDir: Path
@@ -454,10 +454,10 @@ class ScanWorkspaceIntegrationTest {
 
             corpusDir.resolve("livre.adoc").writeText(
                 """
-                = Devenir Formateur Professionnel d'Adultes
+                = Maîtriser l'architecture logicielle
                 == Chapitre 1 : Introduction
                 === Définition du métier
-                == Chapitre 2 : Ingénierie pédagogique
+                == Chapitre 2 : Ingénierie logicielle
                 """.trimIndent()
             )
 
@@ -479,10 +479,10 @@ class ScanWorkspaceIntegrationTest {
             val sections = graph.nodes.filter { it.type == "section" }
             assertThat(sections).hasSize(7)
             assertThat(sections.map { it.label }).containsExactlyInAnyOrder(
-                "Devenir Formateur Professionnel d'Adultes",
+                "Maîtriser l'architecture logicielle",
                 "Chapitre 1 : Introduction",
                 "Définition du métier",
-                "Chapitre 2 : Ingénierie pédagogique",
+                "Chapitre 2 : Ingénierie logicielle",
                 "Page 000", "Page 009", "Page 010"
             )
 
