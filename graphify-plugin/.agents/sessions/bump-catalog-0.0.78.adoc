@@ -1,0 +1,17 @@
+= Re-pin catalog 0.0.46 → 0.0.78
+
+_Date_ : 2026-10-11
+_Borough_ : graphify-gradle (Grand Central, N0)
+_Type_ : maintenance build (rollout catalog MEMPHIS 0.0.78)
+
+== Livré
+
+`settings.gradle.kts` : `from("education.cccp:workspace-catalog:0.0.46 → 0.0.78")`.
+
+== Preuve
+
+`./gradlew compileKotlin compileTestKotlin` **VERT** contre le catalog `0.0.78`.
+
+== Notes
+
+* Zéro secret, zéro Python.
