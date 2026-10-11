@@ -2,6 +2,7 @@
 :toc:
 
 _Règles absolues_ : voir `AGENT.adoc`
+_Derniere mise a jour_ : 2026-10-11 (Session 030 — re-pin catalog ws `0.0.46 → 0.0.78`, rollout MEMPHIS 0.0.78 ; compile VERT)
 _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
