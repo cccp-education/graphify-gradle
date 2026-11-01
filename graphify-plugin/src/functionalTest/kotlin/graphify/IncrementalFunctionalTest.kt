@@ -14,7 +14,10 @@ import java.io.File
  *
  * Drives the real plugin end-to-end and proves the incremental scan is a pure
  * optimisation: the second run must reproduce the first graph byte for byte,
- * while genuine workspace changes must still be re-analysed.
+ * while genuine workspace changes must still be re-analysed. The fingerprint
+ * rules themselves (fast path, drift, content-hash reuse, pruning) are pinned by
+ * the pure tests of `graphify.fingerprint.*`; each TestKit build here carries
+ * several assertions instead of one, so one concern = one run pair (XB-FP-6).
  */
 class IncrementalFunctionalTest {
 
@@ -24,7 +27,7 @@ class IncrementalFunctionalTest {
     private val mapper = ObjectMapper()
 
     @Test
-    fun `incremental second run is byte-identical to the first and writes a cache`() {
+    fun `incremental second run is byte-identical to the first, writes a cache and keeps the canonical contract`() {
         writeProject(incremental = true)
         writeFile("my-app/.git/HEAD", "ref: refs/heads/main")
         writeFile("my-app/build.gradle.kts", "plugins { java }")
@@ -45,51 +48,28 @@ class IncrementalFunctionalTest {
 
         assertThat(second).isEqualTo(first)
         assertThat(cacheFile()).exists()
-    }
 
-    @Test
-    fun `cache hit keeps the canonical contract across runs`() {
-        writeProject(incremental = true)
-        writeFile("my-app/.git/HEAD", "ref: refs/heads/main")
-        writeFile("my-app/build.gradle.kts", "plugins { java }")
-        writeFile("docs/book.adoc", "= Book\n== Chapter")
-
-        run()
-        run()
-
-        val graph = readGraph()
-        val nodeTypes = graph.get("nodes").map { it.get("type").asText() }.toSet()
+        val nodeTypes = readGraph().get("nodes").map { it.get("type").asText() }.toSet()
         assertThat(nodeTypes).isSubsetOf(setOf("project", "directory", "file", "section"))
     }
 
     @Test
-    fun `a modified file is re-analysed and its new section appears`() {
+    fun `a modified file is re-analysed and a deleted file leaves no node behind`() {
         writeProject(incremental = true)
         writeFile("m/.git/HEAD", "ref: refs/heads/main")
         writeFile("docs/book.adoc", "= Book\n== First")
-
-        run()
-        assertThat(sectionLabels()).contains("First").doesNotContain("Second")
-
-        writeFile("docs/book.adoc", "= Book\n== First\n== Second")
-        run()
-
-        assertThat(sectionLabels()).contains("First", "Second")
-    }
-
-    @Test
-    fun `a deleted file leaves no node behind`() {
-        writeProject(incremental = true)
-        writeFile("m/.git/HEAD", "ref: refs/heads/main")
         writeFile("docs/keep.adoc", "= Keep")
         writeFile("docs/gone.adoc", "= Gone")
 
         run()
+        assertThat(sectionLabels()).contains("First").doesNotContain("Second")
         assertThat(nodeIds()).contains("docs/gone.adoc")
 
+        writeFile("docs/book.adoc", "= Book\n== First\n== Second")
         projectDir.resolve("docs/gone.adoc").delete()
         run()
 
+        assertThat(sectionLabels()).contains("First", "Second")
         assertThat(nodeIds()).doesNotContain("docs/gone.adoc")
         assertThat(nodeIds()).contains("docs/keep.adoc")
     }
