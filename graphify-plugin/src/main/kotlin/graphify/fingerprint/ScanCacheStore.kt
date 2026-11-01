@@ -18,7 +18,7 @@ object ScanCacheStore {
 
     private val mapper: ObjectMapper =
         ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             .registerKotlinModule()
 
     fun load(file: File): ScanCache {

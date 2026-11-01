@@ -11,7 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 class SchemaVersionSteps : En {
     private val strictMapper: ObjectMapper =
         ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             .registerKotlinModule()
 
     private var model: GraphModel? = null

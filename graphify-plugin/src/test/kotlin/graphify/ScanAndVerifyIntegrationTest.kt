@@ -24,7 +24,7 @@ class ScanAndVerifyIntegrationTest {
     private lateinit var graphOutput: Path
     private val mapper =
         ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             .registerKotlinModule()
     private val dagLevels =
         mapOf(

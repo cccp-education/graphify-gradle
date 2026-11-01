@@ -49,7 +49,7 @@ open class ScanWorkspaceTask : DefaultTask() {
 
     private val mapper: ObjectMapper =
         ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             .registerKotlinModule()
 
     @TaskAction
@@ -222,7 +222,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                     community = repoMap[path.parent],
                     metadata =
                         mapOf(
-                            "extension" to (path.extension ?: ""),
+                            "extension" to path.extension,
                             "size" to size,
                         ),
                 ),

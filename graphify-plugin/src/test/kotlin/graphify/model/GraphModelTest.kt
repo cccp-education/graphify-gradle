@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class GraphModelTest {
     private val mapper: ObjectMapper =
         ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             .registerKotlinModule()
 
     @Test
