@@ -9,7 +9,6 @@ import org.assertj.core.api.Assertions.assertThat
 import java.nio.file.Files
 
 class IncrementalScanSteps : En {
-
     private var cache: ScanCache = ScanCache()
     private var fastPath: Boolean = false
     private var extractionPresent: Boolean = false
@@ -24,11 +23,12 @@ class IncrementalScanSteps : En {
         }
 
         Given("a scan cache recording {string} with size {int} and mtime {int}") { path: String, size: Int, mtime: Int ->
-            cache = cache.record(
-                path = path,
-                fingerprint = FileFingerprint(size = size.toLong(), mtime = mtime.toLong(), sha256 = "hash-$path"),
-                extraction = FileExtraction(imports = listOf("com.example.From$path"))
-            )
+            cache =
+                cache.record(
+                    path = path,
+                    fingerprint = FileFingerprint(size = size.toLong(), mtime = mtime.toLong(), sha256 = "hash-$path"),
+                    extraction = FileExtraction(imports = listOf("com.example.From$path")),
+                )
         }
 
         Given("a cache file written by schema version {int}") { version: Int ->
@@ -44,11 +44,12 @@ class IncrementalScanSteps : En {
 
         When("a file with the same content is recorded under {string} with a newer mtime") { path: String ->
             val existing = cache.fingerprints.values.first()
-            cache = cache.record(
-                path = path,
-                fingerprint = existing.copy(mtime = existing.mtime + 5_000),
-                extraction = cache.extraction(existing.sha256)!!
-            )
+            cache =
+                cache.record(
+                    path = path,
+                    fingerprint = existing.copy(mtime = existing.mtime + 5_000),
+                    extraction = cache.extraction(existing.sha256)!!,
+                )
         }
 
         When("the cache is pruned to the live paths {string}") { live: String ->

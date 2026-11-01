@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class VersionCatalogTomlTest {
-
-    private val catalog = """
+    private val catalog =
+        """
         [metadata]
         format.version = "1.1"
 
@@ -21,11 +21,10 @@ class VersionCatalogTomlTest {
 
         [plugins]
         graphify = {id = "education.cccp.graphify", version.ref = "graphify-plugin" }
-    """.trimIndent()
+        """.trimIndent()
 
     @Nested
     inner class VersionLookup {
-
         @Test
         fun `should resolve a version declared in the versions section`() {
             assertThat(VersionCatalogToml.versionOf(catalog, "graphify-plugin")).isEqualTo("0.0.5")
@@ -49,64 +48,67 @@ class VersionCatalogTomlTest {
 
         @Test
         fun `should not read a plain assignment declared outside the versions section`() {
-            val misplaced = """
+            val misplaced =
+                """
                 [metadata]
                 graphify-plugin = "9.9.9"
 
                 [versions]
                 bakery-plugin = "0.0.12"
-            """.trimIndent()
+                """.trimIndent()
             assertThat(VersionCatalogToml.versionOf(misplaced, "graphify-plugin")).isNull()
         }
     }
 
     @Nested
     inner class CommentAndWhitespaceHandling {
-
         @Test
         fun `should ignore a commented-out version line`() {
-            val commented = """
+            val commented =
+                """
                 [versions]
                 # graphify-plugin = "9.9.9"
                 graphify-plugin = "0.0.5"
-            """.trimIndent()
+                """.trimIndent()
             assertThat(VersionCatalogToml.versionOf(commented, "graphify-plugin")).isEqualTo("0.0.5")
         }
 
         @Test
         fun `should ignore a trailing comment after the value`() {
-            val trailing = """
+            val trailing =
+                """
                 [versions]
                 graphify-plugin = "0.0.5" # published graphify
-            """.trimIndent()
+                """.trimIndent()
             assertThat(VersionCatalogToml.versionOf(trailing, "graphify-plugin")).isEqualTo("0.0.5")
         }
 
         @Test
         fun `should ignore a fully commented-out section`() {
-            val commentedSection = """
+            val commentedSection =
+                """
                 [versions]
                 bakery-plugin = "0.0.12"
 
                 #[versions]
                 #graphify-plugin = "9.9.9"
-            """.trimIndent()
+                """.trimIndent()
             assertThat(VersionCatalogToml.versionOf(commentedSection, "graphify-plugin")).isNull()
         }
 
         @Test
         fun `should tolerate surrounding whitespace around the key and value`() {
-            val spaced = """
+            val spaced =
+                """
                 [versions]
                     graphify-plugin   =   "0.0.5"
-            """.trimIndent()
+                """.trimIndent()
             assertThat(VersionCatalogToml.versionOf(spaced, "graphify-plugin")).isEqualTo("0.0.5")
         }
     }
 }
 
 class PublicationHygieneTest {
-
     @Test
     fun `should report consistency when local and published versions agree`() {
         val result = PublicationHygiene.check(localVersion = "0.0.5", publishedVersion = "0.0.5")

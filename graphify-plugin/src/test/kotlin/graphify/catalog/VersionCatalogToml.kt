@@ -15,17 +15,22 @@ package graphify.catalog
  * is consulted.
  */
 object VersionCatalogToml {
-
     private val sectionPattern = Regex("""^\[([^\]]+)]""")
     private val assignmentPattern = Regex("""^\s*([A-Za-z0-9._-]+)\s*=\s*"([^"]*)"""")
 
-    fun versionOf(content: String, key: String): String? = versionOf(content, listOf(key))
+    fun versionOf(
+        content: String,
+        key: String,
+    ): String? = versionOf(content, listOf(key))
 
     /**
      * Returns the value of the first candidate key found in the `[versions]`
      * section, or `null` when none is declared.
      */
-    fun versionOf(content: String, keys: List<String>): String? {
+    fun versionOf(
+        content: String,
+        keys: List<String>,
+    ): String? {
         val versions = versionsSection(content)
         return keys.firstNotNullOfOrNull { versions[it] }
     }

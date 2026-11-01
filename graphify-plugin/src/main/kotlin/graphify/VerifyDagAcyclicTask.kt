@@ -9,7 +9,6 @@ import java.io.File
 
 @DisableCachingByDefault(because = "DAG verification depends on workspace state across projects")
 open class VerifyDagAcyclicTask : DefaultTask() {
-
     @get:Input
     lateinit var dagLevels: Map<String, Int>
 
@@ -39,7 +38,7 @@ open class VerifyDagAcyclicTask : DefaultTask() {
 
                 if (depLevel > projectLevel) {
                     violations.add(
-                        "$projectName (N$projectLevel) imports $depName (N$depLevel) — N$projectLevel cannot depend on N$depLevel"
+                        "$projectName (N$projectLevel) imports $depName (N$depLevel) — N$projectLevel cannot depend on N$depLevel",
                     )
                 }
             }
@@ -51,29 +50,32 @@ open class VerifyDagAcyclicTask : DefaultTask() {
             val details = violations.joinToString("\n  ") { it }
             logger.error("DAG VIOLATIONS DETECTED (${violations.size}):\n  $details")
             throw GradleException(
-                "DAG violations: $details"
+                "DAG violations: $details",
             )
         }
     }
 
-    internal fun levelOf(name: String, levels: Map<String, Int>): Int? {
+    internal fun levelOf(
+        name: String,
+        levels: Map<String, Int>,
+    ): Int? {
         val candidates = mutableListOf(name)
-        candidates.add("${name}-gradle")
-        candidates.add("${name}-plugin")
+        candidates.add("$name-gradle")
+        candidates.add("$name-plugin")
         if (name.endsWith("-gradle")) candidates.add(name.removeSuffix("-gradle"))
         if (name.endsWith("-plugin")) candidates.add(name.removeSuffix("-plugin"))
 
         val dashNorm = name.replace("_", "-")
         candidates.add(dashNorm)
-        candidates.add("${dashNorm}-gradle")
-        candidates.add("${dashNorm}-plugin")
+        candidates.add("$dashNorm-gradle")
+        candidates.add("$dashNorm-plugin")
         if (dashNorm.endsWith("-gradle")) candidates.add(dashNorm.removeSuffix("-gradle"))
         if (dashNorm.endsWith("-plugin")) candidates.add(dashNorm.removeSuffix("-plugin"))
 
         val underscoreNorm = name.replace("-", "_")
         candidates.add(underscoreNorm)
-        candidates.add("${underscoreNorm}-gradle")
-        candidates.add("${underscoreNorm}-plugin")
+        candidates.add("$underscoreNorm-gradle")
+        candidates.add("$underscoreNorm-plugin")
         if (underscoreNorm.endsWith("-gradle")) candidates.add(underscoreNorm.removeSuffix("-gradle"))
         if (underscoreNorm.endsWith("-plugin")) candidates.add(underscoreNorm.removeSuffix("-plugin"))
 

@@ -9,7 +9,6 @@ import io.cucumber.java8.En
 import org.assertj.core.api.Assertions.assertThat
 
 class GraphSchemaSteps : En {
-
     private var nodeResult: String = ""
     private var edgeResult: String = ""
     private var legacyGraph: GraphModel? = null
@@ -23,21 +22,24 @@ class GraphSchemaSteps : En {
         }
 
         Given("a legacy graph with a {string} node and an {string} edge") { nodeType: String, edgeType: String ->
-            legacyGraph = GraphModel(
-                nodes = listOf(
-                    GraphNode(
-                        id = "n1",
-                        label = "kept-label",
-                        type = nodeType,
-                        community = "kept-community",
-                        metadata = mapOf("extension" to "kt")
-                    )
-                ),
-                edges = listOf(
-                    GraphEdge(source = "n1", target = "n2", type = edgeType, label = "kept-label-edge")
-                ),
-                communities = listOf(GraphCommunity(id = "kept-community", label = "kept-community", size = 1))
-            )
+            legacyGraph =
+                GraphModel(
+                    nodes =
+                        listOf(
+                            GraphNode(
+                                id = "n1",
+                                label = "kept-label",
+                                type = nodeType,
+                                community = "kept-community",
+                                metadata = mapOf("extension" to "kt"),
+                            ),
+                        ),
+                    edges =
+                        listOf(
+                            GraphEdge(source = "n1", target = "n2", type = edgeType, label = "kept-label-edge"),
+                        ),
+                    communities = listOf(GraphCommunity(id = "kept-community", label = "kept-community", size = 1)),
+                )
         }
 
         When("the node type {string} is canonicalised") { raw: String ->

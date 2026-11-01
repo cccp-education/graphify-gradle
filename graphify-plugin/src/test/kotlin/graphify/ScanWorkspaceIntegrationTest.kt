@@ -1,9 +1,9 @@
 package graphify
 
-import graphify.model.GraphModel
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import graphify.model.GraphModel
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
@@ -13,18 +13,21 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import kotlin.collections.iterator
-import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ScanWorkspaceIntegrationTest {
-
     @TempDir
     lateinit var tempDir: Path
 
     private lateinit var task: ScanWorkspaceTask
     private lateinit var outputFile: File
-    private val mapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
+    private val mapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
 
     @BeforeEach
     fun setUp() {
@@ -37,13 +40,17 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class MultiBoroughCommunityDetection {
-
         @Test
         fun `should detect 6 borough communities from independent git repos`() {
-            val boroughs = listOf(
-                "planner-gradle", "codex-gradle", "codebase-gradle",
-                "engine", "plantuml-gradle", "bakery-gradle"
-            )
+            val boroughs =
+                listOf(
+                    "planner-gradle",
+                    "codex-gradle",
+                    "codebase-gradle",
+                    "engine",
+                    "plantuml-gradle",
+                    "bakery-gradle",
+                )
 
             for (borough in boroughs) {
                 val root = tempDir.resolve(borough)
@@ -62,10 +69,11 @@ class ScanWorkspaceIntegrationTest {
 
         @Test
         fun `should assign correct community to each node based on git repo membership`() {
-            val boroughs = mapOf(
-                "planner-gradle" to listOf("src/main/kotlin/Planner.kt", "build.gradle.kts"),
-                "engine" to listOf("src/main/kotlin/Engine.kt", "build.gradle.kts")
-            )
+            val boroughs =
+                mapOf(
+                    "planner-gradle" to listOf("src/main/kotlin/Planner.kt", "build.gradle.kts"),
+                    "engine" to listOf("src/main/kotlin/Engine.kt", "build.gradle.kts"),
+                )
 
             for ((name, files) in boroughs) {
                 val root = tempDir.resolve(name)
@@ -109,39 +117,44 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class CrossProjectEdges {
-
         @Test
         fun `should create agent_reference edges from multiple borough INDEX adoc files`() {
             val engine = tempDir.resolve("engine")
             engine.createDirectories()
             engine.resolve(".git").createDirectories()
-            writeFilePath(engine, ".agents/INDEX.adoc",
+            writeFilePath(
+                engine,
+                ".agents/INDEX.adoc",
                 """
                 = INDEX — Engine
                 Portefeuille: graphify-gradle in foundry/public/graphify-gradle
                 Consumes plantuml-gradle output
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val plantuml = tempDir.resolve("plantuml-gradle")
             plantuml.createDirectories()
             plantuml.resolve(".git").createDirectories()
-            writeFilePath(plantuml, ".agents/INDEX.adoc",
+            writeFilePath(
+                plantuml,
+                ".agents/INDEX.adoc",
                 """
                 = INDEX — PlantUML
                 Dependency: graphify-gradle N0
                 References engine/AGENT.adoc
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val graphify = tempDir.resolve("graphify-gradle")
             graphify.createDirectories()
             graphify.resolve(".git").createDirectories()
-            writeFilePath(graphify, ".agents/INDEX.adoc",
+            writeFilePath(
+                graphify,
+                ".agents/INDEX.adoc",
                 """
                 = INDEX — Graphify
                 Output consumed by engine and plantuml-gradle
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             task.scan()
@@ -161,23 +174,27 @@ class ScanWorkspaceIntegrationTest {
             lib.createDirectories()
             lib.resolve(".git").createDirectories()
             lib.resolve("build.gradle.kts").writeText("")
-            writeFilePath(lib, "src/main/kotlin/com/graphify/ScanWorkspaceTask.kt",
+            writeFilePath(
+                lib,
+                "src/main/kotlin/com/graphify/ScanWorkspaceTask.kt",
                 """
                 package com.graphify
                 class ScanWorkspaceTask
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val consumer = tempDir.resolve("engine")
             consumer.createDirectories()
             consumer.resolve(".git").createDirectories()
             consumer.resolve("build.gradle.kts").writeText("")
-            writeFilePath(consumer, "src/main/kotlin/com/engine/EngineTask.kt",
+            writeFilePath(
+                consumer,
+                "src/main/kotlin/com/engine/EngineTask.kt",
                 """
                 package com.engine
                 import com.graphify.ScanWorkspaceTask
                 class EngineTask
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             task.scan()
@@ -207,13 +224,17 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class ExclusionVerification {
-
         @Test
         fun `should exclude all default ignored directories in realistic workspace`() {
-            val exclusions = listOf(
-                "build/classes", ".gradle/caches", ".git/objects",
-                "node_modules/lodash", ".idea/caches", "target/classes"
-            )
+            val exclusions =
+                listOf(
+                    "build/classes",
+                    ".gradle/caches",
+                    ".git/objects",
+                    "node_modules/lodash",
+                    ".idea/caches",
+                    "target/classes",
+                )
             val kept = listOf("src/main.kt", "README.adoc", "docs/index.adoc")
 
             for (d in exclusions) writeFile(d)
@@ -224,9 +245,12 @@ class ScanWorkspaceIntegrationTest {
             val graph = parseOutput()
             val nodeIds = graph.nodes.map { it.id }.toSet()
             assertThat(nodeIds).noneMatch {
-                it.contains("build") || it.contains(".gradle") ||
-                it.contains(".git") || it.contains("node_modules") ||
-                it.contains(".idea") || it.contains("target")
+                it.contains("build") ||
+                    it.contains(".gradle") ||
+                    it.contains(".git") ||
+                    it.contains("node_modules") ||
+                    it.contains(".idea") ||
+                    it.contains("target")
             }
             assertThat(nodeIds).containsAll(kept)
         }
@@ -279,7 +303,6 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class OutputValidation {
-
         @Test
         fun `should produce valid parseable JSON for multi-borough workspace`() {
             val boroughs = listOf("engine", "graphify-gradle", "plantuml-gradle")
@@ -310,12 +333,13 @@ class ScanWorkspaceIntegrationTest {
 
         @Test
         fun `should include project nodes for gradle maven and npm projects`() {
-            val types = listOf(
-                "gradle-proj" to "build.gradle.kts",
-                "maven-proj" to "pom.xml",
-                "npm-proj" to "package.json",
-                "gradle-groovy" to "build.gradle"
-            )
+            val types =
+                listOf(
+                    "gradle-proj" to "build.gradle.kts",
+                    "maven-proj" to "pom.xml",
+                    "npm-proj" to "package.json",
+                    "gradle-groovy" to "build.gradle",
+                )
 
             for ((name, marker) in types) {
                 val root = tempDir.resolve(name)
@@ -365,11 +389,13 @@ class ScanWorkspaceIntegrationTest {
                 root.resolve("build.gradle.kts").writeText("")
                 writeFilePath(root, "src/main/kotlin/Service.kt")
                 writeFilePath(root, "src/test/kotlin/ServiceTest.kt")
-                writeFilePath(root, ".agents/INDEX.adoc",
+                writeFilePath(
+                    root,
+                    ".agents/INDEX.adoc",
                     """
                     = INDEX — $borough
                     References other projects
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             }
 
@@ -390,7 +416,6 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class WorkspaceMimic {
-
         @Test
         fun `should mimic workspace structure with foundry office and configuration`() {
             val foundry = listOf("engine", "graphify-gradle", "plantuml-gradle", "bakery-gradle")
@@ -400,12 +425,14 @@ class ScanWorkspaceIntegrationTest {
                 root.resolve(".git").createDirectories()
                 root.resolve("build.gradle.kts").writeText("")
                 writeFilePath(root, "src/main/kotlin/${proj.replace("-", "/")}/App.kt")
-                writeFilePath(root, ".agents/INDEX.adoc",
+                writeFilePath(
+                    root,
+                    ".agents/INDEX.adoc",
                     """
                     = INDEX — $proj
                     Portefeuille: foundry/public/engine and foundry/public/plantuml-gradle
                     Config: configuration/.agents/AGENT_GOVERNANCE.adoc
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             }
 
@@ -413,12 +440,14 @@ class ScanWorkspaceIntegrationTest {
             office.createDirectories()
             office.resolve(".git").createDirectories()
             writeFilePath(office, "books-collection/README.adoc")
-            writeFilePath(office, ".agents/INDEX.adoc",
+            writeFilePath(
+                office,
+                ".agents/INDEX.adoc",
                 """
                 = INDEX — Office
                 Consumed by foundry/public/bakery-gradle and foundry/public/engine
                 References configuration/.agents/AGENT_GOVERNANCE.adoc
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             task.scan()
@@ -440,7 +469,6 @@ class ScanWorkspaceIntegrationTest {
 
     @Nested
     inner class CorpusKnowledgeGraph {
-
         @TempDir
         lateinit var corpusDir: Path
 
@@ -458,7 +486,7 @@ class ScanWorkspaceIntegrationTest {
                 == Chapitre 1 : Introduction
                 === Définition du métier
                 == Chapitre 2 : Ingénierie logicielle
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             corpusDir.resolve("toc.adoc").writeText(
@@ -467,7 +495,7 @@ class ScanWorkspaceIntegrationTest {
                 | 1.0.0 | Introduction | 0 | 000.adoc
                 | 1.0.1 | Chapitre 1 | 9 | 009.adoc
                 | 1.0.2 | Chapitre 2 | 10 | 010.adoc
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             task.rootDir = corpusDir.toFile()
@@ -483,7 +511,9 @@ class ScanWorkspaceIntegrationTest {
                 "Chapitre 1 : Introduction",
                 "Définition du métier",
                 "Chapitre 2 : Ingénierie logicielle",
-                "Page 000", "Page 009", "Page 010"
+                "Page 000",
+                "Page 009",
+                "Page 010",
             )
 
             val hasSectionEdges = graph.edges.filter { it.type == "has_section" }
@@ -495,7 +525,9 @@ class ScanWorkspaceIntegrationTest {
 
             val tocEdges = graph.edges.filter { it.type == "reference" && it.label == "toc_entry" }
             assertThat(tocEdges.map { it.target }).containsExactlyInAnyOrder(
-                "scans/000.adoc", "scans/009.adoc", "scans/010.adoc"
+                "scans/000.adoc",
+                "scans/009.adoc",
+                "scans/010.adoc",
             )
 
             val pageNodes = graph.nodes.filter { it.type == "file" && it.id.startsWith("scans/") }
@@ -508,13 +540,20 @@ class ScanWorkspaceIntegrationTest {
         return mapper.readValue(outputFile, GraphModel::class.java)
     }
 
-    private fun writeFile(relativePath: String, content: String = "") {
+    private fun writeFile(
+        relativePath: String,
+        content: String = "",
+    ) {
         val file = tempDir.resolve(relativePath)
         file.parent.createDirectories()
         file.writeText(content)
     }
 
-    private fun writeFilePath(root: Path, relativePath: String, content: String = "") {
+    private fun writeFilePath(
+        root: Path,
+        relativePath: String,
+        content: String = "",
+    ) {
         val file = root.resolve(relativePath)
         file.parent.createDirectories()
         file.writeText(content)

@@ -1,9 +1,9 @@
 package graphify
 
-import graphify.model.GraphModel
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import graphify.model.GraphModel
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -12,27 +12,33 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ScanAndVerifyIntegrationTest {
-
     @TempDir
     lateinit var tempDir: Path
     private lateinit var workspace: Path
     private lateinit var graphOutput: Path
-    private val mapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
-    private val dagLevels = mapOf(
-        "graphify-gradle" to 0, "codebase-gradle" to 1,
-        "bakery-gradle" to 2, "codex-gradle" to 2,
-        "plantuml-gradle" to 2, "runner-gradle" to 3
-    )
+    private val mapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
+    private val dagLevels =
+        mapOf(
+            "graphify-gradle" to 0,
+            "codebase-gradle" to 1,
+            "bakery-gradle" to 2,
+            "codex-gradle" to 2,
+            "plantuml-gradle" to 2,
+            "runner-gradle" to 3,
+        )
     private val project = ProjectBuilder.builder().build()
 
     @Nested
     inner class ScanThenVerify {
-
         @Test
         fun `should produce valid graph json then verify DAG with no violations`() {
             val ws = tempDir.resolve("ws1")
@@ -42,7 +48,10 @@ class ScanAndVerifyIntegrationTest {
 
             createProject(fd, "graphify-gradle") { "plugins { java }" }
             createProject(fd, "codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
-            createProject(fd, "runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
+            createProject(
+                fd,
+                "runner-gradle",
+            ) { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
 
             val st = project.tasks.register("sw", ScanWorkspaceTask::class.java).get()
             st.rootDir = ws.toFile()
@@ -92,7 +101,6 @@ class ScanAndVerifyIntegrationTest {
 
     @Nested
     inner class RunnerConsumer {
-
         @Test
         fun `should validate graph json contract for runner consumption`() {
             val ws = tempDir.resolve("ws3")
@@ -133,7 +141,11 @@ class ScanAndVerifyIntegrationTest {
         }
     }
 
-    private fun createProject(fd: Path, name: String, buildContent: () -> String) {
+    private fun createProject(
+        fd: Path,
+        name: String,
+        buildContent: () -> String,
+    ) {
         val dir = fd.resolve(name)
         dir.createDirectories()
         dir.resolve("build.gradle.kts").writeText(buildContent())

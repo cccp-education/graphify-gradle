@@ -9,10 +9,10 @@ import io.cucumber.java8.En
 import org.assertj.core.api.Assertions.assertThat
 
 class SchemaVersionSteps : En {
-
-    private val strictMapper: ObjectMapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
+    private val strictMapper: ObjectMapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
 
     private var model: GraphModel? = null
     private var json: String = ""
@@ -29,35 +29,38 @@ class SchemaVersionSteps : En {
         }
 
         Given("a legacy graph JSON without a {string} field") { _: String ->
-            json = """
+            json =
+                """
                 {
                   "nodes": [{"id":"a.kt","label":"a.kt","type":"file"}],
                   "edges": [],
                   "communities": []
                 }
-            """.trimIndent()
+                """.trimIndent()
         }
 
         Given("a graph JSON carrying an unknown top-level field") {
-            json = """
+            json =
+                """
                 {
                   "nodes": [],
                   "edges": [],
                   "communities": [],
                   "futureField": "ignored"
                 }
-            """.trimIndent()
+                """.trimIndent()
         }
 
         Given("a graph JSON carrying an unknown node field") {
-            json = """
+            json =
+                """
                 {
                   "schemaVersion": 1,
                   "nodes": [{"id":"a.kt","label":"a.kt","type":"file","futureField":42}],
                   "edges": [],
                   "communities": []
                 }
-            """.trimIndent()
+                """.trimIndent()
         }
 
         When("the model is serialized") {
@@ -75,12 +78,13 @@ class SchemaVersionSteps : En {
 
         When("the graph is read by a strict reader") {
             readError = null
-            readBack = try {
-                strictMapper.readValue<GraphModel>(json)
-            } catch (e: Exception) {
-                readError = e
-                null
-            }
+            readBack =
+                try {
+                    strictMapper.readValue<GraphModel>(json)
+                } catch (e: Exception) {
+                    readError = e
+                    null
+                }
         }
 
         Then("the schema version is the current one") {

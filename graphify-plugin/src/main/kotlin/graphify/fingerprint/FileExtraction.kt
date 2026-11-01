@@ -15,11 +15,12 @@ data class FileExtraction(
     val adocReferences: List<String> = emptyList(),
     val tocReferences: List<String> = emptyList(),
     val agentReferences: List<String> = emptyList(),
-    val sections: List<SectionExtraction> = emptyList()
+    val sections: List<SectionExtraction> = emptyList(),
 ) {
     @get:JsonIgnore
     val isEmpty: Boolean
-        get() = imports.isEmpty() &&
+        get() =
+            imports.isEmpty() &&
                 adocReferences.isEmpty() &&
                 tocReferences.isEmpty() &&
                 agentReferences.isEmpty() &&
@@ -33,5 +34,5 @@ data class FileExtraction(
 data class SectionExtraction(
     val title: String,
     val level: Int,
-    val line: Int
+    val line: Int,
 )

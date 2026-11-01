@@ -3,12 +3,15 @@ plugins {
     alias(libs.plugins.publish)
     id("education.cccp.build.gradle-plugin") version "0.0.7"
     id("education.cccp.build.publishing") version "0.0.7"
+    id("education.cccp.build.lint") version "0.0.7"
     id("education.cccp.build.functional-test") version "0.0.7"
     id("education.cccp.build.cucumber") version "0.0.7"
 }
 
 group = "education.cccp"
-version = ws.versions.graphify.plugin.get()
+version =
+    ws.versions.graphify.plugin
+        .get()
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -28,7 +31,11 @@ tasks.withType<Test> {
     // D5R-2 — inject the *published* workspace catalog version resolved by Gradle
     // (from the published catalog pin). The publication hygiene guard must never
     // read a neighbour repository's working tree: that is racy between sessions.
-    systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())
+    systemProperty(
+        "graphify.publishedCatalog.graphifyVersion",
+        ws.versions.graphify.plugin
+            .get(),
+    )
 }
 
 // Exclude the Cucumber runner + step glue from the unit `test` task.

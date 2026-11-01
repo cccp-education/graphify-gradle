@@ -13,7 +13,6 @@ import org.assertj.core.api.Assertions.assertThat
  * (pattern S-088).
  */
 class PublicationHygieneSteps : En {
-
     private var localCatalog: String = ""
     private var publishedVersion: String? = null
     private var localVersion: String? = null

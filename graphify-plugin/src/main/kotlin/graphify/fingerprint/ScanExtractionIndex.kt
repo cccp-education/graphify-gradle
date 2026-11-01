@@ -18,19 +18,21 @@ import java.nio.file.attribute.BasicFileAttributes
  */
 class ScanExtractionIndex(
     private val previous: ScanCache = ScanCache(),
-    private val incremental: Boolean = false
+    private val incremental: Boolean = false,
 ) {
-
     data class Stats(
         val trusted: Int = 0,
         val reusedByHash: Int = 0,
-        val parsed: Int = 0
+        val parsed: Int = 0,
     ) {
         val reused: Int get() = trusted + reusedByHash
         val total: Int get() = trusted + reusedByHash + parsed
     }
 
-    private data class Entry(val fingerprint: FileFingerprint, val extraction: FileExtraction)
+    private data class Entry(
+        val fingerprint: FileFingerprint,
+        val extraction: FileExtraction,
+    )
 
     private val entries = LinkedHashMap<String, Entry>()
     private var trustedCount = 0
@@ -41,7 +43,10 @@ class ScanExtractionIndex(
 
     val stats: Stats get() = current
 
-    fun extraction(file: Path, relativePath: String): FileExtraction {
+    fun extraction(
+        file: Path,
+        relativePath: String,
+    ): FileExtraction {
         entries[relativePath]?.let { return it.extraction }
 
         val attributes = Files.readAttributes(file, BasicFileAttributes::class.java)
@@ -58,7 +63,7 @@ class ScanExtractionIndex(
         file: Path,
         relativePath: String,
         size: Long,
-        mtime: Long
+        mtime: Long,
     ): Pair<FileFingerprint, FileExtraction> {
         if (!incremental) return parse(file, relativePath, size, mtime)
 
@@ -84,7 +89,7 @@ class ScanExtractionIndex(
         file: Path,
         relativePath: String,
         size: Long,
-        mtime: Long
+        mtime: Long,
     ): Pair<FileFingerprint, FileExtraction> {
         val content = Files.readString(file)
         val fingerprint = FileFingerprint(size = size, mtime = mtime, sha256 = Fingerprinter.digest(content.toByteArray()))

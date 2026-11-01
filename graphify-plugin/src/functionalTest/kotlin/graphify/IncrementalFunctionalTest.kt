@@ -20,7 +20,6 @@ import java.io.File
  * several assertions instead of one, so one concern = one run pair (XB-FP-6).
  */
 class IncrementalFunctionalTest {
-
     @TempDir
     lateinit var projectDir: File
 
@@ -33,7 +32,7 @@ class IncrementalFunctionalTest {
         writeFile("my-app/build.gradle.kts", "plugins { java }")
         writeFile(
             "my-app/src/main/kotlin/com/example/App.kt",
-            "package com.example\nimport com.example.Util\nclass App"
+            "package com.example\nimport com.example.Util\nclass App",
         )
         writeFile("my-app/src/main/kotlin/com/example/Util.kt", "package com.example\nclass Util")
         writeFile("docs/book.adoc", "= Book\n== Chapter\nSee `docs/other.adoc`.")
@@ -101,18 +100,20 @@ class IncrementalFunctionalTest {
     }
 
     private fun sectionLabels(): List<String> =
-        readGraph().get("nodes")
+        readGraph()
+            .get("nodes")
             .filter { it.get("type").asText() == "section" }
             .map { it.get("label").asText() }
 
-    private fun nodeIds(): List<String> =
-        readGraph().get("nodes").map { it.get("id").asText() }
+    private fun nodeIds(): List<String> = readGraph().get("nodes").map { it.get("id").asText() }
 
-    private fun run() = GradleRunner.create()
-        .withProjectDir(projectDir)
-        .withArguments("collectFromWorkspace", "--stacktrace")
-        .withPluginClasspath()
-        .build()
+    private fun run() =
+        GradleRunner
+            .create()
+            .withProjectDir(projectDir)
+            .withArguments("collectFromWorkspace", "--stacktrace")
+            .withPluginClasspath()
+            .build()
 
     private fun cacheFile(): File = projectDir.resolve("build/graphify/fingerprints.json")
 
@@ -137,11 +138,14 @@ class IncrementalFunctionalTest {
                 outputFile.set(layout.projectDirectory.file("graph.json").asFile)
                 incremental.set($incremental)
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
-    private fun writeFile(relativePath: String, content: String) {
+    private fun writeFile(
+        relativePath: String,
+        content: String,
+    ) {
         val file = projectDir.resolve(relativePath)
         file.parentFile.mkdirs()
         file.writeText(content)

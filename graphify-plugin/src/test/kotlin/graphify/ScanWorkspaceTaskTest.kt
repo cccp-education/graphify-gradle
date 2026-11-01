@@ -1,9 +1,9 @@
 package graphify
 
-import graphify.model.GraphModel
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import graphify.model.GraphModel
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
@@ -11,18 +11,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ScanWorkspaceTaskTest {
-
     @TempDir
     lateinit var tempDir: Path
 
     private lateinit var task: ScanWorkspaceTask
     private lateinit var outputFile: File
-    private val mapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
+    private val mapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
 
     @BeforeEach
     fun setUp() {
@@ -199,12 +202,14 @@ class ScanWorkspaceTaskTest {
         val sub = tempDir.resolve("my-app")
         sub.createDirectories()
         sub.resolve("build.gradle.kts").writeText("")
-        writeFilePath(sub, "src/main/kotlin/com/example/App.kt",
+        writeFilePath(
+            sub,
+            "src/main/kotlin/com/example/App.kt",
             """
             package com.example
             import com.example.Util
             import java.util.List
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.scan()
@@ -217,8 +222,9 @@ class ScanWorkspaceTaskTest {
     @Test
     fun `should extract reference edges from adoc files`() {
         writeFile("docs/reference.adoc")
-        writeFile("docs/index.adoc",
-            "See `docs/reference.adoc` for more details."
+        writeFile(
+            "docs/index.adoc",
+            "See `docs/reference.adoc` for more details.",
         )
 
         task.scan()
@@ -230,12 +236,13 @@ class ScanWorkspaceTaskTest {
 
     @Test
     fun `should extract agent reference edges from INDEX adoc`() {
-        writeFile(".agents/INDEX.adoc",
+        writeFile(
+            ".agents/INDEX.adoc",
             """
             = INDEX
             References: configuration/.agents/AGENT_GOVERNANCE.adoc
             and foundry/public/graphify-gradle
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.scan()
@@ -316,31 +323,37 @@ class ScanWorkspaceTaskTest {
         val projA = tempDir.resolve("proj-a")
         projA.createDirectories()
         projA.resolve(".git").createDirectories()
-        writeFilePath(projA, ".agents/INDEX.adoc",
+        writeFilePath(
+            projA,
+            ".agents/INDEX.adoc",
             """
             = INDEX — ProjA
             References proj-b/config and proj-c/lib
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val projB = tempDir.resolve("proj-b")
         projB.createDirectories()
         projB.resolve(".git").createDirectories()
-        writeFilePath(projB, ".agents/INDEX.adoc",
+        writeFilePath(
+            projB,
+            ".agents/INDEX.adoc",
             """
             = INDEX — ProjB
             Consumed by proj-a/.agents/INDEX
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val projC = tempDir.resolve("proj-c")
         projC.createDirectories()
         projC.resolve(".git").createDirectories()
-        writeFilePath(projC, ".agents/INDEX.adoc",
+        writeFilePath(
+            projC,
+            ".agents/INDEX.adoc",
             """
             = INDEX — ProjC
             See proj-a/AGENT.adoc and proj-b/build.gradle.kts
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.scan()
@@ -358,14 +371,15 @@ class ScanWorkspaceTaskTest {
 
     @Test
     fun `should detect agent references from root level agents INDEX to subprojects`() {
-        writeFile(".agents/INDEX.adoc",
+        writeFile(
+            ".agents/INDEX.adoc",
             """
             = INDEX
             Portefeuille:
             - graphify-gradle in foundry/public/graphify-gradle
             - engine in foundry/public/engine
             - bakery-gradle in foundry/public/bakery-gradle
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.scan()
@@ -423,12 +437,15 @@ class ScanWorkspaceTaskTest {
 
     @Test
     fun `should extract section nodes from adoc headings`() {
-        writeFile("book.adoc", """
+        writeFile(
+            "book.adoc",
+            """
             = Livre
             == Chapitre Un
             === Partie A
             == Chapitre Deux
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         task.scan()
 
@@ -443,12 +460,15 @@ class ScanWorkspaceTaskTest {
 
     @Test
     fun `should not create section nodes from block delimiters`() {
-        writeFile("book.adoc", """
+        writeFile(
+            "book.adoc",
+            """
             = Livre
             ====
             This is an example block, not a heading.
             ====
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         task.scan()
 
@@ -459,10 +479,13 @@ class ScanWorkspaceTaskTest {
 
     @Test
     fun `should link sections to their source file with has_section edges`() {
-        writeFile("docs/book.adoc", """
+        writeFile(
+            "docs/book.adoc",
+            """
             = Livre
             == Chapitre Un
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         task.scan()
 
@@ -471,20 +494,23 @@ class ScanWorkspaceTaskTest {
         assertThat(hasSectionEdges).hasSize(2)
         assertThat(hasSectionEdges.map { "${it.source}->${it.target}" }).containsExactlyInAnyOrder(
             "docs/book.adoc->docs/book.adoc#Livre",
-            "docs/book.adoc->docs/book.adoc#Chapitre Un"
+            "docs/book.adoc->docs/book.adoc#Chapitre Un",
         )
     }
 
     @Test
     fun `should build subsection hierarchy edges between section levels`() {
-        writeFile("book.adoc", """
+        writeFile(
+            "book.adoc",
+            """
             = Livre
             == Chapitre Un
             === Partie A
             === Partie B
             == Chapitre Deux
             = Autre Fichier
-        """.trimIndent())
+            """.trimIndent(),
+        )
         writeFile("other.adoc", "= Tête de l'autre fichier")
 
         task.scan()
@@ -495,7 +521,7 @@ class ScanWorkspaceTaskTest {
             "book.adoc#Livre->book.adoc#Chapitre Un",
             "book.adoc#Chapitre Un->book.adoc#Partie A",
             "book.adoc#Chapitre Un->book.adoc#Partie B",
-            "book.adoc#Livre->book.adoc#Chapitre Deux"
+            "book.adoc#Livre->book.adoc#Chapitre Deux",
         )
     }
 
@@ -503,11 +529,14 @@ class ScanWorkspaceTaskTest {
     fun `should resolve toc table cell references to scan pages`() {
         writeFile("scans/000.adoc")
         writeFile("scans/009.adoc")
-        writeFile("toc.adoc", """
+        writeFile(
+            "toc.adoc",
+            """
             | Référence | Sujet / Titre | Page | Fichier
             | 1.0.0 | Introduction | 0 | 000.adoc
             | 1.0.1 | Chapitre 1 | 9 | 009.adoc
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         task.scan()
 
@@ -515,18 +544,21 @@ class ScanWorkspaceTaskTest {
         val tocRefs = graph.edges.filter { it.type == "reference" && it.label == "toc_entry" }
         assertThat(tocRefs.map { "${it.source}->${it.target}" }).containsExactlyInAnyOrder(
             "toc.adoc->scans/000.adoc",
-            "toc.adoc->scans/009.adoc"
+            "toc.adoc->scans/009.adoc",
         )
     }
 
     @Test
     fun `should deduplicate section ids when same title appears twice`() {
-        writeFile("book.adoc", """
+        writeFile(
+            "book.adoc",
+            """
             = Livre
             == Introduction
             == Chapitre
             === Introduction
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         task.scan()
 
@@ -543,13 +575,20 @@ class ScanWorkspaceTaskTest {
         return mapper.readValue(outputFile, GraphModel::class.java)
     }
 
-    private fun writeFile(relativePath: String, content: String = "") {
+    private fun writeFile(
+        relativePath: String,
+        content: String = "",
+    ) {
         val file = tempDir.resolve(relativePath)
         file.parent.createDirectories()
         file.writeText(content)
     }
 
-    private fun writeFilePath(base: Path, relativePath: String, content: String = "") {
+    private fun writeFilePath(
+        base: Path,
+        relativePath: String,
+        content: String = "",
+    ) {
         val file = base.resolve(relativePath)
         file.parent.createDirectories()
         file.writeText(content)

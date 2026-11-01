@@ -1,5 +1,8 @@
 package graphify
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import graphify.fingerprint.ScanCache
 import graphify.fingerprint.ScanCacheStore
 import graphify.fingerprint.ScanExtractionIndex
@@ -9,9 +12,6 @@ import graphify.model.GraphModel
 import graphify.model.GraphNode
 import graphify.schema.EdgeType
 import graphify.schema.NodeType
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -25,11 +25,13 @@ import java.nio.file.Path
 import java.nio.file.PathMatcher
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import kotlin.io.path.*
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 
 @DisableCachingByDefault(because = "File system scan varies between environments")
 open class ScanWorkspaceTask : DefaultTask() {
-
     @get:Internal
     lateinit var rootDir: File
 
@@ -45,56 +47,74 @@ open class ScanWorkspaceTask : DefaultTask() {
     @get:Internal
     var cacheFile: File? = null
 
-    private val mapper: ObjectMapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
+    private val mapper: ObjectMapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
 
     @TaskAction
     fun scan() {
         val root = rootDir.toPath()
         val output = outputFile
 
-        val matchers = excludePatterns.map { pattern ->
-            FileSystems.getDefault().getPathMatcher("glob:$pattern")
-        }
+        val matchers =
+            excludePatterns.map { pattern ->
+                FileSystems.getDefault().getPathMatcher("glob:$pattern")
+            }
         val customExcludedNames = extractExcludedNamesFromPatterns(excludePatterns)
 
         val allFileData = mutableListOf<FileInfo>()
         try {
-            Files.walkFileTree(root, object : SimpleFileVisitor<Path>() {
-                override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    if (isExcluded(dir, root, matchers, customExcludedNames)) return FileVisitResult.SKIP_SUBTREE
-                    return FileVisitResult.CONTINUE
-                }
-
-                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    if (!isExcluded(file, root, matchers, customExcludedNames)) {
-                        allFileData.add(FileInfo(file, attrs.size()))
+            Files.walkFileTree(
+                root,
+                object : SimpleFileVisitor<Path>() {
+                    override fun preVisitDirectory(
+                        dir: Path,
+                        attrs: BasicFileAttributes,
+                    ): FileVisitResult {
+                        if (isExcluded(dir, root, matchers, customExcludedNames)) return FileVisitResult.SKIP_SUBTREE
+                        return FileVisitResult.CONTINUE
                     }
-                    return FileVisitResult.CONTINUE
-                }
 
-                override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
-                    logger.warn("Skipping inaccessible path: $file")
-                    return FileVisitResult.CONTINUE
-                }
-            })
+                    override fun visitFile(
+                        file: Path,
+                        attrs: BasicFileAttributes,
+                    ): FileVisitResult {
+                        if (!isExcluded(file, root, matchers, customExcludedNames)) {
+                            allFileData.add(FileInfo(file, attrs.size()))
+                        }
+                        return FileVisitResult.CONTINUE
+                    }
+
+                    override fun visitFileFailed(
+                        file: Path,
+                        exc: IOException,
+                    ): FileVisitResult {
+                        logger.warn("Skipping inaccessible path: $file")
+                        return FileVisitResult.CONTINUE
+                    }
+                },
+            )
         } catch (e: Exception) {
             logger.warn("Walk error: ${e.message}, continuing with partial results")
         }
 
         val allFiles = allFileData.map { it.path }
 
-        val projects = allFiles.filter { isProjectMarker(it) }
-            .map { it.parent }
-            .distinct()
+        val projects =
+            allFiles
+                .filter { isProjectMarker(it) }
+                .map { it.parent }
+                .distinct()
         val projectDirs = projects.toSet()
 
-        val dirs = allFiles.asSequence()
-            .map { it.parent }
-            .distinct()
-            .filter { dir -> allFiles.any { it.parent == dir } }
-            .toList()
+        val dirs =
+            allFiles
+                .asSequence()
+                .map { it.parent }
+                .distinct()
+                .filter { dir -> allFiles.any { it.parent == dir } }
+                .toList()
 
         val repoMap = buildRepoMap(root, allFiles)
         val nodes = extractNodes(root, allFileData, dirs, projects, repoMap)
@@ -104,16 +124,18 @@ open class ScanWorkspaceTask : DefaultTask() {
         val communities = extractCommunities(repoMap)
         val sections = extractSections(root, allFiles, index)
 
-        val graph = GraphModel(
-            schemaVersion = GraphModel.SCHEMA_VERSION,
-            nodes = nodes + sections.map { it.node },
-            edges = edges
-                + sections.map { section ->
-                    GraphEdge(source = section.fileRelative, target = section.node.id, type = EdgeType.HAS_SECTION.wire)
-                }
-                + buildSubsectionEdges(sections),
-            communities = communities
-        )
+        val graph =
+            GraphModel(
+                schemaVersion = GraphModel.SCHEMA_VERSION,
+                nodes = nodes + sections.map { it.node },
+                edges =
+                    edges +
+                        sections.map { section ->
+                            GraphEdge(source = section.fileRelative, target = section.node.id, type = EdgeType.HAS_SECTION.wire)
+                        } +
+                        buildSubsectionEdges(sections),
+                communities = communities,
+            )
 
         output.parentFile.mkdirs()
         mapper.writerWithDefaultPrettyPrinter().writeValue(output, graph)
@@ -121,20 +143,29 @@ open class ScanWorkspaceTask : DefaultTask() {
         logger.lifecycle("Graphify scan complete: ${nodes.size} nodes, ${edges.size} edges, ${communities.size} communities -> ${output.absolutePath}")
     }
 
-    private fun persistCache(index: ScanExtractionIndex, allFiles: List<Path>, root: Path) {
+    private fun persistCache(
+        index: ScanExtractionIndex,
+        allFiles: List<Path>,
+        root: Path,
+    ) {
         if (!incremental) return
         val cache = cacheFile ?: return
         val livePaths = allFiles.mapNotNull { safe { root.relativize(it).toString() } }.toSet()
         ScanCacheStore.save(cache, index.updatedCache(livePaths))
         val stats = index.stats
         logger.lifecycle(
-            "Graphify incremental cache: ${stats.trusted} trusted, ${stats.reusedByHash} reused by hash, ${stats.parsed} parsed -> ${cache.absolutePath}"
+            "Graphify incremental cache: ${stats.trusted} trusted, ${stats.reusedByHash} reused by hash, ${stats.parsed} parsed -> ${cache.absolutePath}",
         )
     }
 
     private val excludedDirNames = setOf("build", "node_modules", ".gradle", ".git", ".idea", "target")
 
-    private fun isExcluded(path: Path, root: Path, matchers: List<PathMatcher>, customExcludedNames: Set<String>): Boolean {
+    private fun isExcluded(
+        path: Path,
+        root: Path,
+        matchers: List<PathMatcher>,
+        customExcludedNames: Set<String>,
+    ): Boolean {
         if (path == root) return false
         val relative = safe { root.relativize(path) } ?: return true
         if (matchers.any { it.matches(relative) }) return true
@@ -143,16 +174,18 @@ open class ScanWorkspaceTask : DefaultTask() {
         return false
     }
 
-    private fun extractExcludedNamesFromPatterns(patterns: List<String>): Set<String> {
-        return patterns.flatMap { pattern ->
-            pattern.split("/", "**").filter { it.isNotEmpty() && it.all { c -> c.isLetterOrDigit() || c == '_' || c == '-' || c == '.' } }
-        }.toSet()
-    }
+    private fun extractExcludedNamesFromPatterns(patterns: List<String>): Set<String> =
+        patterns
+            .flatMap { pattern ->
+                pattern.split("/", "**").filter { it.isNotEmpty() && it.all { c -> c.isLetterOrDigit() || c == '_' || c == '-' || c == '.' } }
+            }.toSet()
 
     private fun isProjectMarker(path: Path): Boolean {
         val name = path.fileName.toString()
-        return name == "build.gradle.kts" || name == "build.gradle" ||
-                name == "pom.xml" || name == "package.json"
+        return name == "build.gradle.kts" ||
+            name == "build.gradle" ||
+            name == "pom.xml" ||
+            name == "package.json"
     }
 
     private fun extractNodes(
@@ -160,7 +193,7 @@ open class ScanWorkspaceTask : DefaultTask() {
         fileData: List<FileInfo>,
         dirs: List<Path>,
         projects: List<Path>,
-        repoMap: Map<Path, String>
+        repoMap: Map<Path, String>,
     ): List<GraphNode> {
         val nodes = mutableListOf<GraphNode>()
         val addedDirs = mutableSetOf<String>()
@@ -173,8 +206,8 @@ open class ScanWorkspaceTask : DefaultTask() {
                     id = relative,
                     label = dir.fileName.toString(),
                     type = if (isProject) NodeType.PROJECT.wire else NodeType.DIRECTORY.wire,
-                    community = repoMap[dir]
-                )
+                    community = repoMap[dir],
+                ),
             )
             addedDirs.add(relative)
         }
@@ -187,11 +220,12 @@ open class ScanWorkspaceTask : DefaultTask() {
                     label = path.fileName.toString(),
                     type = NodeType.FILE.wire,
                     community = repoMap[path.parent],
-                    metadata = mapOf(
-                        "extension" to (path.extension ?: ""),
-                        "size" to size
-                    )
-                )
+                    metadata =
+                        mapOf(
+                            "extension" to (path.extension ?: ""),
+                            "size" to size,
+                        ),
+                ),
             )
         }
 
@@ -202,7 +236,7 @@ open class ScanWorkspaceTask : DefaultTask() {
         root: Path,
         files: List<Path>,
         projectDirs: Set<Path>,
-        index: ScanExtractionIndex
+        index: ScanExtractionIndex,
     ): List<GraphEdge> {
         val edges = mutableListOf<GraphEdge>()
 
@@ -225,7 +259,7 @@ open class ScanWorkspaceTask : DefaultTask() {
                     if (target != fileParent) {
                         val src = safe { root.relativize(file).toString() } ?: continue
                         edges.add(
-                            GraphEdge(source = src, target = target, type = EdgeType.IMPORT.wire, label = import)
+                            GraphEdge(source = src, target = target, type = EdgeType.IMPORT.wire, label = import),
                         )
                     }
                 }
@@ -267,7 +301,11 @@ open class ScanWorkspaceTask : DefaultTask() {
         return edges
     }
 
-    private fun resolveImportToDir(import: String, projectDirs: Set<Path>, root: Path): Path? {
+    private fun resolveImportToDir(
+        import: String,
+        projectDirs: Set<Path>,
+        root: Path,
+    ): Path? {
         for (projDir in projectDirs) {
             val srcDir = projDir.resolve("src/main/kotlin")
             val packageDir = srcDir.resolve(import.replace('.', '/').substringBeforeLast("/"))
@@ -276,22 +314,33 @@ open class ScanWorkspaceTask : DefaultTask() {
         return null
     }
 
-    private fun resolveTocReference(fromFile: Path, ref: String, allFiles: List<Path>): Path? {
+    private fun resolveTocReference(
+        fromFile: Path,
+        ref: String,
+        allFiles: List<Path>,
+    ): Path? {
         val direct = safe { resolveReferenceToFile(fromFile.parent, ref) }
         if (direct != null && safe { Files.isRegularFile(direct) } == true) return direct
         return allFiles.firstOrNull { it.fileName.toString() == ref }
     }
 
-    private fun resolveReferenceToFile(base: Path, ref: String): Path? {
-        val candidates = listOf(
-            base.resolve(ref).normalize(),
-            base.resolve("../$ref").normalize(),
-            Path.of(ref)
-        )
+    private fun resolveReferenceToFile(
+        base: Path,
+        ref: String,
+    ): Path? {
+        val candidates =
+            listOf(
+                base.resolve(ref).normalize(),
+                base.resolve("../$ref").normalize(),
+                Path.of(ref),
+            )
         return candidates.firstOrNull { safe { Files.isRegularFile(it) } == true }
     }
 
-    private fun buildRepoMap(root: Path, files: List<Path>): Map<Path, String> {
+    private fun buildRepoMap(
+        root: Path,
+        files: List<Path>,
+    ): Map<Path, String> {
         val result = mutableMapOf<Path, String>()
         for (file in files) {
             var parent: Path? = file.parent
@@ -307,16 +356,22 @@ open class ScanWorkspaceTask : DefaultTask() {
         return result
     }
 
-    private fun extractCommunities(repoMap: Map<Path, String>): List<GraphCommunity> {
-        return repoMap.values
+    private fun extractCommunities(repoMap: Map<Path, String>): List<GraphCommunity> =
+        repoMap.values
             .groupingBy { it }
             .eachCount()
             .map { (name, size) -> GraphCommunity(id = name, label = name, size = size) }
-    }
 
-    private data class FileInfo(val path: Path, val size: Long)
+    private data class FileInfo(
+        val path: Path,
+        val size: Long,
+    )
 
-    private data class SectionInfo(val node: GraphNode, val fileRelative: String, val level: Int)
+    private data class SectionInfo(
+        val node: GraphNode,
+        val fileRelative: String,
+        val level: Int,
+    )
 
     private fun buildSubsectionEdges(sections: List<SectionInfo>): List<GraphEdge> {
         val edges = mutableListOf<GraphEdge>()
@@ -331,7 +386,11 @@ open class ScanWorkspaceTask : DefaultTask() {
         return edges
     }
 
-    private fun extractSections(root: Path, files: List<Path>, index: ScanExtractionIndex): List<SectionInfo> {
+    private fun extractSections(
+        root: Path,
+        files: List<Path>,
+        index: ScanExtractionIndex,
+    ): List<SectionInfo> {
         val sections = mutableListOf<SectionInfo>()
         val adocFiles = files.filter { it.extension == "adoc" || it.extension == "ad" }
         val idCounts = mutableMapOf<String, Int>()
@@ -343,26 +402,31 @@ open class ScanWorkspaceTask : DefaultTask() {
                 val sectionId = if (count == 1) baseId else "$baseId~$count"
                 sections.add(
                     SectionInfo(
-                        node = GraphNode(
-                            id = sectionId,
-                            label = section.title,
-                            type = NodeType.SECTION.wire,
-                            metadata = mapOf(
-                                "level" to section.level,
-                                "line" to section.line,
-                                "source" to fileRelative
-                            )
-                        ),
+                        node =
+                            GraphNode(
+                                id = sectionId,
+                                label = section.title,
+                                type = NodeType.SECTION.wire,
+                                metadata =
+                                    mapOf(
+                                        "level" to section.level,
+                                        "line" to section.line,
+                                        "source" to fileRelative,
+                                    ),
+                            ),
                         fileRelative = fileRelative,
-                        level = section.level
-                    )
+                        level = section.level,
+                    ),
                 )
             }
         }
         return sections
     }
 
-    private fun <T> safe(block: () -> T): T? {
-        return try { block() } catch (_: Exception) { null }
-    }
+    private fun <T> safe(block: () -> T): T? =
+        try {
+            block()
+        } catch (_: Exception) {
+            null
+        }
 }

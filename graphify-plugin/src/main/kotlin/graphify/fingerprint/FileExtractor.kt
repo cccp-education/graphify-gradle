@@ -9,7 +9,6 @@ package graphify.fingerprint
  * content hash.
  */
 object FileExtractor {
-
     private val kotlinImportRegex = Regex("""^import\s+([\w.]+)""", RegexOption.MULTILINE)
 
     private val adocLinkRegex = Regex("""(?:link|include|xref|image):([^\[\]\s]+)\[""")
@@ -25,7 +24,10 @@ object FileExtractor {
     private val kotlinExtensions = setOf("kt", "kts")
     private val adocExtensions = setOf("adoc", "ad")
 
-    fun extract(fileName: String, content: String): FileExtraction {
+    fun extract(
+        fileName: String,
+        content: String,
+    ): FileExtraction {
         val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")
         val isKotlin = extension in kotlinExtensions
         val isAdoc = extension in adocExtensions
@@ -35,12 +37,11 @@ object FileExtractor {
             adocReferences = if (isAdoc) adocReferences(content) else emptyList(),
             tocReferences = if (isAdoc) tocReferences(content) else emptyList(),
             agentReferences = if (fileName == "INDEX.adoc") agentReferences(content) else emptyList(),
-            sections = if (isAdoc) sections(content) else emptyList()
+            sections = if (isAdoc) sections(content) else emptyList(),
         )
     }
 
-    fun kotlinImports(content: String): List<String> =
-        kotlinImportRegex.findAll(content).map { it.groupValues[1] }.toList()
+    fun kotlinImports(content: String): List<String> = kotlinImportRegex.findAll(content).map { it.groupValues[1] }.toList()
 
     fun adocReferences(content: String): List<String> {
         val refs = mutableListOf<String>()
@@ -49,11 +50,14 @@ object FileExtractor {
         return refs
     }
 
-    fun tocReferences(content: String): List<String> =
-        tocCellRegex.findAll(content).map { it.groupValues[1] }.toList()
+    fun tocReferences(content: String): List<String> = tocCellRegex.findAll(content).map { it.groupValues[1] }.toList()
 
     fun agentReferences(content: String): List<String> =
-        agentReferenceRegex.findAll(content).map { it.value }.filter { it.contains("/") }.toList()
+        agentReferenceRegex
+            .findAll(content)
+            .map { it.value }
+            .filter { it.contains("/") }
+            .toList()
 
     fun sections(content: String): List<SectionExtraction> {
         val sections = mutableListOf<SectionExtraction>()
@@ -65,8 +69,8 @@ object FileExtractor {
                 SectionExtraction(
                     title = match.groupValues[2],
                     level = match.groupValues[1].length,
-                    line = lineNumber
-                )
+                    line = lineNumber,
+                ),
             )
         }
         return sections

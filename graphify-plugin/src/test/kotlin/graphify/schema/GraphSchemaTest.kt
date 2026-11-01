@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class GraphSchemaTest {
-
     @Nested
     inner class CanonicalNodeTypes {
-
         @Test
         fun `should expose the four produced node types as canonical values`() {
             assertThat(NodeType.entries.map { it.wire })
@@ -44,13 +42,16 @@ class GraphSchemaTest {
 
     @Nested
     inner class CanonicalEdgeTypes {
-
         @Test
         fun `should expose the six produced edge types as canonical values`() {
             assertThat(EdgeType.entries.map { it.wire })
                 .containsExactlyInAnyOrder(
-                    "contains", "import", "reference", "agent_reference",
-                    "has_section", "subsection"
+                    "contains",
+                    "import",
+                    "reference",
+                    "agent_reference",
+                    "has_section",
+                    "subsection",
                 )
         }
 
@@ -84,7 +85,6 @@ class GraphSchemaTest {
 
     @Nested
     inner class Idempotence {
-
         @Test
         fun `node canonicalization should be idempotent`() {
             val samples = listOf("dir", "module", "file", "unknown-x", "project")
@@ -106,7 +106,6 @@ class GraphSchemaTest {
 
     @Nested
     inner class ReservedVocabulary {
-
         @Test
         fun `should declare reserved node types that are known but not produced`() {
             assertThat(GraphSchema.reservedNodeTypes)

@@ -9,10 +9,8 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 class FileFingerprintTest {
-
     @Nested
     inner class FastComparison {
-
         @Test
         fun `should match when size and mtime are unchanged`() {
             val fingerprint = FileFingerprint(size = 120, mtime = 1_700_000_000_000L, sha256 = "abc")
@@ -34,7 +32,6 @@ class FileFingerprintTest {
 }
 
 class FingerprinterTest {
-
     @TempDir
     lateinit var tempDir: Path
 
@@ -72,7 +69,10 @@ class FingerprinterTest {
         assertThat(Fingerprinter.fingerprint(file)).isEqualTo(Fingerprinter.fingerprint(file))
     }
 
-    private fun write(name: String, content: String): Path {
+    private fun write(
+        name: String,
+        content: String,
+    ): Path {
         val file = tempDir.resolve(name)
         file.parent?.createDirectories()
         file.writeText(content)
@@ -81,22 +81,21 @@ class FingerprinterTest {
 }
 
 class ScanCacheTest {
-
-    private val extraction = FileExtraction(
-        imports = listOf("com.example.Util"),
-        sections = listOf(SectionExtraction(title = "Chapter", level = 2, line = 3))
-    )
+    private val extraction =
+        FileExtraction(
+            imports = listOf("com.example.Util"),
+            sections = listOf(SectionExtraction(title = "Chapter", level = 2, line = 3)),
+        )
 
     private fun cacheWith(path: String = "src/App.kt"): ScanCache =
         ScanCache().record(
             path = path,
             fingerprint = FileFingerprint(size = 10, mtime = 1_000L, sha256 = "hash-1"),
-            extraction = extraction
+            extraction = extraction,
         )
 
     @Nested
     inner class Recording {
-
         @Test
         fun `should start empty`() {
             val cache = ScanCache()
@@ -113,11 +112,12 @@ class ScanCacheTest {
 
         @Test
         fun `should replace the fingerprint of a re-recorded path`() {
-            val updated = cacheWith().record(
-                path = "src/App.kt",
-                fingerprint = FileFingerprint(size = 20, mtime = 2_000L, sha256 = "hash-2"),
-                extraction = FileExtraction(imports = listOf("com.example.Other"))
-            )
+            val updated =
+                cacheWith().record(
+                    path = "src/App.kt",
+                    fingerprint = FileFingerprint(size = 20, mtime = 2_000L, sha256 = "hash-2"),
+                    extraction = FileExtraction(imports = listOf("com.example.Other")),
+                )
 
             assertThat(updated.fingerprints.getValue("src/App.kt").sha256).isEqualTo("hash-2")
             assertThat(updated.extractions).containsKeys("hash-1", "hash-2")
@@ -126,7 +126,6 @@ class ScanCacheTest {
 
     @Nested
     inner class FastPath {
-
         @Test
         fun `should report fast-unchanged when size and mtime match`() {
             assertThat(cacheWith().isFastUnchanged("src/App.kt", size = 10, mtime = 1_000L)).isTrue()
@@ -156,7 +155,6 @@ class ScanCacheTest {
 
     @Nested
     inner class ContentHashPath {
-
         @Test
         fun `should reuse the extraction by sha256 when only the mtime changed`() {
             assertThat(cacheWith().extraction("hash-1")).isEqualTo(extraction)
@@ -169,11 +167,12 @@ class ScanCacheTest {
 
         @Test
         fun `should share one extraction between two paths holding identical content`() {
-            val shared = cacheWith(path = "a.txt").record(
-                path = "b.txt",
-                fingerprint = FileFingerprint(size = 10, mtime = 3_000L, sha256 = "hash-1"),
-                extraction = extraction
-            )
+            val shared =
+                cacheWith(path = "a.txt").record(
+                    path = "b.txt",
+                    fingerprint = FileFingerprint(size = 10, mtime = 3_000L, sha256 = "hash-1"),
+                    extraction = extraction,
+                )
 
             assertThat(shared.fingerprints).containsOnlyKeys("a.txt", "b.txt")
             assertThat(shared.extractions).containsOnlyKeys("hash-1")
@@ -182,42 +181,41 @@ class ScanCacheTest {
 
     @Nested
     inner class Pruning {
-
         @Test
         fun `should keep only the fingerprints of live paths`() {
-            val pruned = cacheWith(path = "a.txt")
-                .record(
-                    path = "b.txt",
-                    fingerprint = FileFingerprint(size = 5, mtime = 2_000L, sha256 = "hash-2"),
-                    extraction = FileExtraction()
-                )
-                .prunedTo(setOf("a.txt"))
+            val pruned =
+                cacheWith(path = "a.txt")
+                    .record(
+                        path = "b.txt",
+                        fingerprint = FileFingerprint(size = 5, mtime = 2_000L, sha256 = "hash-2"),
+                        extraction = FileExtraction(),
+                    ).prunedTo(setOf("a.txt"))
 
             assertThat(pruned.fingerprints).containsOnlyKeys("a.txt")
         }
 
         @Test
         fun `should drop extractions no surviving fingerprint references`() {
-            val pruned = cacheWith(path = "a.txt")
-                .record(
-                    path = "b.txt",
-                    fingerprint = FileFingerprint(size = 5, mtime = 2_000L, sha256 = "hash-2"),
-                    extraction = FileExtraction()
-                )
-                .prunedTo(setOf("a.txt"))
+            val pruned =
+                cacheWith(path = "a.txt")
+                    .record(
+                        path = "b.txt",
+                        fingerprint = FileFingerprint(size = 5, mtime = 2_000L, sha256 = "hash-2"),
+                        extraction = FileExtraction(),
+                    ).prunedTo(setOf("a.txt"))
 
             assertThat(pruned.extractions).containsOnlyKeys("hash-1")
         }
 
         @Test
         fun `should keep a shared extraction while one live path references it`() {
-            val pruned = cacheWith(path = "a.txt")
-                .record(
-                    path = "b.txt",
-                    fingerprint = FileFingerprint(size = 10, mtime = 4_000L, sha256 = "hash-1"),
-                    extraction = extraction
-                )
-                .prunedTo(setOf("b.txt"))
+            val pruned =
+                cacheWith(path = "a.txt")
+                    .record(
+                        path = "b.txt",
+                        fingerprint = FileFingerprint(size = 10, mtime = 4_000L, sha256 = "hash-1"),
+                        extraction = extraction,
+                    ).prunedTo(setOf("b.txt"))
 
             assertThat(pruned.extractions).containsOnlyKeys("hash-1")
             assertThat(pruned.fingerprints).containsOnlyKeys("b.txt")
@@ -239,22 +237,23 @@ class ScanCacheTest {
 }
 
 class ScanCacheStoreTest {
-
     @TempDir
     lateinit var tempDir: Path
 
-    private val cache = ScanCache()
-        .record(
-            path = "src/App.kt",
-            fingerprint = FileFingerprint(size = 42, mtime = 1_000L, sha256 = "deadbeef"),
-            extraction = FileExtraction(
-                imports = listOf("com.example.Util"),
-                adocReferences = listOf("docs/other.adoc"),
-                tocReferences = listOf("docs/toc.adoc"),
-                agentReferences = listOf(".agents/INDEX.adoc"),
-                sections = listOf(SectionExtraction(title = "Chapter", level = 2, line = 7))
+    private val cache =
+        ScanCache()
+            .record(
+                path = "src/App.kt",
+                fingerprint = FileFingerprint(size = 42, mtime = 1_000L, sha256 = "deadbeef"),
+                extraction =
+                    FileExtraction(
+                        imports = listOf("com.example.Util"),
+                        adocReferences = listOf("docs/other.adoc"),
+                        tocReferences = listOf("docs/toc.adoc"),
+                        agentReferences = listOf(".agents/INDEX.adoc"),
+                        sections = listOf(SectionExtraction(title = "Chapter", level = 2, line = 7)),
+                    ),
             )
-        )
 
     @Test
     fun `should round-trip a cache through disk`() {

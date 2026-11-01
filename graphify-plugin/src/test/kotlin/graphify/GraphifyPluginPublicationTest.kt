@@ -29,7 +29,7 @@ class GraphifyPluginPublicationTest {
             System.getProperty("graphify.publishedCatalog.graphifyVersion")
                 ?: error(
                     "graphify.publishedCatalog.graphifyVersion is not set — run through Gradle " +
-                        "(build.gradle.kts injects the published ws catalog version)"
+                        "(build.gradle.kts injects the published ws catalog version)",
                 )
 
     private val selfVersionKeys = listOf("graphify-plugin", "graphify")
@@ -37,21 +37,20 @@ class GraphifyPluginPublicationTest {
     @Test
     fun `plugin version matches ws catalog version`() {
         val buildScript = pluginDir.resolve("build.gradle.kts").readText(UTF_8)
-        val versionLine =
-            buildScript
-                .lineSequence()
-                .first { it.trimStart().startsWith("version =") }
 
         // MEM-CAT-ROLLOUT-6 (D3) — self version derived from the published workspace catalog.
-        assertThat(versionLine)
+        // Whitespace-insensitive: ktlint may reflow the assignment over several lines
+        // (S-244 F34, same family in S-325), which must not make the guard pass or fail
+        // by accident.
+        assertThat(buildScript.replace(Regex("""\s+"""), ""))
             .withFailMessage("build.gradle.kts version must derive from the published workspace catalog (ws.versions.graphify.plugin)")
-            .contains("ws.versions.graphify.plugin.get()")
+            .contains("version=ws.versions.graphify.plugin.get()")
 
         // Hygiene (D5): local toml self version must match the published ws catalog version.
         val localVersion =
             VersionCatalogToml.versionOf(
                 pluginDir.resolve("gradle/libs.versions.toml").readText(UTF_8),
-                selfVersionKeys
+                selfVersionKeys,
             )
 
         val verdict = PublicationHygiene.check(localVersion, publishedVersion)

@@ -11,23 +11,33 @@ package graphify.fingerprint
  */
 data class ScanCache(
     val fingerprints: Map<String, FileFingerprint> = emptyMap(),
-    val extractions: Map<String, FileExtraction> = emptyMap()
+    val extractions: Map<String, FileExtraction> = emptyMap(),
 ) {
-
-    fun record(path: String, fingerprint: FileFingerprint, extraction: FileExtraction): ScanCache =
+    fun record(
+        path: String,
+        fingerprint: FileFingerprint,
+        extraction: FileExtraction,
+    ): ScanCache =
         copy(
             fingerprints = fingerprints + (path to fingerprint),
-            extractions = extractions + (fingerprint.sha256 to extraction)
+            extractions = extractions + (fingerprint.sha256 to extraction),
         )
 
-    fun isFastUnchanged(path: String, size: Long, mtime: Long): Boolean =
-        fingerprints[path]?.matches(size, mtime) == true
+    fun isFastUnchanged(
+        path: String,
+        size: Long,
+        mtime: Long,
+    ): Boolean = fingerprints[path]?.matches(size, mtime) == true
 
     /**
      * Extraction reuse through the fast path: the path is known *and* its
      * fingerprint still holds, so the cached content hash is trusted.
      */
-    fun extractionFor(path: String, size: Long, mtime: Long): FileExtraction? {
+    fun extractionFor(
+        path: String,
+        size: Long,
+        mtime: Long,
+    ): FileExtraction? {
         val fingerprint = fingerprints[path] ?: return null
         if (!fingerprint.matches(size, mtime)) return null
         return extraction(fingerprint.sha256)
@@ -45,7 +55,7 @@ data class ScanCache(
         val liveHashes = liveFingerprints.values.map { it.sha256 }.toSet()
         return ScanCache(
             fingerprints = liveFingerprints,
-            extractions = extractions.filterKeys { it in liveHashes }
+            extractions = extractions.filterKeys { it in liveHashes },
         )
     }
 }

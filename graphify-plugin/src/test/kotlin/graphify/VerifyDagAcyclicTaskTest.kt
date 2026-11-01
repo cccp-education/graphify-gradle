@@ -13,22 +13,22 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 class VerifyDagAcyclicTaskTest {
-
     @TempDir
     lateinit var tempDir: Path
 
     private lateinit var task: VerifyDagAcyclicTask
 
     companion object {
-        private val levels = mapOf(
-            "graphify-gradle" to 0,
-            "codebase-gradle" to 1,
-            "bakery-gradle" to 2,
-            "codex-gradle" to 2,
-            "magic-stick" to 2,
-            "plantuml-gradle" to 2,
-            "runner-gradle" to 3
-        )
+        private val levels =
+            mapOf(
+                "graphify-gradle" to 0,
+                "codebase-gradle" to 1,
+                "bakery-gradle" to 2,
+                "codex-gradle" to 2,
+                "magic-stick" to 2,
+                "plantuml-gradle" to 2,
+                "runner-gradle" to 3,
+            )
     }
 
     @BeforeEach
@@ -125,7 +125,9 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `should pass with no violations in mixed setup`() {
-        writeBuild("runner-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\"; id(\"com.cheroliv.codex\") version \"0.0.1\" }" }
+        writeBuild("runner-gradle") {
+            "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\"; id(\"com.cheroliv.codex\") version \"0.0.1\" }"
+        }
         writeBuild("plantuml-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\"; id(\"com.cheroliv.codebase\") version \"0.0.1\" }" }
         writeBuild("codebase-gradle") { "plugins { id(\"com.cheroliv.graphify\") version \"0.0.1\" }" }
         writeBuild("graphify-gradle") { "plugins { java; kotlin }" }
@@ -156,11 +158,12 @@ class VerifyDagAcyclicTaskTest {
 
     @Test
     fun `levelOf should find by key then by suffixed variants`() {
-        val levels = mapOf(
-            "graphify-gradle" to 0,
-            "quizz-benchmark-plugin" to 2,
-            "training-gradle" to 2
-        )
+        val levels =
+            mapOf(
+                "graphify-gradle" to 0,
+                "quizz-benchmark-plugin" to 2,
+                "training-gradle" to 2,
+            )
 
         assertThat(task.levelOf("graphify-gradle", levels)).isEqualTo(0)
         assertThat(task.levelOf("graphify", levels)).isEqualTo(0)
@@ -171,7 +174,10 @@ class VerifyDagAcyclicTaskTest {
         assertThat(task.levelOf("unknown", levels)).isNull()
     }
 
-    private fun writeBuild(projectName: String, content: () -> String) {
+    private fun writeBuild(
+        projectName: String,
+        content: () -> String,
+    ) {
         val dir = tempDir.resolve(projectName)
         dir.createDirectories()
         dir.resolve("build.gradle.kts").writeText(content())

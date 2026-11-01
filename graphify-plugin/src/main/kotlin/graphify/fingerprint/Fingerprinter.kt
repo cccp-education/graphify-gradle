@@ -13,19 +13,20 @@ import java.security.MessageDigest
  * I/O-free.
  */
 object Fingerprinter {
-
-    fun fingerprint(file: Path): FileFingerprint = FileFingerprint(
-        size = Files.size(file),
-        mtime = Files.getLastModifiedTime(file).toMillis(),
-        sha256 = sha256(file)
-    )
+    fun fingerprint(file: Path): FileFingerprint =
+        FileFingerprint(
+            size = Files.size(file),
+            mtime = Files.getLastModifiedTime(file).toMillis(),
+            sha256 = sha256(file),
+        )
 
     fun sha256(file: Path): String = digest(Files.readAllBytes(file))
 
     fun sha256(file: File): String = sha256(file.toPath())
 
     fun digest(bytes: ByteArray): String =
-        MessageDigest.getInstance("SHA-256")
+        MessageDigest
+            .getInstance("SHA-256")
             .digest(bytes)
             .joinToString("") { "%02x".format(it) }
 }

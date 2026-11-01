@@ -12,34 +12,36 @@ package graphify.catalog
  * filesystem, a Gradle build, or a neighbour repository.
  */
 object PublicationHygiene {
-
     data class Verdict(
         val consistent: Boolean,
-        val message: String
+        val message: String,
     )
 
-    fun check(localVersion: String?, publishedVersion: String?): Verdict {
+    fun check(
+        localVersion: String?,
+        publishedVersion: String?,
+    ): Verdict {
         if (localVersion.isNullOrBlank()) {
             return Verdict(
                 consistent = false,
-                message = "local catalog version is missing (expected a graphify self version in [versions])"
+                message = "local catalog version is missing (expected a graphify self version in [versions])",
             )
         }
         if (publishedVersion.isNullOrBlank()) {
             return Verdict(
                 consistent = false,
-                message = "published workspace catalog version is missing (was the ws catalog injected at build time?)"
+                message = "published workspace catalog version is missing (was the ws catalog injected at build time?)",
             )
         }
         if (localVersion != publishedVersion) {
             return Verdict(
                 consistent = false,
-                message = "local version ($localVersion) must match published ws catalog version ($publishedVersion)"
+                message = "local version ($localVersion) must match published ws catalog version ($publishedVersion)",
             )
         }
         return Verdict(
             consistent = true,
-            message = "local and published versions agree ($localVersion)"
+            message = "local and published versions agree ($localVersion)",
         )
     }
 }

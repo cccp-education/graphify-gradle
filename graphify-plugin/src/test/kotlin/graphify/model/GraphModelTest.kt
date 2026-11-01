@@ -12,18 +12,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class GraphModelTest {
-
-    private val mapper: ObjectMapper = ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .registerKotlinModule()
+    private val mapper: ObjectMapper =
+        ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerKotlinModule()
 
     @Test
     fun `should serialize graph model to JSON`() {
-        val model = GraphModel(
-            nodes = listOf(GraphNode(id = "src/main.kt", label = "main.kt", type = "file")),
-            edges = emptyList(),
-            communities = emptyList()
-        )
+        val model =
+            GraphModel(
+                nodes = listOf(GraphNode(id = "src/main.kt", label = "main.kt", type = "file")),
+                edges = emptyList(),
+                communities = emptyList(),
+            )
 
         val json = mapper.writeValueAsString(model)
         assertThat(json).contains("src/main.kt")
@@ -32,19 +33,21 @@ class GraphModelTest {
 
     @Test
     fun `should deserialize graph model from JSON round trip`() {
-        val original = GraphModel(
-            nodes = listOf(
-                GraphNode(
-                    id = "src/App.kt",
-                    label = "App.kt",
-                    type = "file",
-                    community = "my-project",
-                    metadata = mapOf("extension" to "kt", "size" to 1024)
-                )
-            ),
-            edges = listOf(),
-            communities = listOf(GraphCommunity(id = "my-project", label = "my-project", size = 5))
-        )
+        val original =
+            GraphModel(
+                nodes =
+                    listOf(
+                        GraphNode(
+                            id = "src/App.kt",
+                            label = "App.kt",
+                            type = "file",
+                            community = "my-project",
+                            metadata = mapOf("extension" to "kt", "size" to 1024),
+                        ),
+                    ),
+                edges = listOf(),
+                communities = listOf(GraphCommunity(id = "my-project", label = "my-project", size = 5)),
+            )
 
         val json = mapper.writeValueAsString(original)
         val restored = mapper.readValue<GraphModel>(json)
@@ -65,13 +68,14 @@ class GraphModelTest {
 
     @Test
     fun `should serialize GraphNode with all fields`() {
-        val node = GraphNode(
-            id = "readme.md",
-            label = "readme.md",
-            type = "file",
-            community = "docs",
-            metadata = mapOf("extension" to "md")
-        )
+        val node =
+            GraphNode(
+                id = "readme.md",
+                label = "readme.md",
+                type = "file",
+                community = "docs",
+                metadata = mapOf("extension" to "md"),
+            )
 
         val json = mapper.writeValueAsString(node)
         assertThat(json).contains("\"id\"")

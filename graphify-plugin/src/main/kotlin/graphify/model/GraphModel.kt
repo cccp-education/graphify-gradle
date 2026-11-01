@@ -19,7 +19,7 @@ data class GraphModel(
     val schemaVersion: Int = SCHEMA_VERSION,
     val nodes: List<GraphNode> = emptyList(),
     val edges: List<GraphEdge> = emptyList(),
-    val communities: List<GraphCommunity> = emptyList()
+    val communities: List<GraphCommunity> = emptyList(),
 ) {
     companion object {
         const val SCHEMA_VERSION: Int = 1
@@ -32,7 +32,7 @@ data class GraphNode(
     val label: String,
     val type: String,
     val community: String? = null,
-    val metadata: Map<String, Any> = emptyMap()
+    val metadata: Map<String, Any> = emptyMap(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,12 +40,12 @@ data class GraphEdge(
     val source: String,
     val target: String,
     val type: String,
-    val label: String? = null
+    val label: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class GraphCommunity(
     val id: String,
     val label: String,
-    val size: Int
+    val size: Int,
 )

@@ -7,26 +7,30 @@ import org.gradle.api.provider.Property
 import java.io.File
 import javax.inject.Inject
 
-open class GraphifyExtension @Inject constructor(objects: ObjectFactory) {
-    val rootDir: Property<File> = objects.property(File::class.java)
-    val outputFile: Property<File> = objects.property(File::class.java)
-    val excludePatterns: ListProperty<String> = objects.listProperty(String::class.java)
-    val dagLevels: MapProperty<String, Int> = objects.mapProperty(String::class.java, Int::class.java)
-    val foundryDir: Property<File> = objects.property(File::class.java)
-    val incremental: Property<Boolean> = objects.property(Boolean::class.java)
-    val cacheFile: Property<File> = objects.property(File::class.java)
+open class GraphifyExtension
+    @Inject
+    constructor(
+        objects: ObjectFactory,
+    ) {
+        val rootDir: Property<File> = objects.property(File::class.java)
+        val outputFile: Property<File> = objects.property(File::class.java)
+        val excludePatterns: ListProperty<String> = objects.listProperty(String::class.java)
+        val dagLevels: MapProperty<String, Int> = objects.mapProperty(String::class.java, Int::class.java)
+        val foundryDir: Property<File> = objects.property(File::class.java)
+        val incremental: Property<Boolean> = objects.property(Boolean::class.java)
+        val cacheFile: Property<File> = objects.property(File::class.java)
 
-    init {
-        incremental.convention(false)
-        excludePatterns.convention(
-            listOf(
-                "**/build/**",
-                "**/node_modules/**",
-                "**/.gradle/**",
-                "**/.git/**",
-                "**/.idea/**",
-                "**/target/**"
+        init {
+            incremental.convention(false)
+            excludePatterns.convention(
+                listOf(
+                    "**/build/**",
+                    "**/node_modules/**",
+                    "**/.gradle/**",
+                    "**/.git/**",
+                    "**/.idea/**",
+                    "**/target/**",
+                ),
             )
-        )
+        }
     }
-}

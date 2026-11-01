@@ -11,7 +11,10 @@ package graphify.fingerprint
 data class FileFingerprint(
     val size: Long,
     val mtime: Long,
-    val sha256: String
+    val sha256: String,
 ) {
-    fun matches(size: Long, mtime: Long): Boolean = this.size == size && this.mtime == mtime
+    fun matches(
+        size: Long,
+        mtime: Long,
+    ): Boolean = this.size == size && this.mtime == mtime
 }

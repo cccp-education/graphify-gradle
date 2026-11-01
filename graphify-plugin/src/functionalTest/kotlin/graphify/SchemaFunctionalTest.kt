@@ -17,7 +17,6 @@ import java.io.File
  * canonical type literals only, and a top-level shape a strict mapper accepts.
  */
 class SchemaFunctionalTest {
-
     @TempDir
     lateinit var projectDir: File
 
@@ -35,17 +34,19 @@ class SchemaFunctionalTest {
         writeFile("my-app/build.gradle.kts", "plugins { java }")
         writeFile(
             "my-app/src/main/kotlin/com/example/App.kt",
-            "package com.example\nimport com.example.Util\nclass App"
+            "package com.example\nimport com.example.Util\nclass App",
         )
         writeFile("my-app/src/main/kotlin/com/example/Util.kt", "package com.example\nclass Util")
         writeFile("docs/book.adoc", "= Book\n== Chapter\nSee `docs/other.adoc`.")
         writeFile("docs/other.adoc", "= Other\n== Section")
 
-        val result = GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withArguments("collectFromWorkspace", "--stacktrace")
-            .withPluginClasspath()
-            .build()
+        val result =
+            GradleRunner
+                .create()
+                .withProjectDir(projectDir)
+                .withArguments("collectFromWorkspace", "--stacktrace")
+                .withPluginClasspath()
+                .build()
 
         assertThat(result.task(":collectFromWorkspace")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
 
@@ -65,7 +66,8 @@ class SchemaFunctionalTest {
         writeFile("my-app/.git/HEAD", "ref: refs/heads/main")
         writeFile("my-app/README.adoc", "= Readme\n== Intro")
 
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .withProjectDir(projectDir)
             .withArguments("collectFromWorkspace")
             .withPluginClasspath()
@@ -86,7 +88,8 @@ class SchemaFunctionalTest {
         writeFile("my-app/build.gradle.kts", "plugins { java }")
         writeFile("my-app/src/main/kotlin/com/example/App.kt", "package com.example\nclass App")
 
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .withProjectDir(projectDir)
             .withArguments("collectFromWorkspace")
             .withPluginClasspath()
@@ -94,7 +97,8 @@ class SchemaFunctionalTest {
         val first = projectDir.resolve("graph.json").readText()
 
         projectDir.resolve("graph.json").delete()
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .withProjectDir(projectDir)
             .withArguments("collectFromWorkspace")
             .withPluginClasspath()
@@ -122,11 +126,14 @@ class SchemaFunctionalTest {
                 rootDir.set(layout.projectDirectory.asFile)
                 outputFile.set(layout.projectDirectory.file("graph.json").asFile)
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
-    private fun writeFile(relativePath: String, content: String) {
+    private fun writeFile(
+        relativePath: String,
+        content: String,
+    ) {
         val file = projectDir.resolve(relativePath)
         file.parentFile.mkdirs()
         file.writeText(content)
