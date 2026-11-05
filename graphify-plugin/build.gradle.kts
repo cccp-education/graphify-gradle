@@ -1,3 +1,5 @@
+import org.gradle.plugin.compatibility.compatibility
+
 plugins {
     `java-library`
     alias(libs.plugins.publish)
@@ -55,6 +57,12 @@ gradlePlugin {
             displayName = "Graphify Plugin"
             description = "Gradle plugin for knowledge graph extraction across a workspace."
             tags.set(listOf("knowledge-graph", "workspace", "dependency-analysis", "graphify"))
+            compatibility {
+                features {
+                    configurationCache.set(false)
+                    isolatedProjects.set(false)
+                }
+            }
         }
     }
     website = "https://cccp.education/"
