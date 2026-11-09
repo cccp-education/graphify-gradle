@@ -32,3 +32,9 @@
 | 000 | 2026-05-09 | governance | Bootstrap gouvernance agent (.agents/ + AGENT.adoc + PROMPT_REPRISE + INDEX.adoc + SESSIONS_HISTORY) | 10/10
 | 030 | 2026-10-11 | maintenance build | Re-pin catalog ws `0.0.46 → 0.0.78` (rollout MEMPHIS 0.0.78). `compileKotlin compileTestKotlin` VERT. | 9/10
 |===
+
+== Session 030 — JitPack mirror (CNV-16) — 2026-11-09
+
+Publication JitPack de graphify-plugin 0.0.5. JitPack : 0.0.5 — POM HTTP 200. Shim `useModule` pour
+`education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
+`graphify-plugin/.agents/sessions/030-jitpack-mirror.adoc`.
