@@ -49,11 +49,13 @@ Deux candidats « non planifiés » du backlog graphify ont été attaqués :
   `graphify.catalog.VersionCatalogToml` devient une **façade dépréciée
   déléguante** (une seule implémentation) ; sa suppression est différée à la
   confirmation fichier par fichier (règle `AGENT.adoc`).
-* **Gate restant** : la publication distante du contrat. Central est suspendu
-  jusqu'au **2026-12-01** ; JitPack relabelle le groupe
-  (`com.github.cccp-education.workspace-bom`) → la CI de graphify ne résoudra
-  `education.cccp:catalog-contracts` qu'après la reprise Central (ou une décision
-  pilote JitPack dédiée). Aucun push n'a été fait.
+* **Publication JitPack (CNV-16)** : `workspace-bom v0.0.130` a été poussé
+  (commit `08a2c96`) → **`com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130`**
+  HTTP 200. graphify consomme ce coordinate depuis `https://jitpack.io`
+  (`maven("https://jitpack.io")` dans `repositories` — les dépôts projet du
+  plugin de conventions priment sur `settings`). **CI graphify verte**
+  (run `43328720865`, 1m44s) ; workspace-bom `runAllTests` verte
+  (`43328195597`, job `n0-contracts` 11 builds).
 
 == Gates
 

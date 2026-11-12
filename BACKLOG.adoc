@@ -152,12 +152,13 @@ partagé MEMPHIS, utile à 20+ gardes D5 cross-borough »._
 | US | Description | Pts | Statut
 | N0-CATALOG-1 | Créer le module N0 `workspace-bom/catalog-contracts` (`contracts.catalog.VersionCatalogToml`, pure Kotlin stdlib, 10 tests unit déplacés) + entrée catalogue + contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds) | 2 | ✅ TERMINÉ (S-031 — compiles + `publishToMavenLocal` VERTS, `catalog-contracts 0.0.1`)
 | N0-CATALOG-2 | Adopter dans graphify (`testImplementation(libs.catalog.contracts)`, imports `contracts.catalog.*`) | 1 | ✅ TERMINÉ (S-031 — `compileTestKotlin` VERT contre mavenLocal ; l'ancien objet local devient une **façade dépréciée déléguante**, suppression en attente de confirmation fichier par fichier — règle AGENT)
-| N0-CATALOG-3 | Publication distante (gate) : Central suspendu jusqu'au 2026-12-01 ; JitPack relabelle le groupe (`com.github.cccp-education.workspace-bom`) → la CI de graphify ne résoudra `education.cccp:catalog-contracts` qu'à la reprise Central (ou décision pilote JitPack dédiée) | 1 | 🟡 **GATE PUBLICATION** (aucun push sans artefact publié ; la preuve locale est `publishToMavenLocal`)
+| N0-CATALOG-3 | Publication via **JitPack** (canal secondaire, CNV-16) : `workspace-bom v0.0.130` → `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130` (**HTTP 200**), graphify consomme ce coordinate depuis `https://jitpack.io` | 1 | ✅ TERMINÉ (S-031 — CI graphify **verte** run `43328720865`, 1m44s ; workspace-bom CI `runAllTests` verte incluant le job `n0-contracts` 11 builds)
 |===
 
-_Cette session ne commit pas (le module et l'adoption ont été compilés mais la
-CI ne peut pas résoudre le contrat non publié) : la publication est le seul
-verrou restant, tracé ici._
+_La consolidation est **publiée** sur JitPack (Central suspendu jusqu'au 2026-12-01) :
+graphify résout `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130`.
+Au reset Central, basculer le coordinate vers `education.cccp:catalog-contracts:0.0.1`
+(le BOM/catalogue le déclare déjà) et supprimer la façade dépréciée._
 
 '''
 

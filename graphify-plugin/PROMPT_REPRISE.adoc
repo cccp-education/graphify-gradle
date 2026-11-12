@@ -19,11 +19,10 @@ Rapport `.agents/sessions/030-jitpack-mirror.adoc`.
 * **N0 `catalog-contracts`** : module créé dans `workspace-bom`
   (`contracts.catalog.VersionCatalogToml`, 10 tests unit) + entrée catalogue +
   contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds).
-  `publishToMavenLocal` VERT. graphify consomme `libs.catalog.contracts`
-  (l'ancien objet local est une **façade dépréciée déléguante**).
-* **Verrou restant** : la publication distante du contrat (Central suspendu
-  jusqu'au 2026-12-01, JitPack relabelle le groupe) — la CI de graphify ne
-  résoudra `education.cccp:catalog-contracts` qu'après publication.
+  **Publié via JitPack** `workspace-bom v0.0.130` →
+  `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130` (HTTP 200),
+  consommé par graphify depuis `https://jitpack.io`. **CI graphify verte**
+  (run `43328720865`, 1m44s) ; workspace-bom `runAllTests` verte (`43328195597`).
 * Rapports `.agents/sessions/031-gf-schema-5-bis-n0-catalog-contracts.adoc` +
   `workspace-bom/.agents/sessions/350-n0-catalog-contracts.adoc`.
 
@@ -43,9 +42,9 @@ Une *seconde session opencode* détient le borough `bakery-gradle` (et
 
 Aucune US/EPIC ouverte. Backlog ouvert :
 
-1. *Publication `catalog-contracts 0.0.1`* (gate) — après le 2026-12-01 (Central)
-   ou décision pilote JitPack ; puis vérifier la CI graphify (résolution
-   `education.cccp:catalog-contracts`).
+1. *Bascule Central* (au reset 2026-12-01) : repasser le coordinate de
+   `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130` (JitPack)
+   vers `education.cccp:catalog-contracts:0.0.1` (déjà déclaré au BOM/catalogue).
 2. *Nettoyage final* : suppression de la façade dépréciée
    `graphify.catalog.VersionCatalogToml` + de son test (confirmation fichier par
    fichier requise par `AGENT.adoc`).
