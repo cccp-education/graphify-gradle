@@ -570,6 +570,25 @@ class ScanWorkspaceTaskTest {
         assertThat(introIds[0]).isNotEqualTo(introIds[1])
     }
 
+    // GF-SCHEMA-5-bis — the *corpus* graph (`graph-content.json`) is produced by
+    // this very task, so the end-to-end proof that the wire carries the schema
+    // version lives here (the model-only round-trip is GraphModelSchemaVersionTest).
+    // A legacy payload produced before GF-SCHEMA-5 must still load through the
+    // shared class default: no consumer migration is ever required.
+    @Test
+    fun `should stamp the schema version in the produced graph`() {
+        writeFile("src/App.kt")
+
+        task.scan()
+
+        val raw = outputFile.readText()
+        assertThat(mapper.readTree(raw).get("schemaVersion").asInt())
+            .isEqualTo(GraphModel.SCHEMA_VERSION)
+
+        val legacy = mapper.readValue("""{"nodes":[],"edges":[],"communities":[]}""", GraphModel::class.java)
+        assertThat(legacy.schemaVersion).isEqualTo(GraphModel.SCHEMA_VERSION)
+    }
+
     private fun parseOutput(): GraphModel {
         assertThat(outputFile).exists()
         return mapper.readValue(outputFile, GraphModel::class.java)

@@ -15,6 +15,13 @@ version =
     ws.versions.graphify.plugin
         .get()
 
+repositories {
+    // CNV-16 — JitPack mirror for the public artefacts (Central suspended until
+    // 2026-12-01). Required here because the conventions plugin declares
+    // project repositories, so the settings-level repositories are ignored.
+    maven("https://jitpack.io")
+}
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     api(libs.bundles.jackson)
@@ -24,6 +31,9 @@ dependencies {
     testImplementation(libs.slf4j.api)
     testRuntimeOnly(libs.logback.classic)
     testImplementation(libs.assertj)
+    // N0 contract — the section-scoped version catalog reader (MEMPHIS
+    // catalog-contracts), consumed only by the publication hygiene guard.
+    testImplementation(libs.catalog.contracts)
     testImplementation(gradleTestKit())
 }
 

@@ -1,7 +1,7 @@
 package graphify
 
+import contracts.catalog.VersionCatalogToml
 import graphify.catalog.PublicationHygiene
-import graphify.catalog.VersionCatalogToml
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.io.File

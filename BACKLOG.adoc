@@ -4,7 +4,8 @@
 :toc: left
 :sectnums:
 
-_Dernière mise à jour : 2026-09-17 (S-029 — **EPIC D5-RACE TERMINÉ 3/3 US** : la garde `GraphifyPluginPublicationTest` ne lit plus le working tree du repo voisin (racy inter-sessions) — la version *publiée* du catalogue workspace est *injectée* par Gradle (`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`). Objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]` scopée par section) + `graphify.catalog.PublicationHygiene` (verdict), 13 unit ; BDD `publication_hygiene.feature` 5 scénarios. Gates : 162 unit + 9 functional + 25 cucumber, 0 FAIL. Zéro bump, zéro publication. S-028 : **EPIC GF-SCHEMA COMPLET 5/5 US** (GF-SCHEMA-5 `schemaVersion` + tolérance N0) ; graphify-plugin 0.0.5 Central (bundle `895d2e53`) ; COORD-0.0.46 TERMINÉ. S-027 : publication 0.0.4. S-026 : EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5).)_
+_Dernière mise à jour : 2026-11-13 (S-031 — **GF-SCHEMA-5-bis TERMINÉ 3/3** : `schemaVersion` dans `graph-content.json` régénéré (1997 nœuds / 1871 arêtes) + tolérance consommateurs prouvée ; **N0 `catalog-contracts` livré** dans `workspace-bom` (`VersionCatalogToml`, 10 tests, catalogue/BOM/`jitpack.yml`/CI `n0-contracts` 11 builds), adoption graphify compilée — publication distante = gate.)_
+_Dernière mise à jour (antérieure) : 2026-09-17 (S-029 — **EPIC D5-RACE TERMINÉ 3/3 US** : la garde `GraphifyPluginPublicationTest` ne lit plus le working tree du repo voisin (racy inter-sessions) — la version *publiée* du catalogue workspace est *injectée* par Gradle (`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`). Objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]` scopée par section) + `graphify.catalog.PublicationHygiene` (verdict), 13 unit ; BDD `publication_hygiene.feature` 5 scénarios. Gates : 162 unit + 9 functional + 25 cucumber, 0 FAIL. Zéro bump, zéro publication. S-028 : **EPIC GF-SCHEMA COMPLET 5/5 US** (GF-SCHEMA-5 `schemaVersion` + tolérance N0) ; graphify-plugin 0.0.5 Central (bundle `895d2e53`) ; COORD-0.0.46 TERMINÉ. S-027 : publication 0.0.4. S-026 : EPIC GF-FINGERPRINT TERMINÉ 6/6 US (DFL-5).)_
 
 '''
 == EPIC GF-CORPUS — Graphe de connaissance du corpus FPA (ex-métier privé — renommage RENAME) (GBL-003.2) ✅ TERMINÉ (S-024)
@@ -122,3 +123,45 @@ Par :
 | Artefact | URL |
 |---|---|
 | graphify-plugin | https://central.sonatype.com/artifact/education.cccp/graphify-plugin |
+
+'''
+
+== EPIC GF-SCHEMA-5-bis — `schemaVersion` du graphe de corpus (`graph-content.json`) ✅ TERMINÉ 3/3 (S-031)
+
+_Origine : candidat **différé** de GF-SCHEMA-5 (S-028). Le risque « casserait les
+mappers stricts bakery/codebase » est **caduque** : la tolérance est portée par
+la classe N0 partagée `graphify.model.GraphModel` (`@JsonIgnoreProperties` +
+`schemaVersion` par défaut) depuis la publication 0.0.5 — les consommateurs
+deviennent tolérants en bumpant leur dépendance, sans modifier une ligne._
+
+|===
+| US | Description | Pts | Statut
+| GF-SCHEMA-5-bis-1 | Prouver que `ScanWorkspaceTask` estampille `schemaVersion` dans le JSON produit **et** qu'un payload legacy (pré-0.0.5, sans le champ) charge toujours via le défaut partagé | 1 | ✅ TERMINÉ (S-031 — test end-to-end `ScanWorkspaceTaskTest.should stamp the schema version in the produced graph`)
+| GF-SCHEMA-5-bis-2 | Régénérer `office/metiers/FPA/graph-content.json` (dogfooding) avec le champ | 1 | ✅ TERMINÉ (S-031 — **1997 nœuds / 1871 arêtes**, `schemaVersion: 1`)
+| GF-SCHEMA-5-bis-3 | Vérifier la tolérance des consommateurs (bakery + codebase importent `GraphModel` 0.0.5) | 1 | ✅ TERMINÉ (S-031 — pins `graphify = "0.0.5"`, zéro migration)
+|===
+
+'''
+
+== N0 contract — `VersionCatalogToml` consolidé (MEMPHIS `catalog-contracts`) 🟡 module livré, adoption gatée
+
+_Origine : candidat « consolidation de `VersionCatalogToml` vers un contrat N0
+partagé MEMPHIS, utile à 20+ gardes D5 cross-borough »._
+
+|===
+| US | Description | Pts | Statut
+| N0-CATALOG-1 | Créer le module N0 `workspace-bom/catalog-contracts` (`contracts.catalog.VersionCatalogToml`, pure Kotlin stdlib, 10 tests unit déplacés) + entrée catalogue + contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds) | 2 | ✅ TERMINÉ (S-031 — compiles + `publishToMavenLocal` VERTS, `catalog-contracts 0.0.1`)
+| N0-CATALOG-2 | Adopter dans graphify (`testImplementation(libs.catalog.contracts)`, imports `contracts.catalog.*`) | 1 | ✅ TERMINÉ (S-031 — `compileTestKotlin` VERT contre mavenLocal ; l'ancien objet local devient une **façade dépréciée déléguante**, suppression en attente de confirmation fichier par fichier — règle AGENT)
+| N0-CATALOG-3 | Publication distante (gate) : Central suspendu jusqu'au 2026-12-01 ; JitPack relabelle le groupe (`com.github.cccp-education.workspace-bom`) → la CI de graphify ne résoudra `education.cccp:catalog-contracts` qu'à la reprise Central (ou décision pilote JitPack dédiée) | 1 | 🟡 **GATE PUBLICATION** (aucun push sans artefact publié ; la preuve locale est `publishToMavenLocal`)
+|===
+
+_Cette session ne commit pas (le module et l'adoption ont été compilés mais la
+CI ne peut pas résoudre le contrat non publié) : la publication est le seul
+verrou restant, tracé ici._
+
+'''
+
+== Candidats futurs (non planifiés)
+
+* `VersionCatalogToml` → contrat N0 MEMPHIS (voir ci-dessus, module livré).
+* `schemaVersion` DIFFÉRÉ pour `graph-content.json` : **soldé** par GF-SCHEMA-5-bis (S-031).

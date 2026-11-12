@@ -1,0 +1,72 @@
+= Session 031 — GF-SCHEMA-5-bis + consolidation N0 `VersionCatalogToml`
+:toc:
+
+:_date_: 2026-11-13
+:_borough_: graphify (Grand Central, N0) — cross-borough MEMPHIS
+:_session_precedente_: 030
+:_statut_: ✅ GF-SCHEMA-5-bis TERMINÉ 3/3 · N0 `catalog-contracts` livré · adoption graphify compilée (publication distante = gate)
+
+'''
+
+== Contexte
+
+Deux candidats « non planifiés » du backlog graphify ont été attaqués :
+
+1. `schemaVersion` pour `graph-content.json` (GF-SCHEMA-5-bis, différé depuis
+   S-028 au motif « casserait les mappers stricts bakery/codebase ») ;
+2. la consolidation de `VersionCatalogToml` vers un contrat N0 MEMPHIS partagé
+   (utile aux gardes D5 cross-borough).
+
+== GF-SCHEMA-5-bis — `schemaVersion` du graphe de corpus
+
+* **Périmètre** : `ScanWorkspaceTask` produit `graph-content.json` en
+  dogfooding ; la tolérance N0 (`@JsonIgnoreProperties` + `schemaVersion` par
+  défaut) est livrée par `graphify-plugin 0.0.5` (GF-SCHEMA-5, S-028). Le risque
+  initial est donc **caduque** : bakery et codebase importent
+  `graphify.model.GraphModel` (pin `graphify = "0.0.5"`) et deviennent tolérants
+  en bumpant, sans modifier une ligne.
+* **Livré** : test end-to-end `ScanWorkspaceTaskTest.should stamp the schema
+  version in the produced graph` — lit le JSON **brut** produit, vérifie
+  `schemaVersion == GraphModel.SCHEMA_VERSION`, et charge un payload **legacy**
+  (sans le champ) via le défaut partagé.
+* **Dogfooding** : `graph-content.json` régénéré via le consumer
+  (`./gradlew scanFpaCorpus` après `publishToMavenLocal` + alignement du
+  consumer `graphify = 0.0.3 → 0.0.5`) → **1997 nœuds / 1871 arêtes** (vs 1989 /
+  1857 en S-024), `schemaVersion: 1` en tête.
+
+== N0 `catalog-contracts` (MEMPHIS)
+
+* **Module** `workspace-bom/catalog-contracts` : `contracts.catalog.VersionCatalogToml`
+  (pure Kotlin stdlib, lecture **section-scopée** de `[versions]`, commentaires
+  ligne/fin de ligne) + les 10 tests unit déplacés verbatim.
+* **Câblage N0** : entrée `[versions]`/`[libraries]` du catalogue workspace +
+  contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds).
+* **Preuve locale** : `compileKotlin`/`compileTestKotlin` + `publishToMavenLocal`
+  du module = **VERT** (`education.cccp:catalog-contracts:0.0.1` dans `~/.m2`).
+* **Adoption graphify** : `testImplementation(libs.catalog.contracts)` ; les
+  call sites (`GraphifyPluginPublicationTest`, `PublicationHygieneSteps`) importent
+  `contracts.catalog.VersionCatalogToml`. L'ancien objet local
+  `graphify.catalog.VersionCatalogToml` devient une **façade dépréciée
+  déléguante** (une seule implémentation) ; sa suppression est différée à la
+  confirmation fichier par fichier (règle `AGENT.adoc`).
+* **Gate restant** : la publication distante du contrat. Central est suspendu
+  jusqu'au **2026-12-01** ; JitPack relabelle le groupe
+  (`com.github.cccp-education.workspace-bom`) → la CI de graphify ne résoudra
+  `education.cccp:catalog-contracts` qu'après la reprise Central (ou une décision
+  pilote JitPack dédiée). Aucun push n'a été fait.
+
+== Gates
+
+* `./gradlew compileKotlin compileTestKotlin` (graphify) — **VERT**.
+* `./gradlew compileKotlin compileTestKotlin publishToMavenLocal`
+  (`catalog-contracts`) — **VERT**.
+* `./gradlew help` (BOM workspace-bom) — **VERT** (catalogue + contrainte).
+* Tests = CI (Local = Build). Zéro bump d'artefact publié, zéro publication,
+  zéro secret, zéro Python.
+
+== Reste
+
+* Publication `catalog-contracts 0.0.1` (gate) puis CI graphify.
+* Suppression de la façade dépréciée + de son test (confirmation requise).
+* Drift de pins (maintenance) : graphify épingle `workspace-catalog:0.0.116`
+  (catalogue courant `0.0.129`).

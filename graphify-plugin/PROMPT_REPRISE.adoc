@@ -1,28 +1,31 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 030
-:session: 030
-:date: 2026-09-17
+= PROMPT_REPRISE — Graphify Gradle — Session 031
+:session: 031
+:date: 2026-11-13
 
-== Session 029 terminée — EPIC D5-RACE (garde de publication racy soldée)
+== Session 030 terminée — JitPack mirror (CNV-16)
 
-`GraphifyPluginPublicationTest` ne lit plus le working tree du repo voisin
-(`../workspace-bom/gradle/libs.versions.toml`, racy entre sessions) : la version
-*publiée* du catalogue workspace est *injectée* par Gradle
-(`systemProperty("graphify.publishedCatalog.graphifyVersion", ws.versions.graphify.plugin.get())`).
+Shim `useModule` des conventions via le tag JitPack `0.0.16` + publication
+JitPack `graphify-plugin 0.0.5` (POM HTTP 200). Veille, aucune mission ouverte.
+Rapport `.agents/sessions/030-jitpack-mirror.adoc`.
 
-* D5R-0 cadrage — audit 5 constats, 7 décisions. Doc
-  `.agents/CADRAGE_EPIC_D5_RACE.adoc`.
-* D5R-1 objets purs `graphify.catalog.VersionCatalogToml` (lecture `[versions]`
-  *scopée par section*, commentaires) + `graphify.catalog.PublicationHygiene`
-  (verdict). 12 tests unit.
-* D5R-2 wiring + refactor garde (zéro accès repo voisin). Preuve RED one-shot
-  (propriété forcée `9.9.9` → échec).
-* D5R-3 BDD `publication_hygiene.feature` 5 scénarios + `PublicationHygieneSteps`.
+== Session 031 terminée — GF-SCHEMA-5-bis + consolidation N0 `VersionCatalogToml`
 
-Gates : 162 unit + 9 functional + 25 cucumber, 0 FAIL. `check --rerun-tasks` +
-`publishToMavenLocal` VERTS. Zéro secret, zéro bump, zéro publication Central.
-
-*Les objets d'hygiène vivent dans le source set `test`* — utilitaires de
-publication, jamais dans le wire publié.
+* **GF-SCHEMA-5-bis** : `ScanWorkspaceTask` estampille bien `schemaVersion` ;
+  test end-to-end ajouté (`ScanWorkspaceTaskTest`) ; corpus régénéré
+  (`office/metiers/FPA/graph-content.json`, **1997 nœuds / 1871 arêtes**,
+  `schemaVersion: 1`) ; consommateurs bakery/codebase tolérants (`graphify 0.0.5`).
+  Le candidat « casserait les mappers stricts » est **caduque** (tolérance portée
+  par la classe N0 depuis GF-SCHEMA-5).
+* **N0 `catalog-contracts`** : module créé dans `workspace-bom`
+  (`contracts.catalog.VersionCatalogToml`, 10 tests unit) + entrée catalogue +
+  contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds).
+  `publishToMavenLocal` VERT. graphify consomme `libs.catalog.contracts`
+  (l'ancien objet local est une **façade dépréciée déléguante**).
+* **Verrou restant** : la publication distante du contrat (Central suspendu
+  jusqu'au 2026-12-01, JitPack relabelle le groupe) — la CI de graphify ne
+  résoudra `education.cccp:catalog-contracts` qu'après publication.
+* Rapports `.agents/sessions/031-gf-schema-5-bis-n0-catalog-contracts.adoc` +
+  `workspace-bom/.agents/sessions/350-n0-catalog-contracts.adoc`.
 
 == COLLISION DE SESSION — à connaître en ouverture
 
@@ -36,22 +39,23 @@ Une *seconde session opencode* détient le borough `bakery-gradle` (et
   avant consigne d'arrêt).
 * Ne PAS travailler dans bakery sans coordination pilote.
 
-== Mission session 030 — à la demande pilote
+== Mission session 032 — à la demande pilote
 
-Aucune urgence. Backlog ouvert :
+Aucune US/EPIC ouverte. Backlog ouvert :
 
-1. *EPIC PUB* (si accord pilote) — publication Central d'un prochain bump.
-   Aujourd'hui 0.0.5 publié ET référencé par `workspace-catalog:0.0.46`.
-   Aucun besoin immédiat.
-2. *GF-SCHEMA-5* est TERMINÉ ; *GF-FINGERPRINT* TERMINÉ ; *D5-RACE* TERMINÉ.
-3. Candidats futurs (non planifiés) : `schemaVersion` DIFFÉRÉ pour
-   `graph-content.json` (GF-SCHEMA-5-bis, casserait les mappers stricts
-   bakery/codebase du corpus), consolidation de `VersionCatalogToml` vers un
-   contrat N0 partagé MEMPHIS (utile à 20+ gardes D5 cross-borough).
+1. *Publication `catalog-contracts 0.0.1`* (gate) — après le 2026-12-01 (Central)
+   ou décision pilote JitPack ; puis vérifier la CI graphify (résolution
+   `education.cccp:catalog-contracts`).
+2. *Nettoyage final* : suppression de la façade dépréciée
+   `graphify.catalog.VersionCatalogToml` + de son test (confirmation fichier par
+   fichier requise par `AGENT.adoc`).
+3. *EPIC PUB* — aucun besoin immédiat (`graphify-plugin 0.0.5` publié).
+4. Drift de pins (maintenance) : `settings.gradle.kts` épingle
+   `workspace-catalog:0.0.116` (catalogue workspace courant `0.0.129`).
 
 == Rappel
 
-- Borough N0, tooling 0.0.5 Central, pin `workspace-catalog:0.0.46`.
+- Borough N0, tooling 0.0.5 Central, pin `workspace-catalog:0.0.116`.
 - Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
 - Filtre `graphify.steps.**` obligatoire sur le task `test`.
 - Le source set `functionalTest` n'a PAS `main` sur son classpath de

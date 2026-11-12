@@ -31,6 +31,7 @@
 | 001 | 2026-05-10 | feat | Extraction apikey/ de plantuml-gradle → :api-key-pool N0 : 6 src + 6 tests, package com.cheroliv.graphify.apikey, 66/66 PASS | 10/10
 | 000 | 2026-05-09 | governance | Bootstrap gouvernance agent (.agents/ + AGENT.adoc + PROMPT_REPRISE + INDEX.adoc + SESSIONS_HISTORY) | 10/10
 | 030 | 2026-10-11 | maintenance build | Re-pin catalog ws `0.0.46 → 0.0.78` (rollout MEMPHIS 0.0.78). `compileKotlin compileTestKotlin` VERT. | 9/10
+| 031 | 2026-11-13 | dev/cross-borough | **GF-SCHEMA-5-bis TERMINÉ 3/3** (`schemaVersion` du graphe de corpus : test end-to-end `ScanWorkspaceTaskTest`, `graph-content.json` régénéré 1997/1871, tolérance consommateurs) + **N0 `catalog-contracts` livré** (`workspace-bom`, 10 tests, catalogue/BOM/`jitpack.yml`/CI `n0-contracts` 11 builds, `publishToMavenLocal` VERT ; graphify adopte `libs.catalog.contracts`, façade locale dépréciée). **Gate** : publication distante du contrat. Zéro bump, zéro publication, zéro secret. | 9/10
 |===
 
 == Session 030 — JitPack mirror (CNV-16) — 2026-11-09

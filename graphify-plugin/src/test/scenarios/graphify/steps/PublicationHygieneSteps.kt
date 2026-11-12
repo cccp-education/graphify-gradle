@@ -1,7 +1,7 @@
 package graphify.steps
 
+import contracts.catalog.VersionCatalogToml
 import graphify.catalog.PublicationHygiene
-import graphify.catalog.VersionCatalogToml
 import io.cucumber.java8.En
 import org.assertj.core.api.Assertions.assertThat
 
