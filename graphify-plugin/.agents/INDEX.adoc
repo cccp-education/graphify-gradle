@@ -15,7 +15,7 @@ _Session en cours_ : 030 — à la demande pilote (backlog ouvert : EPIC PUB opt
 == RÈGLES ABSOLUES (résumé)
 
 === 0. PUBLISH TO MAVEN LOCAL — OBLIGATOIRE APRÈS TOUTE MODIFICATION DU CODE SOURCE
-=== 1. COMMITS/GIT — INTERDICTION FORMELLE sans permission
+=== 1. COMMITS/GIT — AUTORISÉS (décision pilote 2026-11-11 : tous repos publics)
 === 1b. FICHIERS DE CONFIGURATION — RÈGLE ABSOLUE DE SÛRETÉ (backup avant modif)
 === 2. TESTS EN FIN DE SESSION — INTERDICTION FORMELLE
 === 3. PROCÉDURE DE FIN DE SESSION — 6 ÉTAPES OBLIGATOIRES
