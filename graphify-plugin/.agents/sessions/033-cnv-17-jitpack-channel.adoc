@@ -1,0 +1,53 @@
+= Session 033 — CNV-17 : JitPack canal unique (graphify)
+:toc:
+
+:_date_: 2026-11-13
+:_borough_: Grand Central (graphify-gradle, N0)
+:_session_precedente_: 032 (façade dépréciée supprimée + catalogue JitPack `v0.0.133`)
+:_statut_: ✅ catalogue `0.0.136` (JitPack) + garde alignée
+
+== Contexte
+
+Décision pilote « mise en sécurité de la chaîne de publication en optant pour la
+**totalité** vers JitPack » : JitPack = canal unique des artefacts publics ; un
+artefact = un canal = un nom = une version. `foundry/private/**` et `office/**`
+exclus. N0 amont : `workspace-bom 0.0.136` (+ `catalog-contracts`) et
+`conventions-plugin 0.0.17`. Cadrage :
+`conventions-gradle/conventions-plugin/.agents/CADRAGE_EPIC_CNV_17_JITPACK_PRIMARY.adoc`.
+
+== Changements
+
+* `settings.gradle.kts` (racine) : dépôt `https://jitpack.io` ajouté à
+  `dependencyResolutionManagement` ; shim `useModule` épinglé `0.0.17` (sans
+  préfixe `v`).
+* `graphify-plugin/settings.gradle.kts` : catalogue `ws` ←
+  `com.github.cccp-education.workspace-bom:workspace-catalog:0.0.136` (le préfixe
+  `v` de CNV-16 disparaît, D2) ; même pin shim et dépôt de résolution.
+* `GraphifyPluginPublicationTest` : le pin contrôlé devient
+  `workspace-catalog:0.0.136` (commentaire CNV-17 : canal unique, pas de `v`).
+* Aucun changement de dépendance : les contrats sont résolus par le catalogue.
+
+== Preuves CI
+
+|===
+| Run | Commit | Workflow | Verdict
+
+| `43478632713` | `63d0978` | `Test` | ✅ **success**
+|===
+
+Les runs `43463690347` (garde non alignée) et `43469683509` (pin shim `0.0.16`)
+sont rouges ; le run final prouve le canal unique.
+
+== Fichiers touchés
+
+* `settings.gradle.kts`
+* `graphify-plugin/settings.gradle.kts`
+* `src/test/kotlin/graphify/GraphifyPluginPublicationTest.kt`
+
+Version build `0.0.5` == version publiée ; aucune publication de code.
+
+== Suite
+
+Maintenance. Veille : aucun EPIC/US ouvert dans le borough. Ne plus épingler de
+préfixe `v` sur le catalogue JitPack et ne jamais réintroduire de coordonnée
+`education.cccp:*` dans les pins.

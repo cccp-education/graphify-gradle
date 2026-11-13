@@ -53,3 +53,11 @@ son test : zéro consommateur (les gardes importent le N0), couverture reprise p
 `catalog-contracts`. Catalogue `ws` ← JitPack `workspace-catalog:v0.0.133` ;
 `catalog-contracts 0.0.130 → 0.0.133`. Version build `0.0.5` == publiée.
 Rapport `.agents/sessions/032-drop-deprecated-facade-jitpack-catalog.adoc`.
+
+== Session 033 — CNV-17 : JitPack canal unique — 2026-11-13
+
+Catalogue `ws` ← JitPack `workspace-catalog:0.0.136` (préfixe `v` retiré, D2),
+shim conventions `0.0.17` (sans `v`) et dépôt `jitpack.io` en résolution ;
+`GraphifyPluginPublicationTest` aligné sur le pin `0.0.136`. Version build
+`0.0.5` == publiée. CI `Test` **verte** `43478632713` (commit `63d0978`).
+Rapport `.agents/sessions/033-cnv-17-jitpack-channel.adoc`.

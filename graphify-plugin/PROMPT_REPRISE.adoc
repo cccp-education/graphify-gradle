@@ -1,74 +1,40 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 032
-:session: 032
+= PROMPT_REPRISE — Graphify Gradle — Session 033 TERMINÉE → 034
+:session: 034
 :date: 2026-11-13
+
+== Session 033 terminée — CNV-17 : JitPack canal unique
+
+* Catalogue `ws` ← JitPack `workspace-catalog:0.0.136` (le préfixe `v` de
+  CNV-16 disparaît, décision D2).
+* Shim `education.cccp.build.*` → `conventions-plugin:0.0.17` (sans `v`) ;
+  dépôt `https://jitpack.io` ajouté à `dependencyResolutionManagement`
+  (racine + sous-build).
+* `GraphifyPluginPublicationTest` aligné sur le pin `0.0.136`.
+* Version build `0.0.5` == artefact publié. Aucune publication.
+* CI `Test` **verte** `43478632713` (commit `63d0978`).
+* Rapport `.agents/sessions/033-cnv-17-jitpack-channel.adoc`.
 
 == Session 032 terminée — façade supprimée + catalogue JitPack `v0.0.133`
 
-* Façade dépréciée `graphify.catalog.VersionCatalogToml` (source de test)
-  **supprimée** avec son test : aucun consommateur (les deux gardes importent le
-  N0 `contracts.catalog.VersionCatalogToml`), couverture reprise par le N0.
-* Pin catalogue ← JitPack `workspace-catalog:v0.0.133` ; `catalog-contracts
-  0.0.130 → 0.0.133`. Version build `0.0.5` == publiée.
-* Gates locaux : compiles + `ktlintCheck` VERTS. Aucune publication.
-* Rapport `.agents/sessions/032-drop-deprecated-facade-jitpack-catalog.adoc`.
+Façade `graphify.catalog.VersionCatalogToml` (source de test) supprimée : zéro
+consommateur (les gardes importent le N0 `contracts.catalog.VersionCatalogToml`).
+Couverture reprise par `catalog-contracts`. Rapport
+`.agents/sessions/032-drop-deprecated-facade-jitpack-catalog.adoc`.
 
-== Session 030 terminée — JitPack mirror (CNV-16)
+== Session 031 terminée — GF-SCHEMA-5-bis + N0 `catalog-contracts`
 
-Shim `useModule` des conventions via le tag JitPack `0.0.16` + publication
-JitPack `graphify-plugin 0.0.5` (POM HTTP 200). Veille, aucune mission ouverte.
-Rapport `.agents/sessions/030-jitpack-mirror.adoc`.
+`schemaVersion` estampillé dans `graph-content.json` régénéré (1997 nœuds /
+1871 arêtes) ; adoption du N0 `catalog-contracts` dans les gardes de test.
 
-== Session 031 terminée — GF-SCHEMA-5-bis + consolidation N0 `VersionCatalogToml`
+== Mission Session 034 — veille (aucun EPIC/US ouvert)
 
-* **GF-SCHEMA-5-bis** : `ScanWorkspaceTask` estampille bien `schemaVersion` ;
-  test end-to-end ajouté (`ScanWorkspaceTaskTest`) ; corpus régénéré
-  (`office/metiers/FPA/graph-content.json`, **1997 nœuds / 1871 arêtes**,
-  `schemaVersion: 1`) ; consommateurs bakery/codebase tolérants (`graphify 0.0.5`).
-  Le candidat « casserait les mappers stricts » est **caduque** (tolérance portée
-  par la classe N0 depuis GF-SCHEMA-5).
-* **N0 `catalog-contracts`** : module créé dans `workspace-bom`
-  (`contracts.catalog.VersionCatalogToml`, 10 tests unit) + entrée catalogue +
-  contrainte BOM + `jitpack.yml` + job CI `n0-contracts` (11 builds).
-  **Publié via JitPack** `workspace-bom v0.0.130` →
-  `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130` (HTTP 200),
-  consommé par graphify depuis `https://jitpack.io`. **CI graphify verte**
-  (run `43328720865`, 1m44s) ; workspace-bom `runAllTests` verte (`43328195597`).
-* Rapports `.agents/sessions/031-gf-schema-5-bis-n0-catalog-contracts.adoc` +
-  `workspace-bom/.agents/sessions/350-n0-catalog-contracts.adoc`.
+Aucune US/EPIC ouverte. Backlog transverse porté par MEMPHIS (`MEM-WARN-ZERO`,
+F2 `buildDir`, gate US-7). Ne pas reprendre de travail transverse sans accord
+pilote. Ne jamais réintroduire de coordonnée `education.cccp:*` dans les pins de
+consommation, ni de préfixe `v` sur le catalogue JitPack.
 
-== COLLISION DE SESSION — à connaître en ouverture
+== Rappels
 
-Une *seconde session opencode* détient le borough `bakery-gradle` (et
-`workspace-bom`). En S-029 :
-
-* Mission « adoption bakery » (committer le bump 0.0.5 + 2 tests de tolérance)
-  *hors scope* — le pilote a interdit de lancer bakery.
-* `bakery-gradle` working tree : `graphify = "0.0.5"` + 2 tests de tolérance
-  (`SubgraphExtractorTest`) — **non committés** (vérifié verts en 4/4 isolément
-  avant consigne d'arrêt).
-* Ne PAS travailler dans bakery sans coordination pilote.
-
-== Mission session 033 — veille (aucun EPIC ouvert ; suite `MEM-WARN-ZERO` côté MEMPHIS)
-
-Aucune US/EPIC ouverte. Backlog ouvert :
-
-1. *Bascule Central* (au reset 2026-12-01) : repasser le coordinate de
-   `com.github.cccp-education.workspace-bom:catalog-contracts:0.0.130` (JitPack)
-   vers `education.cccp:catalog-contracts:0.0.1` (déjà déclaré au BOM/catalogue).
-2. *Nettoyage final* : suppression de la façade dépréciée
-   `graphify.catalog.VersionCatalogToml` + de son test (confirmation fichier par
-   fichier requise par `AGENT.adoc`).
-3. *EPIC PUB* — aucun besoin immédiat (`graphify-plugin 0.0.5` publié).
-4. Drift de pins (maintenance) : `settings.gradle.kts` épingle
-   `workspace-catalog:0.0.116` (catalogue workspace courant `0.0.129`).
-
-== Rappel
-
-- Borough N0, tooling 0.0.5 Central, pin `workspace-catalog:0.0.116`.
-- Baby-step DDD/TDD/BDD strict, 3 niveaux (unit → functional → cucumber).
-- Filtre `graphify.steps.**` obligatoire sur le task `test`.
-- Le source set `functionalTest` n'a PAS `main` sur son classpath de
-  compilation — les tests de modèle/domaine vont dans `test/`.
-- Version propre dérivée du catalogue : tout bump passe par MEMPHIS.
-- La garde de publication exige la propriété
-  `graphify.publishedCatalog.graphifyVersion` (injectée par `build.gradle.kts`).
+* Local = Build, Tests = CI ; zéro Python ; English only code/tests/features.
+* Commit/push sur accord pilote ; indexer explicitement (jamais `git add -A`).
+* Ne pas lire les fichiers gitignorés.
