@@ -147,7 +147,7 @@ Graphify consomme le convention plugin centralise `education.cccp.build` v0.0.3 
 [cols="2,5"]
 |===
 | Plugin ID | Role
-| `education.cccp.build.publishing` | POM Maven Central + signing conditionnel + relocation + publicationType
+| `education.cccp.build.publishing` | POM (licence/dev/scm) + signing conditionnel + relocation + publicationType
 |===
 
 Ce plugin remplace ~62 lignes de build redondantes (POM, signing).
