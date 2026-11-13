@@ -65,9 +65,13 @@ class GraphifyPluginPublicationTest {
         val settings = pluginDir.resolve("settings.gradle.kts").readText(UTF_8)
 
         // MEM-CAT-ROLLOUT-6 (D4) — single pin per borough, published workspace catalog.
+        // CNV-16 — the pin is the catalogue *deployed on JitPack* (tag `v0.0.133`),
+        // so the build version equals the published artefact version.
         assertThat(settings)
-            .withFailMessage("settings.gradle.kts must pin the published workspace catalog (education.cccp:workspace-catalog:0.0.116)")
-            .contains("""from("education.cccp:workspace-catalog:0.0.116")""")
+            .withFailMessage(
+                "settings.gradle.kts must pin the JitPack workspace catalog " +
+                    "(com.github.cccp-education.workspace-bom:workspace-catalog:v0.0.133)",
+            ).contains("""from("com.github.cccp-education.workspace-bom:workspace-catalog:v0.0.133")""")
     }
 
     @Test
