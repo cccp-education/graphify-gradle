@@ -175,3 +175,9 @@ Total : ~1098 lignes Kotlin, compilable ✅, publishToMavenLocal ✅
 == Session 030 — JitPack mirror (CNV-16)
 
 Publication JitPack de graphify-plugin 0.0.5. JitPack : 0.0.5 — POM HTTP 200.
+
+== Session 035 — EAGER : publication JitPack canal unique (2026-11-14)
+
+Alignement EAGER (AGENT/PROMPT_REPRISE) : JitPack canal unique ;
+Central/Portal retirés. Zéro code. Rapport
+`.agents/sessions/035-eager-publication-jitpack-only.adoc`.
