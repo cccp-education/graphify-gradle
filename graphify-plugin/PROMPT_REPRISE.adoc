@@ -1,6 +1,14 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 033 TERMINÉE → 034
-:session: 034
-:date: 2026-11-13
+= PROMPT_REPRISE — Graphify Gradle — Session 034 TERMINÉE → 035
+:session: 035
+:date: 2026-11-14
+
+== Session 034 terminée — GBL-013 vague 2 : CI sur l'image de runtime
+
+* `ci/run.sh` (`fast`/`test`) + `test.yml` épinglé sur
+  `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; `setup-java` supprimé.
+* Run `43501398358` **VERT** (commit `b2e8548`). Rapport
+  `.agents/sessions/034-gbl-013-wave2.adoc`.
+* Aucun EPIC/US ouvert : veille, prochaine action sur demande pilote.
 
 == Session 033 terminée — CNV-17 : JitPack canal unique
 

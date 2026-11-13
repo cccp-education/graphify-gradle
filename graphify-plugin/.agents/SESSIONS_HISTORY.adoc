@@ -61,3 +61,11 @@ shim conventions `0.0.17` (sans `v`) et dépôt `jitpack.io` en résolution ;
 `GraphifyPluginPublicationTest` aligné sur le pin `0.0.136`. Version build
 `0.0.5` == publiée. CI `Test` **verte** `43478632713` (commit `63d0978`).
 Rapport `.agents/sessions/033-cnv-17-jitpack-channel.adoc`.
+
+== Session 034 — GBL-013 vague 2 : gate CI sur l'image de runtime — 2026-11-14
+
+`ci/run.sh` (`fast`/`test`) et `test.yml` épinglé sur
+`cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; `setup-java` supprimé.
+Run `43501398358` **VERT** (commit `b2e8548`). Rapport
+`.agents/sessions/034-gbl-013-wave2.adoc`.
+

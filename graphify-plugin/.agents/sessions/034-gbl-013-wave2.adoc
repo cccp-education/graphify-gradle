@@ -1,0 +1,21 @@
+= Session 034 — GBL-013 vague 2 : gate CI sur l'image de runtime
+:date: 2026-11-14
+:borough: Grand Central (graphify-gradle)
+
+== Livré
+
+* `ci/run.sh` — `fast` (compilation plugin) et `test` (build + publishToMavenLocal
+  du plugin, puis `collectAndVerify` à la racine).
+* `.github/workflows/test.yml` migré : `container:` épinglé sur
+  `cccpeducation/cccp-ci-base@sha256:4722c1bc…`, suppression de `setup-java`,
+  `ci/run.sh test`.
+* Run `43501398358` **VERT** (commit `b2e8548`).
+
+== Notes
+
+Aucune modification de code métier. Les deux wrappers (racine + plugin) sont
+vérifiés par l'action `verify-gradle-wrapper` en mode découverte.
+
+== Suivant
+
+US-5 se poursuit sur les dépôts restants de la vague 2.

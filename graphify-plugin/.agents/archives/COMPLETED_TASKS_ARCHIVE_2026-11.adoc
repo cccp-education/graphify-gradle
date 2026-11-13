@@ -5,3 +5,11 @@
 * Façade test-only supprimée (zéro consommateur, N0 seul implémenteur).
 * Catalogue `workspace-catalog:v0.0.133` + `catalog-contracts 0.0.133` ;
   version build `0.0.5` == publiée ; CI verte.
+
+== S-034 — GBL-013 vague 2 : CI sur l'image de runtime ✅
+
+* `ci/run.sh` (`fast`/`test`) + `test.yml` épinglé sur
+  `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; `setup-java` supprimé.
+* Run `43501398358` VERT (commit `b2e8548`).
+* Rapport `.agents/sessions/034-gbl-013-wave2.adoc`.
+

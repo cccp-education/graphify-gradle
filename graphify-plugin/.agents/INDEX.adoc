@@ -2,6 +2,7 @@
 :toc:
 
 _Règles absolues_ : voir `AGENT.adoc`
+_Derniere mise a jour_ : 2026-11-14 (Session 034 — **GBL-013 vague 2** ✅ — `ci/run.sh` (`fast`/`test`) + `test.yml` épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; run `43501398358` VERT) ; pin ws JitPack `0.0.136`.
 _Derniere mise a jour_ : 2026-11-13 (Session 033 — **CNV-17 — JitPack canal unique** ✅ — catalogue `ws` ← JitPack `workspace-catalog:0.0.136` (sans préfixe `v`, D2), shim conventions `0.0.17` (sans `v`) + dépôt `jitpack.io` en résolution ; `GraphifyPluginPublicationTest` aligné sur le pin `0.0.136` ; version build `0.0.5` == publiée ; CI `Test` verte `43478632713`) ; pin ws JitPack `0.0.136`.
 _Derniere mise a jour (antérieure)_ : 2026-11-13 (Session 032 — **façade `VersionCatalogToml` SUPPRIMÉE** (test-only, zéro consommateur — les gardes importent le N0) + catalogue `ws` lu depuis **JitPack `workspace-catalog:v0.0.133`** + `catalog-contracts 0.0.133` ; version build `0.0.5` == publiée ; compiles + `ktlintCheck` VERTS) ; pin ws JitPack `v0.0.133`.
 _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
@@ -9,8 +10,9 @@ _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
 _Derniere mise a jour (antérieure)_ : 2026-10-11 (session 030 — re-pin catalog ws `0.0.46 → 0.0.78`) · 2026-09-17 (session 029 — **EPIC D5-RACE TERMINÉ 3/3**)
+_Session terminee_ : 034 — GBL-013 vague 2 (CI sur l'image de runtime, run `43501398358`)
 _Session terminee_ : 033 — CNV-17 (catalogue JitPack `0.0.136`, shim `0.0.17`, garde alignée)
-_Session en cours_ : 034 — veille (aucun EPIC/US ouvert)
+_Session en cours_ : 035 — veille (aucun EPIC/US ouvert)
 
 '''
 == RÈGLES ABSOLUES (résumé)
