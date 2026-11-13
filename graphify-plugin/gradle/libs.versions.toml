@@ -1,7 +1,7 @@
 [versions]
 graphify = "0.0.5"
 plugin-publish = "2.2.1"
-catalog-contracts = "0.0.130"
+catalog-contracts = "0.0.133"
 kotlin = "2.4.10"
 jackson = "2.18.3"
 junit = "5.10.1"

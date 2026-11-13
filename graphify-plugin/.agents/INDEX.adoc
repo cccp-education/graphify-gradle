@@ -2,14 +2,14 @@
 :toc:
 
 _Règles absolues_ : voir `AGENT.adoc`
-_Derniere mise a jour_ : 2026-11-13 (Session 031 — **GF-SCHEMA-5-bis TERMINÉ** (`schemaVersion` dans `graph-content.json` régénéré, 1997 nœuds / 1871 arêtes) + **N0 `catalog-contracts` livré** (`workspace-bom`, `publishToMavenLocal` VERT) ; adoption graphify via `libs.catalog.contracts`, publication distante = gate) ; pin ws `0.0.116`.
+_Derniere mise a jour_ : 2026-11-13 (Session 032 — **façade `VersionCatalogToml` SUPPRIMÉE** (test-only, zéro consommateur — les gardes importent le N0) + catalogue `ws` lu depuis **JitPack `workspace-catalog:v0.0.133`** + `catalog-contracts 0.0.133` ; version build `0.0.5` == publiée ; compiles + `ktlintCheck` VERTS) ; pin ws JitPack `v0.0.133`.
 _Projet_ : graphify-gradle — N0 (Scanner, zéro dépendance inter-plugin)
 _Ontologie spatiale_ : voir `configuration/.agents/AGENT_GOVERNANCE.adoc`
 
 _Création gouvernance_ : 2026-05-11 (Session A2 — Unification multi-projet)
 _Derniere mise a jour (antérieure)_ : 2026-10-11 (session 030 — re-pin catalog ws `0.0.46 → 0.0.78`) · 2026-09-17 (session 029 — **EPIC D5-RACE TERMINÉ 3/3**)
-_Session terminee_ : 031 — GF-SCHEMA-5-bis + consolidation N0 `VersionCatalogToml`
-_Session en cours_ : 032 — à la demande pilote (publication `catalog-contracts`, nettoyage façade, drift pins)
+_Session terminee_ : 032 — façade `VersionCatalogToml` supprimée + catalogue JitPack `v0.0.133`
+_Session en cours_ : 033 — veille (aucun EPIC/US ouvert)
 
 '''
 == RÈGLES ABSOLUES (résumé)

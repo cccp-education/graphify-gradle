@@ -1,0 +1,60 @@
+= Session 032 — suppression de la façade dépréciée + catalogue JitPack `v0.0.133`
+:toc:
+
+:_date_: 2026-11-13
+:_borough_: Grand Central (graphify-gradle, N0)
+:_session_precedente_: 031 (GF-SCHEMA-5-bis + N0 `catalog-contracts`)
+:_statut_: ✅ façade supprimée, pin catalogue = artefact JitPack
+
+'''
+
+== Contexte
+
+Suite du P1 de la session hyperframes S-059 (canal JitPack uniquement, versions
+de build = artefacts déployés). Graphify portait encore une **façade
+dépréciée** de `VersionCatalogToml` en source de test, maintenue « le temps de
+la confirmation fichier par fichier » (garde AGENT.adoc) depuis l'extraction du
+contrat en N0 (S-031).
+
+'''
+
+== Confirmation fichier par fichier (garde AGENT.adoc)
+
+* `git ls-files` : `src/test/kotlin/graphify/catalog/VersionCatalogToml.kt` +
+  `VersionCatalogTomlTest.kt`.
+* **Consommateurs de la façade** : aucun — `GraphifyPluginPublicationTest` et
+  `PublicationHygieneSteps` importent déjà le contrat N0
+  `contracts.catalog.VersionCatalogToml` (vérifié par `grep`) ; la façade n'est
+  référencée que par **son propre test**.
+* **Couverture** : le N0 `catalog-contracts` possède son propre
+  `VersionCatalogTomlTest` (9 tests). La suppression ne perd aucune couverture.
+* Décision (accord pilote « enchaine ») : suppression des deux fichiers.
+
+'''
+
+== Livré
+
+* `git rm src/test/kotlin/graphify/catalog/VersionCatalogToml.kt`
+  + `VersionCatalogTomlTest.kt` — une seule implémentation (N0), zéro doublon.
+* `settings.gradle.kts` : catalogue `ws` ← **JitPack**
+  `com.github.cccp-education.workspace-bom:workspace-catalog:v0.0.133`
+  (au lieu de `education.cccp:workspace-catalog:0.0.116`, Central) → version
+  build `0.0.5` == artefact publié.
+* `gradle/libs.versions.toml` : `catalog-contracts 0.0.130 → 0.0.133`
+  (module JitPack publié avec le catalogue).
+
+'''
+
+== Gates
+
+* Local = Build : `compileKotlin`, `compileTestKotlin`, `ktlintCheck` —
+  **VERTS** ; `properties` → `version: 0.0.5`.
+* Tests : CI du commit poussé.
+* Zéro secret, zéro publication (aucun changement de code publié : la façade
+  vivait en source de test).
+
+'''
+
+== Reste
+
+* Rien d'ouvert dans le borough (EPICs antérieurs terminés).

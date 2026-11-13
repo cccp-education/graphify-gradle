@@ -1,6 +1,16 @@
-= PROMPT_REPRISE — Graphify Gradle — Session 031
-:session: 031
+= PROMPT_REPRISE — Graphify Gradle — Session 032
+:session: 032
 :date: 2026-11-13
+
+== Session 032 terminée — façade supprimée + catalogue JitPack `v0.0.133`
+
+* Façade dépréciée `graphify.catalog.VersionCatalogToml` (source de test)
+  **supprimée** avec son test : aucun consommateur (les deux gardes importent le
+  N0 `contracts.catalog.VersionCatalogToml`), couverture reprise par le N0.
+* Pin catalogue ← JitPack `workspace-catalog:v0.0.133` ; `catalog-contracts
+  0.0.130 → 0.0.133`. Version build `0.0.5` == publiée.
+* Gates locaux : compiles + `ktlintCheck` VERTS. Aucune publication.
+* Rapport `.agents/sessions/032-drop-deprecated-facade-jitpack-catalog.adoc`.
 
 == Session 030 terminée — JitPack mirror (CNV-16)
 
