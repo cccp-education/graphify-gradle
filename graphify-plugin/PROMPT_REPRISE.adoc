@@ -48,7 +48,7 @@ Une *seconde session opencode* détient le borough `bakery-gradle` (et
   avant consigne d'arrêt).
 * Ne PAS travailler dans bakery sans coordination pilote.
 
-== Mission session 032 — à la demande pilote
+== Mission session 033 — veille (aucun EPIC ouvert ; suite `MEM-WARN-ZERO` côté MEMPHIS)
 
 Aucune US/EPIC ouverte. Backlog ouvert :
 

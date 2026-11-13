@@ -185,3 +185,10 @@ La dette S-028 (garde racy) est soldée : la garde lit la version *publiée*
 injectée par Gradle, plus le working tree d'un repo voisin.
 Candidat futur non planifié : consolidation de `VersionCatalogToml` vers un
 contrat N0 partagé MEMPHIS (utile à 20+ gardes D5 cross-borough).
+
+== Session 032 — façade supprimée + catalogue JitPack
+
+- Test-only : suppression de `graphify.catalog.VersionCatalogToml` + son test
+  (couverture reprise par le N0 `catalog-contracts`, 9 UT) ; garde publication
+  alignée sur le pin JitPack.
+- Aucun test de production modifié.
