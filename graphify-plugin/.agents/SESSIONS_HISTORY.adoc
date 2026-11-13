@@ -39,3 +39,17 @@
 Publication JitPack de graphify-plugin 0.0.5. JitPack : 0.0.5 — POM HTTP 200. Shim `useModule` pour
 `education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
 `graphify-plugin/.agents/sessions/030-jitpack-mirror.adoc`.
+
+== Session 031 — GF-SCHEMA-5-bis + consolidation N0 `VersionCatalogToml` — 2026-11-13
+
+`schemaVersion` estampillé dans `graph-content.json` régénéré (1997 nœuds /
+1871 arêtes) ; adoption du N0 `catalog-contracts` dans les gardes de test.
+Rapport `.agents/sessions/031-gf-schema-5-bis-n0-catalog-contracts.adoc`.
+
+== Session 032 — façade dépréciée supprimée + catalogue JitPack `v0.0.133` — 2026-11-13
+
+Façade `graphify.catalog.VersionCatalogToml` (source de test) **supprimée** avec
+son test : zéro consommateur (les gardes importent le N0), couverture reprise par
+`catalog-contracts`. Catalogue `ws` ← JitPack `workspace-catalog:v0.0.133` ;
+`catalog-contracts 0.0.130 → 0.0.133`. Version build `0.0.5` == publiée.
+Rapport `.agents/sessions/032-drop-deprecated-facade-jitpack-catalog.adoc`.
