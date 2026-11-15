@@ -2,6 +2,7 @@
 :toc:
 
 _Règles absolues_ : voir `AGENT.adoc`
+_Derniere mise a jour_ : 2026-11-15 (Session 036 — **GBL-014-5** canal conditionnel (`-Pchannel`, défaut `jitpack`) racine + sous-build, hygiène DRM (`c3684c4`), **GBL-014-4** shim `conventions-plugin 0.0.19`, **GBL-013-10** actions `node24`-natives + image `cccp-ci-base@sha256:03ead378…` (Node 26.13.1) ; CI `Test` verte sur les 5 commits — `43660597309`, `43665861151`, `43672568653`, `43685744365`, `43690084882`. Rapport `.agents/sessions/036-gbl-014-5-channel-rollout.adoc`.)
 _Derniere mise a jour_ : 2026-11-14 (Session 034 — **GBL-013 vague 2** ✅ — `ci/run.sh` (`fast`/`test`) + `test.yml` épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; run `43501398358` VERT) ; pin ws JitPack `0.0.136`.
 _Derniere mise a jour_ : 2026-11-13 (Session 033 — **CNV-17 — JitPack canal unique** ✅ — catalogue `ws` ← JitPack `workspace-catalog:0.0.136` (sans préfixe `v`, D2), shim conventions `0.0.17` (sans `v`) + dépôt `jitpack.io` en résolution ; `GraphifyPluginPublicationTest` aligné sur le pin `0.0.136` ; version build `0.0.5` == publiée ; CI `Test` verte `43478632713`) ; pin ws JitPack `0.0.136`.
 _Derniere mise a jour (antérieure)_ : 2026-11-13 (Session 032 — **façade `VersionCatalogToml` SUPPRIMÉE** (test-only, zéro consommateur — les gardes importent le N0) + catalogue `ws` lu depuis **JitPack `workspace-catalog:v0.0.133`** + `catalog-contracts 0.0.133` ; version build `0.0.5` == publiée ; compiles + `ktlintCheck` VERTS) ; pin ws JitPack `v0.0.133`.
