@@ -48,7 +48,9 @@ dependencyResolutionManagement {
         // CNV-16 — JitPack mirror for the public artefacts (Central suspended
         // until 2026-12-01). The N0 `catalog-contracts` and the plugins are
         // served from JitPack under `com.github.cccp-education.*`.
-        maven("https://jitpack.io")
+        if (publicationChannel == "jitpack") {
+            maven("https://jitpack.io")
+        }
     }
 }
 
