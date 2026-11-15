@@ -6,13 +6,15 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 job="${1:-}"
+# GBL-014 — publication channel (jitpack default until the Sonatype reset).
+channel="${CHANNEL:-jitpack}"
 case "$job" in
   fast)
-    ( cd "$ROOT/graphify-plugin" && ./gradlew compileKotlin compileTestKotlin --no-daemon --console=plain )
+    ( cd "$ROOT/graphify-plugin" && ./gradlew compileKotlin compileTestKotlin verifyChannel -Pchannel="$channel" --no-daemon --console=plain )
     ;;
   test)
-    ( cd "$ROOT/graphify-plugin" && ./gradlew build publishToMavenLocal --no-daemon --console=plain )
-    ./gradlew collectAndVerify --no-daemon --console=plain
+    ( cd "$ROOT/graphify-plugin" && ./gradlew build publishToMavenLocal -Pchannel="$channel" --no-daemon --console=plain )
+    ./gradlew collectAndVerify -Pchannel="$channel" --no-daemon --console=plain
     ;;
   *)
     printf 'unsupported job for graphify-gradle: %s\n' "${job:-<none>}" >&2
